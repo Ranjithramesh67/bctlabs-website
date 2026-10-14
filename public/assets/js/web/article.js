@@ -1,0 +1,1 @@
+(()=>{"use strict";$(document).on("keyup","#searchArticle",(function(){var a=$(this).val();""!=a&&$.ajax({url:articleSearchUrl,type:"GET",data:{searchData:a},success:function(a){$("#articles").html(a)},error:function(a){manageAjaxErrors(a.responseJSON.message)}})}))})();

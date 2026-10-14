@@ -1,0 +1,150 @@
+import { deleteDashboardImage } from "@/app/admin/dashboard_image/actions";
+import { connection } from "next/server";
+import { AdminSection, PaginatorRow } from "@/components/admin/ui";
+import { prisma } from "@/lib/prisma";
+import { t } from "@/lib/i18n";
+import { getCurrentUser } from "@/lib/auth";
+
+export const instant = false;
+
+const PER_PAGE = 15;
+
+export default async function DashboardImageIndexPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; search?: string }>;
+}) {
+  // Session/DB-backed page: render at request time (Cache Components).
+  await connection();
+  await getCurrentUser();
+
+  const { page: pageParam, search } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+  const term = (search ?? "").trim();
+
+  const where = term ? { title: { contains: term } } : {};
+
+  const [images, total] = await Promise.all([
+    prisma.dashboard_slider.findMany({
+      where,
+      orderBy: { created_at: "desc" },
+      skip: (page - 1) * PER_PAGE,
+      take: PER_PAGE,
+    }),
+    prisma.dashboard_slider.count({ where }),
+  ]);
+
+  const lastPage = Math.max(1, Math.ceil(total / PER_PAGE));
+
+  return (
+    <AdminSection title="Dashboard image">
+      <div className="card">
+        <div className="card-body">
+          <div className="row">
+            <div className="mt-0 mb-3 col-12 d-flex justify-content-end">
+              <div className="p-2">
+                <form method="get">
+                  <input
+                    type="search"
+                    name="search"
+                    defaultValue={term}
+                    className="form-control"
+                    placeholder={t("common.search")}
+                    id="search"
+                  />
+                </form>
+              </div>
+              <div className="p-2">
+                <a
+                  href="/admin/dashboard_image/create"
+                  className="btn btn-primary form-btn"
+                >
+                  <i className="fas fa-plus"></i>&nbsp;&nbsp; Add
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-12">
+            <div className="table-responsive">
+              <table className="table table-striped table-bordered">
+                <thead>
+                  <tr>
+                    <th>S No</th>
+                    <th>Image</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {images.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="text-center">
+                        <p className="text-dark">
+                          {term === ""
+                            ? t("member.no_member_available")
+                            : t("member.no_member_found")}
+                        </p>
+                      </td>
+                    </tr>
+                  ) : (
+                    images.map((image, index) => (
+                      <tr key={image.id.toString()}>
+                        <td>{(page - 1) * PER_PAGE + index + 1}</td>
+                        <td>
+                          <img
+                            width="50"
+                            src={image.image ? `/${image.image}` : ""}
+                            alt={image.title}
+                            className="rounded-circle user-avatar-image"
+                          />
+                        </td>
+                        <td>{image.title}</td>
+                        <td>{image.description}</td>
+                        <td style={{ display: "flex", alignItems: "center" }}>
+                          <a
+                            href={`/admin/dashboard_image/${image.id}/edit`}
+                            className="dropdown-item dropdown-item-desc edit-btn"
+                            data-id={image.id.toString()}
+                          >
+                            <i className="fas fa-edit mr-2 card-edit-icon"></i>{" "}
+                            {t("common.edit")}
+                          </a>
+                          <form action={deleteDashboardImage}>
+                            <input
+                              type="hidden"
+                              name="id"
+                              value={image.id.toString()}
+                            />
+                            <button
+                              type="submit"
+                              className="dropdown-item dropdown-item-desc delete-btn border-0 bg-transparent"
+                              data-id={image.id.toString()}
+                            >
+                              <i className="fas fa-trash mr-2 card-delete-icon"></i>
+                              {t("common.delete")}
+                            </button>
+                          </form>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <PaginatorRow
+            currentPage={page}
+            lastPage={lastPage}
+            perPage={PER_PAGE}
+            total={total}
+            basePath="/admin/dashboard_image"
+            query={{ search: term }}
+          />
+        </div>
+      </div>
+    </AdminSection>
+  );
+}

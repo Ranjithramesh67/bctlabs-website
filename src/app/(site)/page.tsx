@@ -1,0 +1,1426 @@
+"use client";
+
+import { SiteImage } from "@/components/frontend/site-image";
+import { asset } from "@/lib/site";
+
+type SlideWindow = Window & {
+  plusSlides?: (step: number) => void;
+};
+
+export default function HomePage() {
+  return (
+    <>
+
+
+
+      <section className="banner-two-area">
+          <div className="slideshow-container">
+
+
+              <div className="mySlides fade">
+                  <div className="slide-inner">
+                      <SiteImage targetWidth={1200} priority src={asset('assets/frontend/images/home/slider/slider_new/slider1.jpg')} alt="" style={{ width: "100%" }} />
+
+                  </div>
+              </div>
+
+
+              <div className="mySlides fade">
+                  <div className="slide-inner">
+                      <SiteImage targetWidth={1200} src={asset('assets/frontend/images/home/slider/slider_new/slider2.jpg')} alt="" style={{ width: "100%" }} />
+
+                  </div>
+              </div>
+
+              <div className="mySlides fade">
+                  <div className="slide-inner">
+                      <SiteImage targetWidth={1200} src={asset('assets/frontend/images/home/slider/slider_new/slider3.jpg')} alt="" style={{ width: "100%" }} />
+
+                  </div>
+              </div>
+
+              <div className="mySlides fade">
+                  <div className="slide-inner">
+                      <SiteImage targetWidth={1200} src={asset('assets/frontend/images/home/slider/slider_new/slider4.jpg')} alt="" style={{ width: "100%" }} />
+
+                  </div>
+              </div>
+
+              <div className="mySlides fade">
+                  <div className="slide-inner">
+                      <SiteImage targetWidth={1200} src={asset('assets/frontend/images/home/slider/slider_new/slider5.jpg')} alt="" style={{ width: "100%" }} />
+
+                  </div>
+              </div>
+
+              <div className="mySlides fade">
+                  <div className="slide-inner">
+                      <SiteImage targetWidth={1200} src={asset('assets/frontend/images/home/slider/slider_new/slider6.jpg')} alt="" style={{ width: "100%" }} />
+
+                  </div>
+              </div>
+
+
+
+
+              <div className="banner-two__arry-btn">
+                  <button onClick={() => (window as SlideWindow).plusSlides?.(-1)} className="arry-prev mb-15 banner-two__arry-prev active">
+                      <i className="fa-light fa-chevron-left"></i>
+                  </button>
+                  <button onClick={() => (window as SlideWindow).plusSlides?.(1)} className="arry-next banner-two__arry-next">
+                      <i className="fa-light fa-chevron-right"></i>
+                  </button>
+              </div>
+
+          </div>
+      </section>
+
+
+
+
+
+
+
+      <section className="about-area pt-30 pb-30">
+          <div className="container">
+              <div className="row g-2">
+                  <div className="col-lg-12 text-center">
+                      <div className="section-header mb-20">
+                          <h2 className="wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms">
+                              About Us
+                          </h2>
+                      </div>
+                  </div>
+                  <div className="col-lg-6">
+                      <div className="section- mb-20">
+                          <h3 className="wow fadeInUp" data-wow-delay="200ms" data-wow-duration="1500ms" style={{ fontSize: "2rem" }}>
+                              Who We Are
+                          </h3>
+
+                          <p className="wow fadeInUp text-black text-justify pr-30 pr-sm-0 mt-3" data-wow-delay="400ms"
+                              data-wow-duration="1500ms">
+                              We aim to empower students through hands-on learning in Science, Technology, Engineering, and
+                              Mathematics (STEM). Our STEM Labs bridge the gap between theory and real-world application,
+                              encouraging creativity, innovation, and problem-solving. By engaging in practical activities and
+                              collaborative projects, students develop critical thinking skills and a deeper understanding of
+                              STEM concepts, preparing them for future success. Our curriculum is designed to nurture
+                              curiosity and inspire a lifelong interest in science and technology from an early age. With
+                              access to cutting-edge tools like robotics kits, 3D printers, and coding platforms, students
+                              gain valuable exposure to emerging technologies shaping tomorrow’s world. This experiential
+                              approach not only strengthens academic performance but also builds confidence and adaptability
+                              in an ever-evolving global landscape.
+                          </p>
+                          <div className="btn-two d-lg-inline-block mt-4">
+
+                              <a href="/who_we_are" className="btn-inner">
+                                  <span className="btn-text">
+                                      Know More
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+
+                  </div>
+
+                  <div className="col-lg-6 wow fadeInLeft" data-wow-delay="200ms" data-wow-duration="1500ms">
+                      <div className="">
+                          <div className="image">
+                              <SiteImage targetWidth={828} src={asset('assets/frontend/images/about.png')} width="100%" alt="image" />
+                          </div>
+
+
+                  </div>
+              </div>
+          </div>
+          </div>
+      </section>
+
+
+
+
+      <section className="about-area pt-30 pb-30">
+          <div className="container">
+              <div className="row g-2">
+                  <div className="col-lg-12 text-center">
+                      <div className="section-header mb-20">
+                          <h2 className="wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms">
+                              Our Mission & Vision
+                          </h2>
+                      </div>
+                  </div>
+
+                  <div className="col-lg-6">
+                      <div className=" mb-20 card mvision p-4">
+                          <h2 className="wow fadeInUp" data-wow-delay="200ms" data-wow-duration="1500ms">
+                              Our Mission
+                          </h2>
+
+                          <p className="wow fadeInUp mt-2 text-justify" data-wow-delay="400ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "400ms", animationName: "fadeInUp" }}>
+                              We bridge the gap between theory and technology-driven practice.
+                              Our programs turn classroom knowledge into real-world tech skills.
+                              We prepare students to innovate, build, and thrive in a tech-first future.</p>
+                      </div>
+
+                  </div>
+                  <div className="col-lg-6 mt-sm-10">
+                      <div className=" mb-20 card mvision p-4">
+                          <h2 className="wow fadeInUp" data-wow-delay="200ms" data-wow-duration="1500ms">
+                              Our Vision
+                          </h2>
+
+                          <p className="wow fadeInUp mt-2 text-justify" data-wow-delay="400ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "400ms", animationName: "fadeInUp" }}>
+                              Our vision is to equip young minds with essential 21st-century skills through immersive STEM
+                              learning.
+                              By combining hands-on technology, creativity, and critical thinking, we make education
+                              future-ready.
+                              We aim to nurture innovators, problem-solvers, and tech leaders of tomorrow.</p>
+                      </div>
+
+                  </div>
+
+
+              </div>
+          </div>
+      </section>
+
+
+
+      <section className="about-area pt-30 pb-30">
+          <div className="container">
+              <div className="row g-2">
+                  <div className="col-lg-12 text-center">
+                      <div className="section-header mb-20">
+                          <h2 className="wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms">
+                              Accreditation
+                          </h2>
+                      </div>
+                  </div>
+
+                  <div className="col-lg-6 wow fadeInLeft" data-wow-delay="200ms" data-wow-duration="1500ms">
+                      <div className="">
+                          <div className="image">
+                              <SiteImage targetWidth={828} src={asset('assets/frontend/images/home/cert1.png')} width="100%" alt="image" />
+                          </div>
+                      </div>
+                  </div>
+
+
+                  <div className="col-lg-6">
+                      <div className="section- mb-20">
+
+                          <p className="wow fadeInUp text-black text-justify pr-30 pr-sm-0 mt-4" data-wow-delay="400ms"
+                              data-wow-duration="1500ms">
+                              BCTLABS STEM Academy is accredited by STEM.org, the global leader in STEM education
+                              credentialing. This recognition confirms our commitment to high-quality, innovative, and
+                              hands-on learning. Partnering with us boosts your school’s credibility, strengthens its
+                              reputation, and ensures students receive future-ready skills through world-class STEM programs
+                              that meet international standards of excellence and educational impact. Our accreditation also
+                              provides measurable benchmarks, assuring parents and stakeholders of a reliable, results-driven
+                              education model. Schools that collaborate with us gain access to structured curricula, expert
+                              training, and advanced teaching tools that enhance both teacher effectiveness and student
+                              engagement. With this global recognition, BCTLABS empowers institutions to become pioneers in
+                              STEM education within their region.
+                          </p>
+                          <div className="btn-two  d-lg-inline-block mt-4">
+
+                              <a href="/who_we_are" className="btn-inner">
+                                  <span className="btn-text">
+                                      Know More
+                                  </span>
+                              </a>
+                          </div>
+                      </div>
+
+                  </div>
+              </div>
+          </div>
+      </section>
+
+
+
+
+      <section className="blog-area pt-30 pb-30 bg-prime-light">
+          <div className="container">
+              <div className="section-header mb-40 text-center">
+                  <h2 className="wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                      style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                      What We Do</h2>
+              </div>
+              <div className="row g-4">
+                  <div className="col-xl-4 col-md-6 wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                      style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                      <div className="blog__item bg-white rounded card px-3 pt-3 pb-5">
+                          <div className="image rounded">
+                              <SiteImage targetWidth={828} src={asset('assets/frontend/images/home/w1.png')} alt="image" />
+
+                          </div>
+                          <div className="blog__content  text-center pt-4 px-2">
+
+                              <h4 className="mt-10 pb-15" style={{ fontWeight: "bold" }}><a
+                                      href="/atal_tinkering_labs" className="primary-color">ATAL Tinkering
+                                      Labs</a></h4>
+                              <p>We help schools establish and run Atal Tinkering Labs with complete support—setup, tools,
+                                  training, and curriculum—creating a hands-on learning
+                                  environment that inspires students to explore and innovate</p>
+                              <div className="btn-two wwd d-lg-inline-block mt-3">
+
+                                  <a href="/atal_tinkering_labs" className="btn-inner">
+                                      <span className="btn-text">
+                                          Know More
+                                      </span>
+                                  </a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div className="col-xl-4 col-md-6 wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                      style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                      <div className="blog__item bg-white rounded card px-3 pt-3 pb-5">
+                          <div className="image rounded">
+                              <SiteImage targetWidth={828} src={asset('assets/frontend/images/home/w2.png')} alt="image" />
+
+                          </div>
+                          <div className="blog__content  text-center pt-4 px-2">
+
+                              <h4 className="mt-10 pb-15 "><a href="/stem_labs" className="primary-color">STEM
+                                      LAB</a></h4>
+                              <p>Our STEM Lab is a vibrant space where students explore, build, and think creatively. With
+                                  modern tools and expert guidance, it helps young innovators
+                                  turn ideas into real-world solutions and grow their passion for science a...</p>
+                              <div className="btn-two wwd d-lg-inline-block mt-3">
+
+                                  <a href="/stem_labs" className="btn-inner">
+                                      <span className="btn-text">
+                                          Know More
+                                      </span>
+                                  </a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div className="col-xl-4 col-md-6 wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                      style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                      <div className="blog__item bg-white rounded card px-3 pt-3 pb-5">
+                          <div className="image rounded">
+                              <SiteImage targetWidth={828} src={asset('assets/frontend/images/home/e3_1.png')} alt="image" />
+
+                          </div>
+                          <div className="blog__content  text-center pt-4 px-2">
+
+                              <h4 className="mt-10 pb-15 "><a href="/advanced_innovation_lab"
+                                      className="primary-color">Advanced Innovation Lab</a></h4>
+                              <p>Our Advanced Innovation Lab is designed to empower college students with a professional
+                                  environment for research, design, and product development.
+                                  Outfitted with industry-grade tools and cutting-edge...
+                              </p>
+                              <div className="btn-two wwd d-lg-inline-block mt-3">
+
+                                  <a href="/advanced_innovation_lab" className="btn-inner">
+                                      <span className="btn-text">
+                                          Know More
+                                      </span>
+                                  </a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div className="col-xl-4 col-md-6 wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                      style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                      <div className="blog__item bg-white rounded card px-3 pt-3 pb-5">
+                          <div className="image rounded">
+                              <SiteImage targetWidth={828} src={asset('assets/frontend/images/home/w4.png')} alt="image" />
+
+                          </div>
+                          <div className="blog__content  text-center pt-4 px-2">
+
+                              <h4 className="mt-10 pb-15 "><a href="/csr_stem_solutions"
+                                      className="primary-color">CSR STEM Solutions</a></h4>
+                              <p>We believe every student deserves the chance to explore and excel in STEM. Our CSR STEM
+                                  Solutions focus on delivering inclusive, high-quality
+                                  education by offering hands-on learning, modern tools, and expert guidance. By reaching
+                                  students from all walks of life, we help unlock potential, spark...
+
+                              </p>
+                              <div className="btn-two wwd  d-lg-inline-block mt-3">
+
+                                  <a href="/csr_stem_solutions" className="btn-inner">
+                                      <span className="btn-text">
+                                          Know More
+                                      </span>
+                                  </a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div className="col-xl-4 col-md-6 wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                      style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                      <div className="blog__item bg-white rounded card px-3 pt-3 pb-5">
+                          <div className="image rounded">
+                              <SiteImage targetWidth={828} src={asset('assets/frontend/images/home/w5.png')} alt="image" />
+
+                          </div>
+                          <div className="blog__content  text-center pt-4 px-2">
+
+                              <h4 className="mt-10 pb-15 "><a href="/stem_learning_programs"
+                                      className="primary-color">STEM Learning Programs</a></h4>
+                              <p>Our STEM Learning Programs are designed for curious minds eager to dive into the world of
+                                  technology. Offered in both online and offline formats,
+                                  these immersive, long-term courses provide practical, hands-on experience across diverse
+                                  tech fields. Learners gain real-world skills, foster innovation...
+
+                              </p>
+                              <div className="btn-two wwd  d-lg-inline-block mt-3">
+
+                                  <a href="/stem_learning_programs" className="btn-inner">
+                                      <span className="btn-text">
+                                          Know More
+                                      </span>
+                                  </a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div className="col-xl-4 col-md-6 wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                      style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                      <div className="blog__item bg-white rounded card px-3 pt-3 pb-5">
+                          <div className="image rounded">
+                              <SiteImage targetWidth={828} src={asset('assets/frontend/images/home/w6.png')} alt="image" />
+
+                          </div>
+                          <div className="blog__content  text-center pt-4 px-2">
+
+                              <h4 className="mt-10 pb-15 "><a href="/stem_workshops"
+                                      className="primary-color">STEM Workshops</a></h4>
+                              <p>Fuel curiosity and creativity through hands-on experiences in AI, robotics, IoT, drones,
+                                  aeromodelling, and app development. Designed for future tech
+                                  leaders, our workshops turn learning into innovationwhere students build, code, and create
+                                  real-world solutions beyond the textbook.</p>
+                              <div className="btn-two wwd d-lg-inline-block mt-3">
+
+                                  <a href="/stem_workshops" className="btn-inner">
+                                      <span className="btn-text">
+                                          Know More
+                                      </span>
+                                  </a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
+              </div>
+          </div>
+      </section>
+
+      <section className="bg-white pt-30 pb-30">
+          <div className="container">
+              <div className="section-header mb-60 text-center">
+                  <h2 className="wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms">
+                      Technologies We Focus</h2>
+              </div>
+              <div className="row">
+                  <div className="col-lg-12 tech">
+                      <div className="grid">
+                          <div className="card">
+
+                              <svg width="82" height="90" viewBox="0 0 82 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path
+                                      d="M35.6217 45.3688L6.88342 29.7505C5.6051 29.0562 4.09557 29.0848 2.84468 29.8284C1.5938 30.5719 0.847382 31.8845 0.847382 33.3397V69.5706C0.847382 71.0366 1.63899 72.3974 2.91343 73.122L31.6523 89.4599C32.2858 89.8201 32.9786 89.9999 33.6716 89.9999C34.3777 89.9999 35.0837 89.813 35.7257 89.4394C36.9971 88.6996 37.7562 87.3797 37.7562 85.9085V48.9581C37.7562 47.4599 36.9386 46.0845 35.6217 45.3688Z"
+                                      fill="#5E0075" />
+                                  <path
+                                      d="M75.9379 20.3257C75.936 18.796 75.0909 17.4085 73.7329 16.7046L42.3947 0.457709C41.2082 -0.157711 39.7939 -0.153139 38.6118 0.469138L7.73445 16.716C6.39002 17.4238 5.55376 18.8071 5.55182 20.3264C5.55006 21.8455 6.38299 23.2307 7.72548 23.9414L38.603 40.2898C39.2009 40.6061 39.8572 40.7643 40.514 40.7643C41.1626 40.7643 41.8115 40.61 42.4033 40.301L73.7422 23.953C75.0986 23.2455 75.94 21.8555 75.9379 20.3257Z"
+                                      fill="#5E0075" />
+                                  <path
+                                      d="M79.1553 29.8285C77.9051 29.0849 76.3949 29.0555 75.1171 29.7504L46.3779 45.3689C45.0614 46.0845 44.2438 47.4597 44.2438 48.958V85.9083C44.2438 87.3795 45.0029 88.6995 46.2743 89.4393C46.9163 89.8129 47.6221 89.9996 48.3284 89.9996C49.0212 89.9996 49.7143 89.8198 50.3477 89.4598L79.0867 73.1218C80.3612 72.3972 81.1526 71.0365 81.1526 69.5705V33.3397C81.1526 31.8845 80.4062 30.5719 79.1553 29.8285Z"
+                                      fill="#5E0075" />
+                              </svg>
+
+                              <h5 className="">3D Printing</h5>
+                          </div>
+
+                          <div className="card">
+
+                              <svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path
+                                      d="M53.4375 16.875C53.4375 20.5312 51.075 23.6531 47.8125 24.8062C46.9406 25.1437 45.9844 25.3125 45 25.3125C44.0156 25.3125 43.0594 25.1437 42.1875 24.8062C38.925 23.6531 36.5625 20.5312 36.5625 16.875C36.5625 12.2344 40.3594 8.4375 45 8.4375C49.6406 8.4375 53.4375 12.2344 53.4375 16.875ZM73.125 42.1875V73.125C73.125 77.7656 69.3281 81.5625 64.6875 81.5625H25.3125C20.6719 81.5625 16.875 77.7656 16.875 73.125V42.1875C16.875 37.5469 20.6719 33.75 25.3125 33.75H42.1875V30.6562C43.0875 30.8531 44.0438 30.9375 45 30.9375C45.9562 30.9375 46.9125 30.8531 47.8125 30.6562V33.75H64.6875C69.3281 33.75 73.125 37.5469 73.125 42.1875ZM33.75 54.8438C36.0844 54.8438 37.9688 52.9594 37.9688 50.625C37.9688 48.2906 36.0844 46.4062 33.75 46.4062C31.4156 46.4062 29.5312 48.2906 29.5312 50.625C29.5312 52.9594 31.4156 54.8438 33.75 54.8438ZM55.6875 63C54.7594 61.7625 52.9875 61.5094 51.75 62.4375C49.1344 64.4063 46.4062 64.6875 45 64.6875C41.7375 64.6875 39.375 63.2813 38.25 62.4375C37.0125 61.5094 35.2406 61.7625 34.3125 63C33.3844 64.2375 33.6375 66.0094 34.875 66.9375C36.5625 68.2031 40.1063 70.3125 45 70.3125C47.1094 70.3125 51.2156 69.8625 55.125 66.9375C56.3625 66.0094 56.6156 64.2375 55.6875 63ZM60.4688 50.625C60.4688 48.2906 58.5844 46.4062 56.25 46.4062C53.9156 46.4062 52.0312 48.2906 52.0312 50.625C52.0312 52.9594 53.9156 54.8438 56.25 54.8438C58.5844 54.8438 60.4688 52.9594 60.4688 50.625ZM11.25 45C8.14781 45 5.625 47.5228 5.625 50.625V64.6875C5.625 67.7897 8.14781 70.3125 11.25 70.3125V45ZM78.75 45V70.3125C81.8522 70.3125 84.375 67.7897 84.375 64.6875V50.625C84.375 47.5228 81.8522 45 78.75 45Z"
+                                      fill="#5E0075" />
+                              </svg>
+
+                              <h5 className="">Robotics</h5>
+                          </div>
+
+                          <div className="card">
+
+                              <svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path
+                                      d="M88.207 20.9726H72.9298V20.3291C72.9298 19.3388 72.1271 18.5359 71.1366 18.5359C70.1463 18.5359 69.3434 19.3386 69.3434 20.3291V20.9726H54.0581C53.0678 20.9726 52.2649 21.7753 52.2649 22.7658C52.2649 23.756 53.0676 24.559 54.0581 24.559H69.3414V28.1134C67.4433 28.7239 66.1556 30.4887 66.1536 32.4827V34.6543H62.8363V34.455C62.8331 32.2006 61.0063 30.374 58.7519 30.3706h21.2558C29.0014 30.3738 27.1748 32.2006 27.1714 34.455V34.6543H23.8541V32.4827C23.8521 30.4889 22.5643 28.7239 20.6663 28.1134V24.559h25.9496C36.9399 24.559 37.7428 23.7562 37.7428 22.7658C37.7428 21.7755 36.9401 20.9726 35.9496 20.9726H20.6623V20.3291C20.6623 19.3388 19.8596 18.5359 18.8691 18.5359C17.8786 18.5359 17.0759 19.3386 17.0759 20.3291V20.9726H1.7932C0.802914 20.9726 0 21.7753 0 22.7658C0 23.756 0.802712 24.559 1.7932 24.559H17.0765V28.1134C15.1785 28.7239 13.8907 30.4887 13.8887 32.4827V40.4181C13.8887 42.9489 15.9403 45.0005 18.4711 45.0005H19.2679C21.7987 45.0005 23.8503 42.9489 23.8503 40.4181V38.2465H27.1655V38.7407C27.1777 40.9912 29.0053 42.8091 31.2558 42.8091h24.2282V43.1537C34.2301 43.376 34.2501 43.598 34.2879 43.8172C31.0047 45.9788 23.7784 52.6632 23.7784 69.6618C23.7784 70.652 24.5811 71.455 25.5716 71.455C26.5621 71.455 27.3648 70.6522 27.3648 69.6618C27.3648 59.7 30.0684 53.8505 32.3456 50.7046C33.8917 48.561 35.4476 47.3475 36.38 46.7459C36.9763 47.0697 37.6441 47.2388 38.3225 47.238H43.2098V50.113h25.8501C34.8598 50.113 34.0569 50.9157 34.0569 51.9062V60.3099C34.0569 61.3002 34.8596 62.1031 35.8501 62.1031H54.1538C55.1441 62.1031 55.947 61.3004 55.947 60.3099V51.9161C55.947 50.9258 55.1443 50.1229 54.1538 50.1229H46.796V47.2479H51.6932C52.3717 47.2488 53.0395 47.0796 53.6358 46.7558C54.5662 47.3536 56.1242 48.5709 57.6702 50.7146C59.9395 53.8605 62.651 59.704 62.651 69.6717C62.651 70.662 63.4537 71.4649 64.4442 71.4649C65.4344 71.4649 66.2374 70.6622 66.2374 69.6717C66.2374 52.6731 59.0111 45.9887 55.7278 43.8271C55.7659 43.6079 55.7859 43.386 55.7875 43.1636V42.8089H58.7501C61.0045 42.8056 62.831 40.9788 62.8345 38.7245V38.2303H66.1497V40.4179C66.1497 42.9487 68.2013 45.0003 70.7321 45.0003H71.5289C74.0597 45.0003 76.1113 42.9487 76.1113 40.4179V32.4883C76.1093 30.4946 74.8215 28.7295 72.9235 28.1191V24.5588H88.2068C89.1971 24.5588 90 23.756 90 22.7656C90 21.7753 89.1973 20.9726 88.207 20.9726ZM47.4118 56.1174C47.4118 57.4477 46.3333 58.5262 45.003 58.5262C43.6728 58.5262 42.5943 57.4477 42.5943 56.1174C42.5943 54.7872 43.6728 53.7087 45.003 53.7087C46.3329 53.7097 47.4106 54.7876 47.4118 56.1174Z"
+                                      fill="#5E0075" />
+                              </svg>
+
+                              <h5 className="">Drones</h5>
+                          </div>
+
+                          <div className="card">
+
+                              <svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <g clipPath="url(#clip0_526_640)">
+                                      <path
+                                          d="M87.3633 42.3633H68.7305V35.332H78.5742C80.0297 35.332 81.2109 34.1508 81.2109 32.6953C81.2109 31.2398 80.0297 30.0586 78.5742 30.0586H68.7305V24.2912C68.7305 22.8357 67.5492 21.6545 66.0938 21.6545H61.0031V10.5469H70.3125C71.4006 13.616 74.3309 15.8203 77.7691 15.8203C82.1303 15.8203 85.6793 12.2713 85.6793 7.91016C85.6793 3.54902 82.1303 0 77.7691 0C74.3309 0 71.4006 2.2043 70.3125 5.27344H58.3664C56.9109 5.27344 55.7297 6.45469 55.7297 7.91016V21.6545H47.6367V2.63672C47.6367 1.18125 46.4555 0 45 0C43.5445 0 42.3633 1.18125 42.3633 2.63672V21.6545h24.2703V7.91016C34.2703 6.45469 33.0891 5.27344 31.6336 5.27344H19.6875C18.5994 2.2043 15.6691 0 12.2309 0C7.86973 0 4.3207 3.54902 4.3207 7.91016C4.3207 12.2713 7.86973 15.8203 12.2309 15.8203C15.6691 15.8203 18.5994 13.616 19.6875 10.5469H28.9969V21.6545H23.9062C22.4508 21.6545 21.2695 22.8357 21.2695 24.2912V30.0586H11.4258C9.97031 30.0586 8.78906 31.2398 8.78906 32.6953C8.78906 34.1508 9.97031 35.332 11.4258 35.332H21.2695V42.3633H2.63672C1.18125 42.3633 0 43.5445 0 45C0 46.4555 1.18125 47.6367 2.63672 47.6367H21.2695V54.668H11.4258C9.97031 54.668 8.78906 55.8492 8.78906 57.3047C8.78906 58.7602 9.97031 59.9414 11.4258 59.9414H21.2695V65.7088C21.2695 67.1643 22.4508 68.3455 23.9062 68.3455H28.9969V79.4531H19.6875C18.5994 76.384 15.6691 74.1797 12.2309 74.1797C7.86973 74.1797 4.3207 77.7287 4.3207 82.0898C4.3207 86.451 7.86973 90 12.2309 90C15.6691 90 18.5994 87.7957 19.6875 84.7266h21.6336C33.0891 84.7266 34.2703 83.5453 34.2703 82.0898V68.3455H42.3633V87.3633C42.3633 88.8187 43.5445 90 45 90C46.4555 90 47.6367 88.8187 47.6367 87.3633V68.3455H55.7297V82.0898C55.7297 83.5453 56.9109 84.7266 58.3664 84.7266H70.3125C71.4006 87.7957 74.3309 90 77.7691 90C82.1303 90 85.6793 86.451 85.6793 82.0898C85.6793 77.7287 82.1303 74.1797 77.7691 74.1797C74.3309 74.1797 71.4006 76.384 70.3125 79.4531H61.0031V68.3455H66.0938C67.5492 68.3455 68.7305 67.1643 68.7305 65.7088V59.9414H78.5742C80.0297 59.9414 81.2109 58.7602 81.2109 57.3047C81.2109 55.8492 80.0297 54.668 78.5742 54.668H68.7305V47.6367H87.3633C88.8187 47.6367 90 46.4555 90 45C90 43.5445 88.8187 42.3633 87.3633 42.3633ZM37.0898 49.0764V54.283C37.0898 55.7385 35.9086 56.9197 34.4531 56.9197C32.9977 56.9197 31.8164 55.7385 31.8164 54.283V40.9904C31.8164 36.6293 35.3654 33.0803 39.7266 33.0803C44.0877 33.0803 47.6367 36.6293 47.6367 40.9904V54.283C47.6367 55.7385 46.4555 56.9197 45 56.9197C43.5445 56.9197 42.3633 55.7385 42.3633 54.283V49.0764h27.0898ZM58.1836 54.283C58.1836 55.7385 57.0023 56.9197 55.5469 56.9197C54.0914 56.9197 52.9102 55.7385 52.9102 54.283V35.717C52.9102 34.2615 54.0914 33.0803 55.5469 33.0803C57.0023 33.0803 58.1836 34.2615 58.1836 35.717V54.283Z"
+                                          fill="#5E0075" />
+                                      <path
+                                          d="M42.3633 40.9905V43.803h27.0898V40.9905C37.0898 39.5368 38.2729 38.3538 39.7266 38.3538C41.1803 38.3538 42.3633 39.5368 42.3633 40.9905Z"
+                                          fill="#5E0075" />
+                                  </g>
+                                  <defs>
+                                      <clipPath id="clip0_526_640">
+                                          <rect width="90" height="90" fill="white" />
+                                      </clipPath>
+                                  </defs>
+                              </svg>
+
+                              <h5 className="">Artificial Intelligence</h5>
+                          </div>
+
+                          <div className="card">
+
+                              <svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path fillRule="evenodd" clipRule="evenodd"
+                                      d="M57.5086 53.4393L57.384 53.5639C57.384 53.5639 57.5501 53.4809 57.5086 53.4393ZM58.2975 54.2283C58.2975 58.0068 53.3148 58.7334 52.609 55.9307L52.5674 55.4324C52.2353 54.3736 49.993 53.4601 48.4775 52.6504C48.7474 51.4463 49.0795 51.1348 49.6609 50.2836C47.5847 50.7611 45.7993 52.2144 43.91 53.1694C39.9446 55.1833 29.647 59.9791 25.7024 60.8926C26.4498 62.0137 28.5674 65.2317 28.8373 66.3943C28.4013 67.0379 28.5467 66.8926 27.9446 67.4739C27.8616 67.557 27.6124 67.7646 27.5294 67.8476C27.4671 67.8892 27.3633 67.9722 27.3218 68.0345L26.8858 68.3874C24.6436 66.8926 22.609 65.1487 20.5121 63.3632C18.6228 61.7438 18.9757 62.1175 16.5259 62.4082C12.8927 62.8442 14.7404 61.2663 15.4878 60.1452L1.72314 54.249C4.65048 49.8684 11.0034 54.8926 17.0449 55.0379C17.0449 48.9341 16.2975 49.0587 20.5744 46.775C23.0657 48.0829 23.6263 49.7231 25.6816 51.0933C27.2802 50.0137 28.6712 48.9549 30.3114 47.8753C31.2041 47.294 31.7854 46.9203 32.6366 46.2767C33.5294 45.5916 33.9654 45.1141 35.1072 44.8234C34.7128 43.3286 33.1557 42.0829 32.346 40.8995L34.4013 39.031C33.0934 38.1175 31.91 36.9549 30.7681 36.1867L28.8789 37.8269C28.0069 37.5985 10.2145 28.9618 9.11415 27.9445C7.39096 26.3459 8.98958 27.9653 8.80273 26.6573C8.80273 26.6573 9.42557 26.4705 7.61934 25.557L2.07609 22.8165C4.98266 18.4982 7.14183 19.7023 10.6712 20.9065L40.9827 30.2905C41.7093 29.813 48.7889 22.6919 50.9065 29.0656C51.5294 30.9134 50.4913 31.3701 49.6193 32.6573C52.9619 32.6573 51.4048 34.4636 58.1522 29.3978C65.0034 24.249 74.9273 17.5224 84.1868 17.294C86.865 17.2317 88.5051 16.6504 88.1314 19.5985C87.9446 21.0726 86.6782 22.6504 85.8685 23.73C81.7993 29.1487 78.1868 31.6816 72.4775 35.4809C70.8581 36.5604 66.0207 40.1106 64.5467 40.5051L67.8269 47.1072C69.9654 46.5674 74.3667 41.7092 76.3598 45.5916C78.2076 49.1833 74.1591 50.7196 70.4221 52.6919L76.3183 64.4843C75.6747 65.3563 73.5986 66.9134 72.3944 67.2456L69.3218 64.422C68.9273 65.6885 69.2387 65.3563 68.0553 65.6885C66.7266 63.6954 65.0865 62.9272 63.4256 61.2663C62.5744 60.4151 62.2006 59.9376 61.2041 59.1694C60.1038 58.3182 59.564 57.6746 58.609 57.031C58.8788 56.0137 59.2941 55.5985 59.7923 54.6642L58.2145 54.2698L58.2975 54.2283Z"
+                                      fill="#5E0075" />
+                              </svg>
+
+                              <h5 className="">Aero Modelling</h5>
+                          </div>
+
+                          <div className="card">
+
+                              <svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path
+                                      d="M20.7726 68.6049C21.8022 69.7516 23.2788 70.4089 24.8233 70.4089C26.1708 70.4089 27.4653 69.9113 28.467 69.0093C30.6992 67.0006 30.8802 63.5471 28.8714 61.3122L14.1888 44.9999L28.8714 28.6852C30.8802 26.4529 30.6992 22.9994 28.467 20.9907C27.3855 20.017 25.9806 19.5113 24.5359 19.5992C23.0806 19.6763 21.7449 20.3123 20.7726 21.3924L2.80804 41.3551C0.938988 43.4328 0.938988 46.567 2.80804 48.6478L20.7726 68.6049Z"
+                                      fill="#5E0075" />
+                                  <path
+                                      d="M69.2275 21.3922C67.2189 19.1627 63.7693 18.9792 61.5331 20.9906C59.3008 22.9993 59.1199 26.4528 61.1287 28.6877L75.8112 44.9998L61.1287 61.3147C59.1199 63.547 59.3008 67.0005 61.5331 69.012C62.5347 69.9112 63.8292 70.4088 65.1768 70.4088C66.7212 70.4088 68.1978 69.7515 69.2275 68.6076L87.192 48.6449C89.0611 46.5669 89.0611 43.4327 87.192 41.3549L69.2275 21.3922Z"
+                                      fill="#5E0075" />
+                                  <path
+                                      d="M54.5462 6.12045L54.5409 6.11786C51.6209 5.4101 48.6689 7.20602 47.956 10.114L31.4627 77.289C30.7457 80.2052 32.5363 83.161 35.4563 83.8794C35.8808 83.9831 36.3184 84.0363 36.7561 84.0363C39.2704 84.0363 41.4454 82.3309 42.044 79.8859L58.5372 12.7109C59.2542 9.79467 57.4636 6.83885 54.5462 6.12045Z"
+                                      fill="#5E0075" />
+                              </svg>
+
+                              <h5 className="">Coding</h5>
+                          </div>
+
+                          <div className="card">
+
+                              <svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path
+                                      d="M13.3594 52.9108H76.6406C78.097 52.9108 79.2773 51.7304 79.2773 50.2741V39.7272C79.2773 38.2708 78.097 37.1255 76.6406 37.1255H13.3594C11.903 37.1255 10.7227 38.2708 10.7227 39.7272V50.2741C10.7227 51.7304 11.903 52.9108 13.3594 52.9108Z"
+                                      fill="#5E0075" />
+                                  <path
+                                      d="M12.4955 52.9116H2.6875C1.69598 52.9116 0.785489 53.4575 0.317884 54.3309C-0.149721 55.2043 -0.0982228 56.2652 0.451093 57.0892L2.9395 60.8218L0.451093 64.5544C-0.0982228 65.379 -0.149721 66.4392 0.317884 67.3126C0.785489 68.186 1.69598 68.7319 2.6875 68.7319H18.9164C16.487 64.4569 14.4964 59.9065 13.1169 55.0849L12.4955 52.9116Z"
+                                      fill="#5E0075" />
+                                  <path
+                                      d="M87.0604 60.8218L89.5488 57.0892C90.0981 56.2652 90.1496 55.2043 89.682 54.3309C89.2144 53.4575 88.3039 52.9116 87.3131 52.9116H77.5037L76.8823 55.0849C75.5035 59.9065 73.5129 64.4569 71.0842 68.7319H87.3131C88.3039 68.7319 89.2144 68.186 89.682 67.3126C90.1496 66.4392 90.0981 65.379 89.5488 64.5544L87.0604 60.8218Z"
+                                      fill="#5E0075" />
+                                  <path
+                                      d="M26.543 23.1379C26.543 22.0585 27.1994 21.0903 28.2012 20.6886L44.0215 14.3626C44.6498 14.1099 45.3502 14.1099 45.9784 14.3626L61.7988 20.6886C62.8006 21.0903 63.457 22.0585 63.457 23.1379V31.8178H74.0039V15.9975C74.0039 14.9187 73.3474 13.9506 72.3456 13.5489L45.9784 3.00201C45.3502 2.74933 44.6498 2.74933 44.0215 3.00201L17.6543 13.5489C16.6525 13.9506 15.9961 14.9187 15.9961 15.9975V31.8178H26.543V23.1379Z"
+                                      fill="#5E0075" />
+                                  <path
+                                      d="M46.6891 73.6813C46.1996 74.0878 45.6001 74.291 45 74.291C44.3999 74.291 43.8004 74.0878 43.3108 73.6813C38.2324 69.4467 34.175 64.1307 31.2856 58.1851H19.7232C24.2461 70.1258 32.5944 80.1817 43.6432 86.8134C44.06 87.0626 44.5317 87.1889 45 87.1889C45.469 87.1889 45.94 87.0626 46.3575 86.8134C57.4063 80.1817 65.7538 70.1258 70.2775 58.1851H58.7143C55.8249 64.1307 51.7676 69.4467 46.6891 73.6813Z"
+                                      fill="#5E0075" />
+                                  <path d="M31.8164 24.9218V31.8178H58.1835V24.9218L45 19.6511L31.8164 24.9218Z"
+                                      fill="#5E0075" />
+                                  <path
+                                      d="M45 68.1421C48.1002 65.2568 50.6792 61.8703 52.7639 58.1851h27.2361C39.3207 61.8703 41.8998 65.2568 45 68.1421Z"
+                                      fill="#5E0075" />
+                              </svg>
+
+                              <h5 className="">Clubs</h5>
+                          </div>
+
+                          <div className="card">
+
+                              <svg width="90" height="80" viewBox="0 0 90 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path
+                                      d="M52.1801 20.7989L55.2832 16.5351C50.3044 12.9114 44.4083 10.9961 38.2324 10.9961C32.0565 10.9961 26.1605 12.9114 21.1816 16.5351L24.2847 20.7989C28.356 17.8357 33.1791 16.2695 38.2324 16.2695C43.2858 16.2695 48.1089 17.8357 52.1801 20.7989Z"
+                                      fill="#5E0075" />
+                                  <path
+                                      d="M14.9817 8.00184L18.0848 12.2656C23.9664 7.98514 30.9333 5.72266 38.2324 5.72266C45.5316 5.72266 52.4985 7.98514 58.38 12.2656L61.483 8.00184C54.694 3.0608 46.6541 0.449219 38.2324 0.449219C29.8108 0.449219 21.7709 3.0608 14.9817 8.00184Z"
+                                      fill="#5E0075" />
+                                  <path
+                                      d="M24.2847 59.2012L21.1816 63.4649C26.1605 67.0887 32.0567 69.004 38.2324 69.004C44.4081 69.004 50.3044 67.0887 55.2832 63.4649L52.1801 59.2012C48.1089 62.1643 43.2858 63.7305 38.2324 63.7305C33.1791 63.7305 28.356 62.1643 24.2847 59.2012Z"
+                                      fill="#5E0075" />
+                                  <path
+                                      d="M38.2324 74.2773C30.9333 74.2773 23.9663 72.0148 18.0849 67.7344L14.9818 71.9981C21.7708 76.9392 29.8107 79.5507 38.2324 79.5507C46.6541 79.5507 54.694 76.9392 61.4832 71.9981L58.3801 67.7344C52.4984 72.0148 45.5315 74.2773 38.2324 74.2773Z"
+                                      fill="#5E0075" />
+                                  <path d="M62.7664 18.8184V30.9221H70.3313V61.1816H82.4351V30.9221H90V18.8184H62.7664Z"
+                                      fill="#5E0075" />
+                                  <path d="M0 18.8184H12.1038V61.1816H0V18.8184Z" fill="#5E0075" />
+                                  <path
+                                      d="M38.2324 58.1557C48.2595 58.1557 56.3881 50.0272 56.3881 40C56.3881 29.9727 48.2595 21.8442 38.2324 21.8442C28.2053 21.8442 20.0767 29.9727 20.0767 40C20.0767 50.0272 28.2053 58.1557 38.2324 58.1557ZM38.2324 33.948C41.5747 33.948 44.2844 36.6575 44.2844 40C44.2844 43.3425 41.5749 46.052 38.2324 46.052C34.8901 46.052 32.1804 43.3425 32.1804 40C32.1804 36.6575 34.8901 33.948 38.2324 33.948Z"
+                                      fill="#5E0075" />
+                              </svg>
+
+                              <h5 className="">Internet of Things</h5>
+                          </div>
+
+                          <div className="card">
+
+                              <svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <g clipPath="url(#clip0_526_673)">
+                                      <path
+                                          d="M60.7034 27.5337L52.6291 27.0403C52.3848 28.6474 52.1968 30.1822 52.0328 31.701C52.2337 31.7283 52.4314 31.7508 52.6339 31.7797C55.2927 32.2303 57.9959 32.3609 60.6857 32.1687C60.7355 30.5856 60.75 29.0347 60.7034 27.5337Z"
+                                          fill="#5E0075" />
+                                      <path
+                                          d="M52.2064 34.9602L51.7404 34.8992C51.5313 37.5981 51.4638 40.3061 51.5379 43.012C53.8261 42.2047 56.2343 41.7901 58.6607 41.7858C59.0593 41.7858 59.4482 41.8243 59.842 41.8452C60.1457 39.6129 60.3852 37.4529 60.5314 35.3845C59.8291 35.4392 59.1284 35.4922 58.463 35.4922C56.3678 35.4583 54.2773 35.2805 52.2064 34.9602Z"
+                                          fill="#5E0075" />
+                                      <path
+                                          d="M25.0907 0.0434894C24.8737 0.0959266 24.718 0.286398 24.7098 0.509561L24.4479 7.75135C25.2535 7.9797 26.1009 8.01984 26.9245 7.86867C27.7303 7.63799 28.4725 7.22564 29.0941 6.66331L25.6436 0.290989C25.5356 0.0939255 25.3097 -0.00721573 25.0907 0.0434894Z"
+                                          fill="#5E0075" />
+                                      <path
+                                          d="M32.7857 32.9096C33.6487 32.7089 34.5114 33.2445 34.7143 34.107L39.3059 53.6932C39.9782 52.3662 40.7861 51.1124 41.7166 49.9518L34.5536 19.2859C33.7995 20.2065 32.8401 20.9375 31.7523 21.4202L32.8902 26.2754C33.0327 26.8386 32.8601 27.4348 32.4388 27.8349C32.0175 28.235 31.4131 28.3765 30.858 28.2051C30.3029 28.0337 29.8835 27.5761 29.7611 27.0082L28.6248 22.1562C28.522 22.1562 28.4143 22.1755 28.313 22.1755C27.2273 22.1742 26.1544 21.9408 25.1663 21.4909L32.22 51.5895C33.4139 51.7635 34.5875 52.0559 35.7236 52.4621L31.5916 34.8398C31.3897 33.9773 31.9238 33.114 32.7857 32.9096Z"
+                                          fill="#5E0075" />
+                                      <path
+                                          d="M64.6553 13.8906C63.9468 9.54739 61.9223 5.5263 58.8552 2.37061C58.3409 5.76971 56.123 9.39061 51.8625 14.1027C50.5587 15.3834 49.8343 17.1409 49.8571 18.9684C49.8798 20.7958 50.6477 22.5347 51.983 23.7826C55.0848 23.9754 58.2246 24.1683 61.4025 24.3611C63.825 21.4365 64.9942 17.6732 64.6553 13.8906ZM58.958 22.0179C58.3493 22.0179 57.7928 21.674 57.5205 21.1295C57.2483 20.585 57.3071 19.9335 57.6723 19.4465C59.0806 17.5165 59.6566 15.1026 59.2714 12.7447C59.1082 12.185 59.261 11.5807 59.6706 11.1658C60.0802 10.7508 60.6824 10.5903 61.2443 10.7463C61.8061 10.9023 62.2393 11.3503 62.3764 11.917C63.0207 15.2315 62.2453 18.6642 60.2389 21.3799C59.9354 21.7814 59.4613 22.0176 58.958 22.0179Z"
+                                          fill="#5E0075" />
+                                      <path
+                                          d="M85.0837 21.6965L78.3466 25.9008C78.05 28.9011 77.3276 31.8439 76.201 34.6405C76.8387 36.3721 78.1711 37.7584 79.8762 38.4641C81.5812 39.1699 83.5036 39.1307 85.1785 38.3562C86.3596 35.5838 87.9289 32.9934 89.8393 30.6628L88.0473 22.9276L85.6687 28.6876C85.3288 29.5077 84.3883 29.897 83.5682 29.5571C82.748 29.2171 82.3588 28.2767 82.6987 27.4565L85.0837 21.6965Z"
+                                          fill="#5E0075" />
+                                      <path
+                                          d="M78.4285 54.5835L83.5569 42.2085C83.2337 42.2469 82.9085 42.2668 82.583 42.268C81.2301 42.2552 79.8932 41.9733 78.6503 41.4387C77.0867 40.8261 75.7069 39.8216 74.6437 38.5217L71.5275 46.0544C74.5169 48.263 76.8924 51.1989 78.4285 54.5835Z"
+                                          fill="#5E0075" />
+                                      <path
+                                          d="M80.3571 70.7144C79.6356 70.7152 78.9163 70.7939 78.2116 70.949C77.6529 71.0717 77.0711 70.8883 76.6839 70.4673C76.2966 70.0463 76.1623 69.4512 76.3312 68.9047C76.8724 67.1482 77.146 65.3202 77.1429 63.4822C77.1429 54.55 70.755 46.896 61.9669 45.2982C53.1788 43.7004 44.5056 48.616 41.3614 56.9765C41.1837 57.4489 40.7943 57.8104 40.3099 57.9526C39.8256 58.0947 39.3026 58.0011 38.8977 57.6997C34.3159 54.2587 28.1931 53.6729 23.042 56.1826C17.8908 58.6923 14.5785 63.8749 14.4643 69.6038C14.4551 70.1071 14.2106 70.5771 13.8037 70.8735C13.3968 71.1699 12.8746 71.2585 12.3927 71.1129C11.5007 70.8456 10.5741 70.7113 9.64286 70.7144C4.31725 70.7144 0 75.0316 0 80.3572C0 85.6828 4.31725 90.0001 9.64286 90.0001H80.3571C85.6827 90.0001 90 85.6828 90 80.3572C90 75.0316 85.6827 70.7144 80.3571 70.7144ZM26.2318 62.5935C24.1063 63.3186 22.6312 65.2581 22.5 67.5001C22.5 68.3877 21.7805 69.1072 20.8929 69.1072C20.0053 69.1072 19.2857 68.3877 19.2857 67.5001C19.2857 61.589 24.9637 59.6251 25.2064 59.5463C26.0496 59.2632 26.9627 59.7172 27.2459 60.5604C27.529 61.4036 27.075 62.3167 26.2318 62.5999V62.5935ZM46.6554 55.8595C47.7345 51.4204 51.682 48.275 56.25 48.2144C57.1376 48.2121 57.8589 48.9299 57.8612 49.8175C57.8634 50.7051 57.1456 51.4264 56.258 51.4286C53.1687 51.5055 50.5128 53.6401 49.7732 56.6406C49.5941 57.3557 48.9514 57.8572 48.2143 57.8572C48.0821 57.8577 47.9503 57.8415 47.8221 57.809C46.9618 57.5926 46.4396 56.72 46.6554 55.8595ZM63.3455 77.5286C62.9567 77.7051 62.5136 77.7195 62.114 77.5688C61.7145 77.418 61.3914 77.1144 61.2161 76.7251C60.4276 75.0214 58.7219 73.9303 56.8446 73.9286C55.7597 73.9262 54.7068 74.2961 53.8618 74.9765C53.8072 75.0086 53.7509 75.0376 53.693 75.0633C53.6456 75.1034 53.5957 75.1405 53.5436 75.1742C53.5018 75.1866 53.4594 75.1968 53.4166 75.2047C53.1252 75.3213 52.804 75.341 52.5005 75.261C52.4015 75.2402 52.3046 75.2101 52.2112 75.171C52.1205 75.1259 52.0344 75.0721 51.9541 75.0102C51.8639 74.9496 51.7804 74.8796 51.705 74.8013C51.6729 74.7676 51.6311 74.7515 51.6021 74.7161C51.5708 74.6642 51.5423 74.6105 51.517 74.5554C51.4768 74.5071 51.4392 74.4567 51.4045 74.4044C50.3573 72.143 48.0867 70.7008 45.5946 70.7144C42.0442 70.7144 39.1661 73.5925 39.1661 77.1429C39.1657 78.0314 39.3461 78.9107 39.6964 79.7272C39.8635 80.1194 39.868 80.5618 39.7089 80.9572C39.5497 81.3527 39.24 81.6687 38.8479 81.8358C38.6488 81.9211 38.4344 81.9649 38.2179 81.9644C37.5737 81.9644 36.9918 81.5798 36.7393 80.9872C36.2192 79.7723 35.9513 78.4645 35.9518 77.1429C35.9414 72.9577 38.6377 69.2458 42.621 67.9614C46.6043 66.6771 50.961 68.1149 53.3973 71.5179C54.4709 70.9928 55.6495 70.718 56.8446 70.7144C59.9829 70.7172 62.8324 72.5468 64.1411 75.3992C64.318 75.787 64.3336 76.2293 64.1844 76.6287C64.0352 77.0281 63.7335 77.3518 63.3455 77.5286Z"
+                                          fill="#5E0075" />
+                                      <path
+                                          d="M29.4927 18.8212C31.5139 18.2675 33.0231 16.5809 33.3499 14.5109L30.6386 9.51587C29.7573 10.2086 28.7431 10.7129 27.659 10.9977C27.1234 11.1206 26.5756 11.1816 26.0261 11.1793C25.4572 11.1768 24.8898 11.123 24.3306 11.0185L24.1265 16.6789C25.3403 18.3836 27.4386 19.2212 29.4927 18.8212Z"
+                                          fill="#5E0075" />
+                                      <path
+                                          d="M8.74451 37.5736L14.6909 35.1115L13.4599 32.1431L0.0836182 37.6781L11.7322 65.7645C13.0622 60.1622 16.9044 55.4879 22.1433 53.0986L20.8431 49.9599L14.8967 52.422C14.7019 52.5021 14.4933 52.5436 14.2827 52.5441C13.5145 52.5477 12.8512 52.0071 12.6997 51.2539C12.5482 50.5008 12.9509 49.7457 13.6608 49.452L19.6072 46.9899L18.3777 44.0199L15.4029 45.2525C15.2081 45.3325 14.9996 45.3739 14.789 45.3747C14.0217 45.3759 13.3605 44.8346 13.2103 44.0821C13.0601 43.3296 13.4628 42.5759 14.1718 42.2825L17.1467 41.0499L15.9172 38.0799L9.97076 40.5436C9.77543 40.6238 9.56638 40.6653 9.35523 40.6657C8.58822 40.6662 7.92778 40.1246 7.77803 39.3724C7.62829 38.6201 8.03098 37.8669 8.73969 37.5736H8.74451Z"
+                                          fill="#5E0075" />
+                                  </g>
+                                  <defs>
+                                      <clipPath id="clip0_526_673">
+                                          <rect width="90" height="90" fill="white" />
+                                      </clipPath>
+                                  </defs>
+                              </svg>
+
+                              <h5 className="">Arts</h5>
+                          </div>
+
+                          <div className="card">
+
+                              <svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <g clipPath="url(#clip0_526_687)">
+                                      <path
+                                          d="M87.3633 0H76.6406C75.1832 0 74.0039 1.17932 74.0039 2.63672V5.27344H52.4245C51.3323 2.21098 48.433 0 45 0C41.567 0 38.6677 2.21098 37.5755 5.27344H15.9961V2.63672C15.9961 1.17932 14.8168 0 13.3594 0H2.63672C1.17932 0 0 1.17932 0 2.63672V13.1836C0 14.641 1.17932 15.8203 2.63672 15.8203H13.3594C14.8168 15.8203 15.9961 14.641 15.9961 13.1836V10.5117H26.8249C17.6743 16.2283 11.6406 26.2687 10.9194 37.5144C7.75564 38.5499 5.44922 41.4949 5.44922 45C5.44922 49.3618 8.99754 52.9102 13.3594 52.9102C17.7212 52.9102 21.2695 49.3618 21.2695 45C21.2695 41.6355 19.1494 38.7751 16.1824 37.6335C17.0821 25.0959 25.8304 14.5287 37.9992 11.5137C39.3152 14.0585 41.9426 15.8203 45 15.8203C48.0574 15.8203 50.6848 14.0585 52.0008 11.5137C64.1696 14.5285 72.9179 25.0958 73.8176 37.6334C70.8506 38.7751 68.7305 41.6355 68.7305 45C68.7305 49.3618 72.2788 52.9102 76.6406 52.9102C81.0025 52.9102 84.5508 49.3618 84.5508 45C84.5508 41.4949 82.2444 38.5499 79.0807 37.5144C78.3594 26.2687 72.3257 16.2635 63.1751 10.5469H74.0039V13.1836C74.0039 14.641 75.1832 15.8203 76.6406 15.8203H87.3633C88.8207 15.8203 90 14.641 90 13.1836V2.63672C90 1.17932 88.8207 0 87.3633 0Z"
+                                          fill="#630075" />
+                                      <path
+                                          d="M62.9385 86.7296C61.5593 82.5093 57.5859 79.2773 52.9101 79.2773h27.0898C32.414 79.2773 28.4407 82.5093 27.0615 86.7296C26.5298 88.3568 27.914 90 29.6262 90H60.3738C62.0857 90 63.4702 88.3568 62.9385 86.7296Z"
+                                          fill="#630075" />
+                                      <path
+                                          d="M68.2875 54.0843L47.6367 23.1079V48.1223C50.6992 49.2144 52.9102 52.1138 52.9102 55.5468C52.9102 59.9086 49.3619 63.4569 45 63.4569C40.6382 63.4569 37.0899 59.9086 37.0899 55.5468C37.0899 52.1138 39.3008 49.2144 42.3633 48.1223V23.1079L21.7125 54.0843C21.0147 55.1296 21.1537 56.5227 22.0421 57.4111C26.8826 62.2516 29.9767 68.4874 31.1708 75.1764C33.0024 74.4334 34.9946 74.0038 37.0899 74.0038H52.9102C55.0055 74.0038 56.9976 74.4332 58.8293 75.1761C60.0233 68.4867 63.1175 62.2516 67.9579 57.4111C68.8463 56.5227 68.9854 55.1296 68.2875 54.0843Z"
+                                          fill="#630075" />
+                                      <path
+                                          d="M45 52.9102C43.5452 52.9102 42.3633 54.0921 42.3633 55.5469C42.3633 57.0016 43.5452 58.1836 45 58.1836C46.4548 58.1836 47.6367 57.0016 47.6367 55.5469C47.6367 54.0921 46.4548 52.9102 45 52.9102Z"
+                                          fill="#630075" />
+                                  </g>
+                                  <defs>
+                                      <clipPath id="clip0_526_687">
+                                          <rect width="90" height="90" fill="white" />
+                                      </clipPath>
+                                  </defs>
+                              </svg>
+
+                              <h5 className="">Designing</h5>
+                          </div>
+
+                          <div className="card">
+
+                              <svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <g clipPath="url(#clip0_526_707)">
+                                      <path
+                                          d="M9.14555 62.1243C6.57615 56.7548 5.27344 50.9934 5.27344 45C5.27344 23.0947 23.0947 5.27344 45 5.27344C53.7029 5.27344 61.9775 8.05482 68.812 13.194L62.2364 14.0597C60.7927 14.2497 59.7763 15.5742 59.9664 17.0179C60.1564 18.4618 61.4809 19.478 62.9246 19.288L75.2994 17.6588C76.7431 17.4688 77.7595 16.1443 77.5695 14.7006L75.9401 2.32594C75.7501 0.882246 74.4256 -0.134121 72.9819 0.0558984H72.9817C71.538 0.245918 70.5217 1.57043 70.7117 3.01412L71.4447 8.58164C63.8067 3.01043 54.6353 0 45 0C32.9801 0 21.6796 4.6807 13.1801 13.1801C4.68088 21.6796 0 32.9801 0 45C0 51.7876 1.47656 58.3149 4.38891 64.4006C5.0175 65.7142 6.5918 66.2695 7.90541 65.6409C9.21885 65.0124 9.77414 63.4379 9.14555 62.1243Z"
+                                          fill="#5E0075" />
+                                      <path
+                                          d="M69.3888 41.0678L70.707 40.3068C71.968 39.5787 72.4003 37.9661 71.672 36.7051L65.5196 26.0488C64.7916 24.7878 63.1789 24.3555 61.9179 25.0838L60.5997 25.8449C57.5728 27.5926 53.7891 25.4079 53.7891 21.9127V20.3906C53.7891 18.9345 52.6085 17.7539 51.1523 17.7539h28.8477C37.3915 17.7539 36.2109 18.9345 36.2109 20.3906V21.9127C36.2109 25.4079 32.4272 27.5924 29.4003 25.8449L28.0821 25.0838C26.8211 24.3557 25.2084 24.7878 24.4804 26.0488L18.328 36.7051C17.5999 37.9661 18.032 39.5787 19.293 40.3068L20.6112 41.0678C23.6382 42.8154 23.6382 47.1844 20.6112 48.932L19.293 49.693C18.032 50.4211 17.5997 52.0337 18.328 53.2948L24.4804 63.951C25.2084 65.212 26.8211 65.6443 28.0821 64.916L29.4003 64.1549C32.4272 62.4073 36.2109 64.5919 36.2109 68.0871V69.6094C36.2109 71.0655 37.3915 72.2461 38.8477 72.2461H51.1523C52.6085 72.2461 53.7891 71.0655 53.7891 69.6094V68.0873C53.7891 64.5921 57.5728 62.4076 60.5997 64.1551L61.9179 64.9162C63.1789 65.6443 64.7916 65.2122 65.5196 63.9512L71.672 53.2949C72.4001 52.0339 71.968 50.4213 70.707 49.6932L69.3888 48.9322C66.3618 47.1846 66.3618 42.8154 69.3888 41.0678ZM45 55.1074C39.4179 55.1074 34.8926 50.5821 34.8926 45C34.8926 39.4179 39.4179 34.8926 45 34.8926C50.5821 34.8926 55.1074 39.4179 55.1074 45C55.1074 50.5821 50.5821 55.1074 45 55.1074Z"
+                                          fill="#5E0075" />
+                                      <path
+                                          d="M85.6111 25.5993C84.9825 24.2857 83.4082 23.7304 82.0946 24.359C80.7812 24.9876 80.2259 26.5619 80.8543 27.8755C83.4239 33.2451 84.7266 39.0065 84.7266 44.9999C84.7266 66.9053 66.9053 84.7265 45 84.7265C36.2971 84.7265 28.0225 81.9451 21.188 76.806L27.7636 75.9403C29.2073 75.7502 30.2237 74.4257 30.0336 72.982C29.8436 71.5382 28.5191 70.522 27.0754 70.712L14.7006 72.3411C13.2569 72.5312 12.2405 73.8557 12.4306 75.2994L14.0599 87.674C14.2499 89.1177 15.5744 90.1341 17.0181 89.944C18.4618 89.754 19.4783 88.4295 19.2883 86.9858L18.5553 81.4183C26.1934 86.9895 35.3647 89.9999 45 89.9999C57.0199 89.9999 68.3204 85.3192 76.8199 76.8199C85.3191 68.3203 90 57.0199 90 44.9999C90 38.2123 88.5235 31.685 85.6111 25.5993Z"
+                                          fill="#5E0075" />
+                                  </g>
+                                  <defs>
+                                      <clipPath id="clip0_526_707">
+                                          <rect width="90" height="90" fill="white" />
+                                      </clipPath>
+                                  </defs>
+                              </svg>
+
+                              <h5 className="">Automation</h5>
+                          </div>
+
+
+                          <div className="card">
+
+                              <svg width="90" height="90" viewBox="0 0 200 200" fill="none"
+                                  xmlns="http://www.w3.org/2000/svg">
+
+                                  <circle cx="50" cy="50" r="10" fill="#5e0075" />
+                                  <circle cx="150" cy="50" r="10" fill="#5e0075" />
+                                  <circle cx="50" cy="150" r="10" fill="#5e0075" />
+                                  <circle cx="150" cy="150" r="10" fill="#5e0075" />
+
+                                  <circle cx="100" cy="100" r="12" fill="#5e0075" />
+
+
+                                  <line x1="50" y1="50" x2="100" y2="100" stroke="#5e0075" strokeWidth="2" />
+                                  <line x1="150" y1="50" x2="100" y2="100" stroke="#5e0075" strokeWidth="2" />
+                                  <line x1="50" y1="150" x2="100" y2="100" stroke="#5e0075" strokeWidth="2" />
+                                  <line x1="150" y1="150" x2="100" y2="100" stroke="#5e0075" strokeWidth="2" />
+                              </svg>
+
+
+                              <h5 className="">Machine learning</h5>
+                          </div>
+
+                      </div>
+
+                  </div>
+              </div>
+          </div>
+      </section>
+
+      <section className="about-area pt-30 pb-30">
+          <div className="container">
+              <div className="row  g-4">
+                  <div className="col-lg-12 text-center">
+                      <div className="section-header mb-20">
+                          <h2 className="wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                              Curriculum
+                          </h2>
+                      </div>
+                  </div>
+                  <div className="col-lg-12  ">
+                      <div className="section-header mb-20">
+                          <p className="wow fadeInUp text-left mt-0 curriculam" data-wow-delay="400ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "400ms", animationName: "fadeInUp" }}>
+                              At BCTLABS STEM Academy, we deliver a comprehensive, age-appropriate curriculum using advanced
+                              hardware and software to teach robotics, coding, electronics, AI, and IoT. Our project-based
+                              learning approach empowers students to work on industry-standard projects while aligning with
+                              global education standards and preparing for international competitions. To further enhance the
+                              learning experience, we provide printed books designed with international benchmarks. These
+                              resources ensure students receive high-quality, world-class STEM education that is tailored to
+                              their individual age, skill level, and developmental needs.</p>
+                      </div>
+
+                  </div>
+
+
+              </div>
+
+              <div className="row">
+                  <div className="col-lg-12 founder">
+                      <div className="grid g-4">
+                          <div className="curriculam_book card wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                              <div className="group__item  bg-white">
+                                  <div className="image">
+                                      <SiteImage targetWidth={384} src={asset('assets/frontend/images/books/book1.png')} alt="image" />
+                                  </div>
+                              </div>
+                          </div>
+                          <div className="curriculam_book card wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                              <div className="group__item bg-white">
+                                  <div className="image">
+                                      <SiteImage targetWidth={384} src={asset('assets/frontend/images/books/book2.png')} alt="image" />
+                                  </div>
+                              </div>
+                          </div>
+
+                          <div className="curriculam_book card wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                              <div className="group__item bg-white">
+                                  <div className="image">
+                                      <SiteImage targetWidth={384} src={asset('assets/frontend/images/books/book3.png')} alt="image" />
+                                  </div>
+                              </div>
+                          </div>
+
+                          <div className="curriculam_book card wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                              <div className="group__item bg-white">
+                                  <div className="image">
+                                      <SiteImage targetWidth={384} src={asset('assets/frontend/images/books/book4.png')} alt="image" />
+                                  </div>
+                              </div>
+                          </div>
+
+                          <div className=" curriculam_book card wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                              <div className="group__item bg-white">
+                                  <div className="image">
+                                      <SiteImage targetWidth={384} src={asset('assets/frontend/images/books/book5.png')} alt="image" />
+                                  </div>
+                              </div>
+                          </div>
+
+                          <div className="curriculam_book card wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                              <div className="group__item bg-white">
+                                  <div className="image">
+                                      <SiteImage targetWidth={384} src={asset('assets/frontend/images/books/book6.png')} alt="image" />
+                                  </div>
+                              </div>
+                          </div>
+
+
+                      </div>
+                  </div>
+              </div>
+
+
+
+          </div>
+      </section>
+
+
+
+
+
+
+
+      <section className="about-area pt-30 pb-30">
+          <div className="container">
+              <div className="row justify-content-center g-2">
+                  <div className="col-lg-12 text-center">
+                      <div className="section-header mb-20">
+                          <h2 className="wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                              Online Courses
+                          </h2>
+                      </div>
+                  </div>
+                  <div className="col-lg-4">
+                      <div className="section-header text-center card course_box p-4">
+                          <div className="mb-3">
+                              <svg width="37" height="37" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+                                  <circle cx="50" cy="50" r="10" fill="#5e0075" />
+                                  <circle cx="150" cy="50" r="10" fill="#5e0075" />
+                                  <circle cx="50" cy="150" r="10" fill="#5e0075" />
+                                  <circle cx="150" cy="150" r="10" fill="#5e0075" />
+
+                                  <circle cx="100" cy="100" r="12" fill="#5e0075" />
+
+
+                                  <line x1="50" y1="50" x2="100" y2="100" stroke="#5e0075" strokeWidth="2" />
+                                  <line x1="150" y1="50" x2="100" y2="100" stroke="#5e0075" strokeWidth="2" />
+                                  <line x1="50" y1="150" x2="100" y2="100" stroke="#5e0075" strokeWidth="2" />
+                                  <line x1="150" y1="150" x2="100" y2="100" stroke="#5e0075" strokeWidth="2" />
+                              </svg>
+                          </div>
+                          <h3 className="wow fadeInUp" data-wow-delay="200ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "200ms", animationName: "fadeInUp" }}>
+                              Basic Electronics
+                          </h3>
+
+                          <p className="wow fadeInUp mt-2  text-normal" data-wow-delay="400ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "400ms", animationName: "fadeInUp" }}>
+                              Kickstart your journey into electronics with this beginner-friendly, hands-on course! Using the
+                              BCTLABS kit, you&apos;ll learn core concepts like voltage,
+                              current, and resistance, while building real circuits with LEDs, sensors, and Arduino.
+
+                          </p>
+                      </div>
+
+                  </div>
+
+                  <div className="col-lg-4">
+                      <div className="section-header text-center card course_box_1 p-4">
+                          <div className="mb-3">
+                             <svg width="37" height="37" viewBox="0 0 90 90" fill="white" xmlns="http://www.w3.org/2000/svg">
+                                  <g clipPath="url(#clip0_526_707)">
+                                      <path d="M9.14555 62.1243C6.57615 56.7548 5.27344 50.9934 5.27344 45C5.27344 23.0947 23.0947 5.27344 45 5.27344C53.7029 5.27344 61.9775 8.05482 68.812 13.194L62.2364 14.0597C60.7927 14.2497 59.7763 15.5742 59.9664 17.0179C60.1564 18.4618 61.4809 19.478 62.9246 19.288L75.2994 17.6588C76.7431 17.4688 77.7595 16.1443 77.5695 14.7006L75.9401 2.32594C75.7501 0.882246 74.4256 -0.134121 72.9819 0.0558984H72.9817C71.538 0.245918 70.5217 1.57043 70.7117 3.01412L71.4447 8.58164C63.8067 3.01043 54.6353 0 45 0C32.9801 0 21.6796 4.6807 13.1801 13.1801C4.68088 21.6796 0 32.9801 0 45C0 51.7876 1.47656 58.3149 4.38891 64.4006C5.0175 65.7142 6.5918 66.2695 7.90541 65.6409C9.21885 65.0124 9.77414 63.4379 9.14555 62.1243Z" fill="white" />
+                                      <path d="M69.3888 41.0678L70.707 40.3068C71.968 39.5787 72.4003 37.9661 71.672 36.7051L65.5196 26.0488C64.7916 24.7878 63.1789 24.3555 61.9179 25.0838L60.5997 25.8449C57.5728 27.5926 53.7891 25.4079 53.7891 21.9127V20.3906C53.7891 18.9345 52.6085 17.7539 51.1523 17.7539h28.8477C37.3915 17.7539 36.2109 18.9345 36.2109 20.3906V21.9127C36.2109 25.4079 32.4272 27.5924 29.4003 25.8449L28.0821 25.0838C26.8211 24.3557 25.2084 24.7878 24.4804 26.0488L18.328 36.7051C17.5999 37.9661 18.032 39.5787 19.293 40.3068L20.6112 41.0678C23.6382 42.8154 23.6382 47.1844 20.6112 48.932L19.293 49.693C18.032 50.4211 17.5997 52.0337 18.328 53.2948L24.4804 63.951C25.2084 65.212 26.8211 65.6443 28.0821 64.916L29.4003 64.1549C32.4272 62.4073 36.2109 64.5919 36.2109 68.0871V69.6094C36.2109 71.0655 37.3915 72.2461 38.8477 72.2461H51.1523C52.6085 72.2461 53.7891 71.0655 53.7891 69.6094V68.0873C53.7891 64.5921 57.5728 62.4076 60.5997 64.1551L61.9179 64.9162C63.1789 65.6443 64.7916 65.2122 65.5196 63.9512L71.672 53.2949C72.4001 52.0339 71.968 50.4213 70.707 49.6932L69.3888 48.9322C66.3618 47.1846 66.3618 42.8154 69.3888 41.0678ZM45 55.1074C39.4179 55.1074 34.8926 50.5821 34.8926 45C34.8926 39.4179 39.4179 34.8926 45 34.8926C50.5821 34.8926 55.1074 39.4179 55.1074 45C55.1074 50.5821 50.5821 55.1074 45 55.1074Z" fill="white" />
+                                      <path d="M85.6111 25.5993C84.9825 24.2857 83.4082 23.7304 82.0946 24.359C80.7812 24.9876 80.2259 26.5619 80.8543 27.8755C83.4239 33.2451 84.7266 39.0065 84.7266 44.9999C84.7266 66.9053 66.9053 84.7265 45 84.7265C36.2971 84.7265 28.0225 81.9451 21.188 76.806L27.7636 75.9403C29.2073 75.7502 30.2237 74.4257 30.0336 72.982C29.8436 71.5382 28.5191 70.522 27.0754 70.712L14.7006 72.3411C13.2569 72.5312 12.2405 73.8557 12.4306 75.2994L14.0599 87.674C14.2499 89.1177 15.5744 90.1341 17.0181 89.944C18.4618 89.754 19.4783 88.4295 19.2883 86.9858L18.5553 81.4183C26.1934 86.9895 35.3647 89.9999 45 89.9999C57.0199 89.9999 68.3204 85.3192 76.8199 76.8199C85.3191 68.3203 90 57.0199 90 44.9999C90 38.2123 88.5235 31.685 85.6111 25.5993Z" fill="white" />
+                                  </g>
+                                  <defs>
+                                      <clipPath id="clip0_526_707">
+                                          <rect width="90" height="90" fill="white" />
+                                      </clipPath>
+                                  </defs>
+                              </svg>
+                          </div>
+                          <h3 className="wow fadeInUp  text-white" data-wow-delay="200ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "200ms", animationName: "fadeInUp" }}>
+                              Automation
+                          </h3>
+                          <p className="wow fadeInUp text-white mt-2  text-normal" data-wow-delay="400ms"
+                              data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "400ms", animationName: "fadeInUp" }}>
+                              Master the basics of automation and smart control systems using the BCTLABS kit. This course is
+                              perfect for beginners who want to build real-world
+                              automation projects with sensors, actuators, relays, and microcontrollers.
+
+                          </p>
+                      </div>
+
+
+                  </div>
+
+                  <div className="col-lg-4">
+                      <div className="section-header text-center card course_box p-4">
+                          <div className="mb-3">
+                             <svg width="37" height="37" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M53.4375 16.875C53.4375 20.5312 51.075 23.6531 47.8125 24.8062C46.9406 25.1437 45.9844 25.3125 45 25.3125C44.0156 25.3125 43.0594 25.1437 42.1875 24.8062C38.925 23.6531 36.5625 20.5312 36.5625 16.875C36.5625 12.2344 40.3594 8.4375 45 8.4375C49.6406 8.4375 53.4375 12.2344 53.4375 16.875ZM73.125 42.1875V73.125C73.125 77.7656 69.3281 81.5625 64.6875 81.5625H25.3125C20.6719 81.5625 16.875 77.7656 16.875 73.125V42.1875C16.875 37.5469 20.6719 33.75 25.3125 33.75H42.1875V30.6562C43.0875 30.8531 44.0438 30.9375 45 30.9375C45.9562 30.9375 46.9125 30.8531 47.8125 30.6562V33.75H64.6875C69.3281 33.75 73.125 37.5469 73.125 42.1875ZM33.75 54.8438C36.0844 54.8438 37.9688 52.9594 37.9688 50.625C37.9688 48.2906 36.0844 46.4062 33.75 46.4062C31.4156 46.4062 29.5312 48.2906 29.5312 50.625C29.5312 52.9594 31.4156 54.8438 33.75 54.8438ZM55.6875 63C54.7594 61.7625 52.9875 61.5094 51.75 62.4375C49.1344 64.4063 46.4062 64.6875 45 64.6875C41.7375 64.6875 39.375 63.2813 38.25 62.4375C37.0125 61.5094 35.2406 61.7625 34.3125 63C33.3844 64.2375 33.6375 66.0094 34.875 66.9375C36.5625 68.2031 40.1063 70.3125 45 70.3125C47.1094 70.3125 51.2156 69.8625 55.125 66.9375C56.3625 66.0094 56.6156 64.2375 55.6875 63ZM60.4688 50.625C60.4688 48.2906 58.5844 46.4062 56.25 46.4062C53.9156 46.4062 52.0312 48.2906 52.0312 50.625C52.0312 52.9594 53.9156 54.8438 56.25 54.8438C58.5844 54.8438 60.4688 52.9594 60.4688 50.625ZM11.25 45C8.14781 45 5.625 47.5228 5.625 50.625V64.6875C5.625 67.7897 8.14781 70.3125 11.25 70.3125V45ZM78.75 45V70.3125C81.8522 70.3125 84.375 67.7897 84.375 64.6875V50.625C84.375 47.5228 81.8522 45 78.75 45Z" fill="#5E0075" />
+                              </svg>
+                          </div>
+                          <h3 className="wow fadeInUp" data-wow-delay="200ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "200ms", animationName: "fadeInUp" }}>
+                              Robotics
+                          </h3>
+
+                          <p className="wow fadeInUp mt-2  text-normal" data-wow-delay="400ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "400ms", animationName: "fadeInUp" }}>
+                              Step into the world of robots with personalized, hands-on training! This course introduces you
+                              to the fundamentals of robotics using the BCTLABS kit,
+                              sensors, motors, and Arduino — all guided one-on-one by an expert trainer.
+
+                          </p>
+                      </div>
+                  </div>
+
+                  <div className="col-lg-4">
+                      <div className="section-header text-center card course_box_1 p-4">
+                          <div className="mb-3">
+                              <svg width="37" height="37" viewBox="0 0 90 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M52.1801 20.7989L55.2832 16.5351C50.3044 12.9114 44.4083 10.9961 38.2324 10.9961C32.0565 10.9961 26.1605 12.9114 21.1816 16.5351L24.2847 20.7989C28.356 17.8357 33.1791 16.2695 38.2324 16.2695C43.2858 16.2695 48.1089 17.8357 52.1801 20.7989Z" fill="#fff" />
+                                  <path d="M14.9817 8.00184L18.0848 12.2656C23.9664 7.98514 30.9333 5.72266 38.2324 5.72266C45.5316 5.72266 52.4985 7.98514 58.38 12.2656L61.483 8.00184C54.694 3.0608 46.6541 0.449219 38.2324 0.449219C29.8108 0.449219 21.7709 3.0608 14.9817 8.00184Z" fill="#fff" />
+                                  <path d="M24.2847 59.2012L21.1816 63.4649C26.1605 67.0887 32.0567 69.004 38.2324 69.004C44.4081 69.004 50.3044 67.0887 55.2832 63.4649L52.1801 59.2012C48.1089 62.1643 43.2858 63.7305 38.2324 63.7305C33.1791 63.7305 28.356 62.1643 24.2847 59.2012Z" fill="#fff" />
+                                  <path d="M38.2324 74.2773C30.9333 74.2773 23.9663 72.0148 18.0849 67.7344L14.9818 71.9981C21.7708 76.9392 29.8107 79.5507 38.2324 79.5507C46.6541 79.5507 54.694 76.9392 61.4832 71.9981L58.3801 67.7344C52.4984 72.0148 45.5315 74.2773 38.2324 74.2773Z" fill="#fff" />
+                                  <path d="M62.7664 18.8184V30.9221H70.3313V61.1816H82.4351V30.9221H90V18.8184H62.7664Z" fill="#fff" />
+                                  <path d="M0 18.8184H12.1038V61.1816H0V18.8184Z" fill="#fff" />
+                                  <path d="M38.2324 58.1557C48.2595 58.1557 56.3881 50.0272 56.3881 40C56.3881 29.9727 48.2595 21.8442 38.2324 21.8442C28.2053 21.8442 20.0767 29.9727 20.0767 40C20.0767 50.0272 28.2053 58.1557 38.2324 58.1557ZM38.2324 33.948C41.5747 33.948 44.2844 36.6575 44.2844 40C44.2844 43.3425 41.5749 46.052 38.2324 46.052C34.8901 46.052 32.1804 43.3425 32.1804 40C32.1804 36.6575 34.8901 33.948 38.2324 33.948Z" fill="#fff" />
+                              </svg>
+                          </div>
+                          <h3 className="wow fadeInUp  text-white" data-wow-delay="200ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "200ms", animationName: "fadeInUp" }}>
+                              Internet Of Things
+                          </h3>
+                          <p className="wow fadeInUp text-white mt-2  text-normal" data-wow-delay="400ms"
+                              data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "400ms", animationName: "fadeInUp" }}>
+                              Connect the physical world to the internet — with expert one-on-one guidance! This course
+                              teaches you how to build smart, connected devices using
+                              the BCTLABS kit, ESP32/Arduino, sensors, and cloud platforms.
+
+                          </p>
+                      </div>
+
+                  </div>
+
+                  <div className="col-lg-4">
+                      <div className="section-header text-center card course_box p-4">
+                          <div className="mb-3">
+                              <svg width="40" height="40" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M88.207 20.9726H72.9298V20.3291C72.9298 19.3388 72.1271 18.5359 71.1366 18.5359C70.1463 18.5359 69.3434 19.3386 69.3434 20.3291V20.9726H54.0581C53.0678 20.9726 52.2649 21.7753 52.2649 22.7658C52.2649 23.756 53.0676 24.559 54.0581 24.559H69.3414V28.1134C67.4433 28.7239 66.1556 30.4887 66.1536 32.4827V34.6543H62.8363V34.455C62.8331 32.2006 61.0063 30.374 58.7519 30.3706h21.2558C29.0014 30.3738 27.1748 32.2006 27.1714 34.455V34.6543H23.8541V32.4827C23.8521 30.4889 22.5643 28.7239 20.6663 28.1134V24.559h25.9496C36.9399 24.559 37.7428 23.7562 37.7428 22.7658C37.7428 21.7755 36.9401 20.9726 35.9496 20.9726H20.6623V20.3291C20.6623 19.3388 19.8596 18.5359 18.8691 18.5359C17.8786 18.5359 17.0759 19.3386 17.0759 20.3291V20.9726H1.7932C0.802914 20.9726 0 21.7753 0 22.7658C0 23.756 0.802712 24.559 1.7932 24.559H17.0765V28.1134C15.1785 28.7239 13.8907 30.4887 13.8887 32.4827V40.4181C13.8887 42.9489 15.9403 45.0005 18.4711 45.0005H19.2679C21.7987 45.0005 23.8503 42.9489 23.8503 40.4181V38.2465H27.1655V38.7407C27.1777 40.9912 29.0053 42.8091 31.2558 42.8091h24.2282V43.1537C34.2301 43.376 34.2501 43.598 34.2879 43.8172C31.0047 45.9788 23.7784 52.6632 23.7784 69.6618C23.7784 70.652 24.5811 71.455 25.5716 71.455C26.5621 71.455 27.3648 70.6522 27.3648 69.6618C27.3648 59.7 30.0684 53.8505 32.3456 50.7046C33.8917 48.561 35.4476 47.3475 36.38 46.7459C36.9763 47.0697 37.6441 47.2388 38.3225 47.238H43.2098V50.113h25.8501C34.8598 50.113 34.0569 50.9157 34.0569 51.9062V60.3099C34.0569 61.3002 34.8596 62.1031 35.8501 62.1031H54.1538C55.1441 62.1031 55.947 61.3004 55.947 60.3099V51.9161C55.947 50.9258 55.1443 50.1229 54.1538 50.1229H46.796V47.2479H51.6932C52.3717 47.2488 53.0395 47.0796 53.6358 46.7558C54.5662 47.3536 56.1242 48.5709 57.6702 50.7146C59.9395 53.8605 62.651 59.704 62.651 69.6717C62.651 70.662 63.4537 71.4649 64.4442 71.4649C65.4344 71.4649 66.2374 70.6622 66.2374 69.6717C66.2374 52.6731 59.0111 45.9887 55.7278 43.8271C55.7659 43.6079 55.7859 43.386 55.7875 43.1636V42.8089H58.7501C61.0045 42.8056 62.831 40.9788 62.8345 38.7245V38.2303H66.1497V40.4179C66.1497 42.9487 68.2013 45.0003 70.7321 45.0003H71.5289C74.0597 45.0003 76.1113 42.9487 76.1113 40.4179V32.4883C76.1093 30.4946 74.8215 28.7295 72.9235 28.1191V24.5588H88.2068C89.1971 24.5588 90 23.756 90 22.7656C90 21.7753 89.1973 20.9726 88.207 20.9726ZM47.4118 56.1174C47.4118 57.4477 46.3333 58.5262 45.003 58.5262C43.6728 58.5262 42.5943 57.4477 42.5943 56.1174C42.5943 54.7872 43.6728 53.7087 45.003 53.7087C46.3329 53.7097 47.4106 54.7876 47.4118 56.1174Z" fill="#5E0075" />
+                              </svg>
+                          </div>
+                          <h3 className="wow fadeInUp" data-wow-delay="200ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "200ms", animationName: "fadeInUp" }}>
+                              Drone Technology
+                          </h3>
+
+                          <p className="wow fadeInUp mt-2  text-normal" data-wow-delay="400ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "400ms", animationName: "fadeInUp" }}>
+                              Take flight with the future of technology! This hands-on course introduces you to the
+                              fundamentals of drone technology, including drone components,
+                              flight control, safety, and programming — all guided one-on-one by an expert trainer.
+
+                          </p>
+                      </div>
+                  </div>
+
+                  <div className="col-lg-4">
+                      <div className="section-header  text-center card course_box_1 p-4">
+                          <div className="mb-3">
+                              <svg width="40" height="40" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <g clipPath="url(#clip0_526_640)">
+                                      <path d="M87.3633 42.3633H68.7305V35.332H78.5742C80.0297 35.332 81.2109 34.1508 81.2109 32.6953C81.2109 31.2398 80.0297 30.0586 78.5742 30.0586H68.7305V24.2912C68.7305 22.8357 67.5492 21.6545 66.0938 21.6545H61.0031V10.5469H70.3125C71.4006 13.616 74.3309 15.8203 77.7691 15.8203C82.1303 15.8203 85.6793 12.2713 85.6793 7.91016C85.6793 3.54902 82.1303 0 77.7691 0C74.3309 0 71.4006 2.2043 70.3125 5.27344H58.3664C56.9109 5.27344 55.7297 6.45469 55.7297 7.91016V21.6545H47.6367V2.63672C47.6367 1.18125 46.4555 0 45 0C43.5445 0 42.3633 1.18125 42.3633 2.63672V21.6545h24.2703V7.91016C34.2703 6.45469 33.0891 5.27344 31.6336 5.27344H19.6875C18.5994 2.2043 15.6691 0 12.2309 0C7.86973 0 4.3207 3.54902 4.3207 7.91016C4.3207 12.2713 7.86973 15.8203 12.2309 15.8203C15.6691 15.8203 18.5994 13.616 19.6875 10.5469H28.9969V21.6545H23.9062C22.4508 21.6545 21.2695 22.8357 21.2695 24.2912V30.0586H11.4258C9.97031 30.0586 8.78906 31.2398 8.78906 32.6953C8.78906 34.1508 9.97031 35.332 11.4258 35.332H21.2695V42.3633H2.63672C1.18125 42.3633 0 43.5445 0 45C0 46.4555 1.18125 47.6367 2.63672 47.6367H21.2695V54.668H11.4258C9.97031 54.668 8.78906 55.8492 8.78906 57.3047C8.78906 58.7602 9.97031 59.9414 11.4258 59.9414H21.2695V65.7088C21.2695 67.1643 22.4508 68.3455 23.9062 68.3455H28.9969V79.4531H19.6875C18.5994 76.384 15.6691 74.1797 12.2309 74.1797C7.86973 74.1797 4.3207 77.7287 4.3207 82.0898C4.3207 86.451 7.86973 90 12.2309 90C15.6691 90 18.5994 87.7957 19.6875 84.7266h21.6336C33.0891 84.7266 34.2703 83.5453 34.2703 82.0898V68.3455H42.3633V87.3633C42.3633 88.8187 43.5445 90 45 90C46.4555 90 47.6367 88.8187 47.6367 87.3633V68.3455H55.7297V82.0898C55.7297 83.5453 56.9109 84.7266 58.3664 84.7266H70.3125C71.4006 87.7957 74.3309 90 77.7691 90C82.1303 90 85.6793 86.451 85.6793 82.0898C85.6793 77.7287 82.1303 74.1797 77.7691 74.1797C74.3309 74.1797 71.4006 76.384 70.3125 79.4531H61.0031V68.3455H66.0938C67.5492 68.3455 68.7305 67.1643 68.7305 65.7088V59.9414H78.5742C80.0297 59.9414 81.2109 58.7602 81.2109 57.3047C81.2109 55.8492 80.0297 54.668 78.5742 54.668H68.7305V47.6367H87.3633C88.8187 47.6367 90 46.4555 90 45C90 43.5445 88.8187 42.3633 87.3633 42.3633ZM37.0898 49.0764V54.283C37.0898 55.7385 35.9086 56.9197 34.4531 56.9197C32.9977 56.9197 31.8164 55.7385 31.8164 54.283V40.9904C31.8164 36.6293 35.3654 33.0803 39.7266 33.0803C44.0877 33.0803 47.6367 36.6293 47.6367 40.9904V54.283C47.6367 55.7385 46.4555 56.9197 45 56.9197C43.5445 56.9197 42.3633 55.7385 42.3633 54.283V49.0764h27.0898ZM58.1836 54.283C58.1836 55.7385 57.0023 56.9197 55.5469 56.9197C54.0914 56.9197 52.9102 55.7385 52.9102 54.283V35.717C52.9102 34.2615 54.0914 33.0803 55.5469 33.0803C57.0023 33.0803 58.1836 34.2615 58.1836 35.717V54.283Z" fill="#fff" />
+                                      <path d="M42.3633 40.9905V43.803h27.0898V40.9905C37.0898 39.5368 38.2729 38.3538 39.7266 38.3538C41.1803 38.3538 42.3633 39.5368 42.3633 40.9905Z" fill="#fff" />
+                                  </g>
+                                  <defs>
+                                      <clipPath id="clip0_526_640">
+                                          <rect width="90" height="90" fill="white" />
+                                      </clipPath>
+                                  </defs>
+                              </svg>
+                          </div>
+                          <h3 className="wow fadeInUp  text-white" data-wow-delay="200ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "200ms", animationName: "fadeInUp" }}>
+                              Artifiicial Intelligence
+                          </h3>
+                          <p className="wow fadeInUp text-white mt-2  text-normal" data-wow-delay="400ms"
+                              data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "400ms", animationName: "fadeInUp" }}>
+                              Our Artificial Intelligence online course offers a comprehensive and beginner-friendly
+                              introduction to AI, designed to equip students with in-demand skills for the future. Through
+                              interactive lessons, real-world projects, and expert guidance, learners will explore machine
+                              learning, neural networks, and AI applications across industries. Whether you&apos;re a student or
+                              professional, this course provides a strong foundation to thrive in the AI-driven world.
+                          </p>
+                      </div>
+
+                  </div>
+
+
+
+
+
+              </div>
+          </div>
+      </section>
+
+
+      <style dangerouslySetInnerHTML={{ __html: `
+      @media (max-width:600px)
+      {
+            /* Add this CSS to your stylesheet */
+          .testimonial__item {
+              height: 550px !important;
+          }
+
+          .testimonial-image-user {
+          bottom: 5px !important;
+      }
+      .founder .grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+      }
+
+      }
+          /* Add this CSS to your stylesheet */
+          .testimonial__item {
+              height: 500px; /* Set your desired fixed height */
+              display: flex;
+              flex-direction: column;
+              background: #fff;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          }
+
+          .testimonial__item .image {
+              height: 200px; /* Fixed height for image */
+              overflow: hidden;
+          }
+
+          .testimonial__item .image img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+          }
+
+          .testimonial__item .blog__content {
+              padding: 20px;
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+          }
+
+          .testimonial__item .blog__content h4 {
+              margin-bottom: 15px;
+          }
+
+          .testimonial__item .blog__content p {
+              flex: 1;
+              overflow: hidden;
+              display: -webkit-box;
+              -webkit-line-clamp: 4; /* Limit to 4 lines */
+              -webkit-box-orient: vertical;
+          }
+
+          /* Adjust the "Know More" button position */
+          .btn-two1 {
+              margin-top: 30px !important;
+          }
+
+          .testimonial-image-user {
+              position: absolute;
+              bottom: 35px;
+          }
+
+      ` }} />
+
+      <section className="testimonial-area pt-60 pb-60 bg-prime-light">
+          <div className="container">
+              <div className="d-flex align-items-center justify-content-between gap-4 mb-60">
+                  <div className="arry-btn wow fadeInUp" data-wow-delay="400ms" data-wow-duration="1500ms">
+                      <button className="arry-prev acieve__slider-prev"><i className="fa-regular fa-chevron-left"></i></button>
+                  </div>
+                  <div className="section-header text-center">
+
+                      <h2 className="wow fadeInUp" data-wow-delay="200ms" data-wow-duration="1500ms">Our Achievements & Accolades
+                      </h2>
+                  </div>
+                  <div className="arry-btn wow fadeInUp" data-wow-delay="400ms" data-wow-duration="1500ms">
+
+                      <button className="arry-next acieve__slider-next active ml-10"><i
+                              className="fa-regular fa-chevron-right"></i></button>
+                  </div>
+              </div>
+          </div>
+          <div className="container swiper  acieve__slider px-3">
+
+              <div className="swiper-wrapper achieve">
+                  <div className="swiper-slide ">
+                      <div className="testimonial__item p-0 ">
+
+                          <div className="image">
+                              <SiteImage targetWidth={384} src={asset('assets/frontend/images/home/a1.png')} alt="image" />
+
+                          </div>
+                          <div className="blog__content achievement_para pt-4">
+                              <h4 className="mt-10 pb-15 "><a href="#" className="primary-color">Victory at IIT Bombay: 1st & 2nd
+                                      Place in Air Quality Poster Presentation</a></h4>
+                              <p>Students from Bharathidhasanar, Universal, AKT Academy, Meenakshi Ramasamy, and Maharishi
+                                  Vidya Mandir schools participated in the 4th Indian International Conference on Air Quality
+                                  Management at IIT Bombay. They secured 1st...</p>
+                          </div>
+
+                      </div>
+                  </div>
+                  <div className="swiper-slide">
+                      <div className="testimonial__item p-0">
+
+                          <div className="image">
+                              <SiteImage targetWidth={384} src={asset('assets/frontend/images/home/a2.png')} alt="image" />
+
+                          </div>
+                          <div className="blog__content achievement_para pt-4">
+                              <h4 className="mt-10 pb-15 "><a href="#" className="primary-color">Line Follower Champions at SAI TECH
+                                      2024</a></h4>
+                              <p>On January 5th, 2024, students of Sri Krish International School achieved 1st prize in the
+                                  Line Follower Category at SAI TECH EVENT (S2T) – 2024 of Sairam Engineering College. They
+                                  were awarded a cash prize of 7,500 rupees for their...</p>
+                          </div>
+
+                      </div>
+                  </div>
+                  <div className="swiper-slide">
+                      <div className="testimonial__item p-0">
+
+                          <div className="image">
+                              <SiteImage targetWidth={384} src={asset('assets/frontend/images/home/a3.png')} alt="image" />
+
+                          </div>
+                          <div className="blog__content achievement_para pt-4">
+                              <h4 className="mt-10 pb-15 "><a href="#" className="primary-color">Winners of Tamil Nadu Innovation
+                                      Challenge 2024</a></h4>
+                              <p>Our students from Sri Krish International School have achieved a remarkable victory at the
+                                  Puthulir - Tamil Nadu Innovation and Ideation Challenge 2024! They were honored to receive
+                                  the award from the Honorable Minister of School Education, ...</p>
+                          </div>
+
+                      </div>
+                  </div>
+                  <div className="swiper-slide">
+                      <div className="testimonial__item p-0">
+
+                          <div className="image">
+                              <SiteImage targetWidth={384} src={asset('assets/frontend/images/home/a4.png')} alt="image" />
+
+                          </div>
+                          <div className="blog__content achievement_para pt-4">
+                              <h4 className="mt-10 pb-10 "><a href="#" className="primary-color">Global Bronze at Codeavour 5.0 in
+                                      Dubai</a></h4>
+                              <p>Students from Sri Krish International School, Rishan N and Jampa Diveeth Himasai Moukthik,
+                                  secured 3rd place at the prestigious Codeavour 5.0 International Project Presentation in
+                                  Dubai, proudly representing India. Their achievement reflects their...</p>
+                          </div>
+
+                      </div>
+                  </div>
+
+              </div>
+
+              <div className="swiper-pagination"></div>
+          </div>
+          <div className="btn-two1 text-center mt-5">
+
+              <a href="/achievements" className="btn-inner">
+                  <span className="btn-text text-white">
+                      Know More
+                  </span>
+              </a>
+          </div>
+      </section>
+
+      <section className="testimonial-area pt-30 pb-30 bg-light">
+          <div className="container">
+              <div className="d-flex align-items-center justify-content-between gap-4 mb-60">
+                  <div className="arry-btn wow fadeInUp" data-wow-delay="400ms" data-wow-duration="1500ms">
+                      <button className="arry-prev testimonial__arry-prev"><i className="fa-regular fa-chevron-left"></i></button>
+
+                  </div>
+                  <div className="section-header text-center">
+                      <h2 className="wow fadeInUp" data-wow-delay="200ms" data-wow-duration="1500ms"> Our Testimonials</h2>
+                      <h5 className="wow fadeInUp text-black mt-2" data-wow-delay="00ms" data-wow-duration="1500ms">
+                          What student say About our online<br /> education course
+                      </h5>
+                  </div>
+                  <div className="arry-btn wow fadeInUp" data-wow-delay="400ms" data-wow-duration="1500ms">
+
+                      <button className="arry-next testimonial__arry-next active ml-10"><i
+                              className="fa-regular fa-chevron-right"></i></button>
+                  </div>
+              </div>
+          </div>
+          <div className=" container swiper testimonial__slider">
+              <div className="swiper-wrapper">
+                  <div className="swiper-slide rounded">
+                      <div className="testimonial__item testi_img card rounded">
+
+
+                          <p className="mt-10">“ BCTLABS STEM Academy has developed impressive educational hardware that brings engineering concepts to life for school students. Their innovative kits, combined with hands-on training and competitive exposure, are highly effective in fostering curiosity, creativity, and real-world problem-solving.”</p>
+                          <div className="d-flex align-items-center gap-3 mt-2 testimonial-image-user">
+
+                              <SiteImage targetWidth={384} src={asset('assets/frontend/images/testimonial/1.jpg')} width="100"
+                                  className="bordered circle" alt="image" />
+                              <div>
+                                  <h5>Dr. G. S. Ayyappan</h5>
+                                  <p><span>Senior Principal Scientist, CSR</span></p>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div className="swiper-slide">
+                      <div className="testimonial__item testi_img card">
+
+                          <p className="mt-10">“ BCTLABS STEM Academy has made learning robotics so much fun and exciting! The coaching is really clear and supportive, and I loved getting the chance to participate in competitions where I could apply what I learned.”</p>
+                          <div className="d-flex align-items-center gap-3 mt-2 testimonial-image-user">
+
+                              <SiteImage targetWidth={384} src={asset('assets/frontend/images/testimonial/2.jpg')} width="100"
+                                  className="bordered circle" alt="image" />
+                              <div>
+                                  <h5>Rishan</h5>
+                                  <p><span>Student, Sri Krish International School</span></p>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div className="swiper-slide">
+                      <div className="testimonial__item testi_img card">
+
+
+                          <p className="mt-10">“ I’m truly impressed with the quality of coaching provided by BCTLABS STEM Academy. My daughter has developed a strong interest in technology and robotics, thanks to their structured guidance and supportive learning environment.”</p>
+                          <div className="d-flex align-items-center gap-3 mt-2 testimonial-image-user">
+
+                              <SiteImage targetWidth={384} src={asset('assets/frontend/images/testimonial/3.jpg')} width="100"
+                                  className="bordered circle" alt="image" />
+                              <div>
+                                  <h5>Dr.S.Vijay Kumar</h5>
+                                  <p><span>Doctor, Parent of Samyuktha </span></p>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
+
+
+              </div>
+          </div>
+      </section>
+
+      <section className="blog-area pt-30 pb-30 bg-prime-light">
+          <div className="container">
+              <div className="section-header mb-60 text-center">
+                  <h2 className="wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                      style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                      Meet Our Core Team</h2>
+                  <p className="wow fadeInUp mt-2" data-wow-delay="00ms" data-wow-duration="2000ms"
+                      style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                      You&apos;ll find something to spark your curiosity and enhance
+                  </p>
+              </div>
+              <div className="row">
+                  <div className="col-lg-12 founder">
+
+
+                      <div className="grid g-4">
+                          <div className="card wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                              <div className="group__item  bg-white">
+                                  <div className="image">
+                                      <SiteImage targetWidth={384} src={asset('assets/frontend/images/home/devaraj.png')} alt="image" />
+                                  </div>
+                                  <div className="blog__content pt-4 p-0">
+                                      <p className="team"><small>Mr. Devaraj Natrajan</small></p>
+                                      <p style={{ fontSize: "14px" }}><small>Founder & Director</small></p>
+                                  </div>
+                              </div>
+                          </div>
+                          <div className="card wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                              <div className="group__item bg-white">
+                                  <div className="image">
+                                      <SiteImage targetWidth={384} src={asset('assets/frontend/images/home/dinesh.png')} alt="image" />
+                                  </div>
+                                  <div className="blog__content pt-4 p-0">
+                                      <p className="team"><small>Mr. Dinesh Raju</small></p>
+                                      <p style={{ fontSize: "14px" }}><small>Founder & Director</small></p>
+                                  </div>
+                              </div>
+                          </div>
+                          <div className="card wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                              <div className="group__item bg-white">
+                                  <div className="image">
+                                      <SiteImage targetWidth={384} src={asset('assets/frontend/images/home/anbazhagan.png')} alt="image" />
+                                  </div>
+                                  <div className="blog__content pt-4 p-0">
+                                      <p className="team"><small>Mr. Anbazhagan Selvaraj</small></p>
+                                      <p style={{ fontSize: "14px" }}><small>Founder & Director</small></p>
+                                  </div>
+                              </div>
+                          </div>
+                          <div className="card wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                              <div className="group__item bg-white">
+                                  <div className="image">
+                                      <SiteImage targetWidth={384} src={asset('assets/frontend/images/home/dhivya.png')} alt="image" />
+                                  </div>
+                                  <div className="blog__content pt-4 p-0">
+                                      <p className="team"><small>Ms. Divya Bharathi</small></p>
+                                      <p style={{ fontSize: "14px" }}><small>Founder & Director</small></p>
+                                  </div>
+                              </div>
+                          </div>
+
+                          <div className="card wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                              <div className="group__item bg-white">
+                                  <div className="image">
+                                      <SiteImage targetWidth={384} src={asset('assets/frontend/images/home/hariharasudhan.png')} alt="image" />
+                                  </div>
+                                  <div className="blog__content pt-4 p-0">
+                                      <p className="team"><small>Mr. Hariharasudhan</small></p>
+                                      <p style={{ fontSize: "14px" }}><small>R&D Executive Director</small></p>
+                                  </div>
+                              </div>
+                          </div>
+
+                          <div className="card wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms"
+                              style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "0ms", animationName: "fadeInUp" }}>
+                              <div className="group__item bg-white">
+                                  <div className="image">
+                                      <SiteImage targetWidth={384} src={asset('assets/frontend/images/home/dhanasekharan.png')} alt="image" />
+                                  </div>
+                                  <div className="blog__content pt-4 p-0">
+                                      <p className="team"><small>Mr. Dhanasekharan Srinivasan</small></p>
+                                      <p style={{ fontSize: "14px" }}><small>Business Development Manager</small></p>
+                                  </div>
+                              </div>
+                          </div>
+
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+
+      <section className="counter-area pt-30 pb-30 bg_primary">
+          <div className="container">
+              <div className="counter__wrp">
+                  <div className="counter__item wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms">
+
+                  <div className="content">
+                      <h2 className=" text-white"><span className="count text-white">2,500</span>+</h2>
+                      <span className=" text-white">Total Happy Children</span>
+                  </div>
+              </div>
+              <div className="counter__item wow fadeInUp" data-wow-delay="200ms" data-wow-duration="1500ms">
+
+              <div className="content">
+                  <h2 className=" text-white"><span className="count text-white">270</span>+</h2>
+                  <span className=" text-white">Total Our Volunteer</span>
+              </div>
+          </div>
+          <div className="counter__item wow fadeInUp" data-wow-delay="400ms" data-wow-duration="1500ms">
+
+          <div className="content">
+              <h2 className=" text-white"><span className="count text-white">3,150</span>+</h2>
+              <span className=" text-white">Our Products & Gifts</span>
+          </div>
+          </div>
+          <div className="counter__item wow fadeInUp" data-wow-delay="600ms" data-wow-duration="1500ms">
+
+          <div className="content">
+              <h2 className=" text-white"><span className="count text-white">8,700</span>+</h2>
+              <span className=" text-white">Worldwide Donor</span>
+          </div>
+          </div>
+          </div>
+          </div>
+      </section>
+
+      <section className="counter-area bg-white  pt-20 pb-20 sub-bg">
+
+
+          <div className="brand-area wow fadeInDown" data-wow-delay="200ms" data-wow-duration="1500ms">
+              <div className="container">
+                  <div className="row align-items-center">
+                      <div className="col-lg-4 col-md-12">
+                          <div className="vline">
+                              <h3 className="wow fadeInUp" data-wow-delay="200ms" data-wow-duration="1500ms"
+                                  style={{ visibility: "visible", animationDuration: "1500ms", animationDelay: "200ms", animationName: "fadeInUp", fontSize: "30px" }}>
+                                  Our Esteemed Clients
+                                  and Partners</h3>
+
+                          </div>
+                      </div>
+                      <div className="col-lg-8 col-md-12">
+                          <div className="swiper brand__slider p-4">
+                              <div className="swiper-wrapper clients">
+                                  <div className="swiper-slide">
+                                      <div className="image">
+                                          <SiteImage targetWidth={256} src={asset('assets/frontend/images/home/c1.png')} alt="image" />
+                                      </div>
+                                  </div>
+                                  <div className="swiper-slide">
+                                      <div className="image">
+                                          <SiteImage targetWidth={256} src={asset('assets/frontend/images/home/c2.png')} alt="image" />
+                                      </div>
+                                  </div>
+                                  <div className="swiper-slide">
+                                      <div className="image">
+                                          <SiteImage targetWidth={256} src={asset('assets/frontend/images/home/c3.png')} alt="image" />
+                                      </div>
+                                  </div>
+                                  <div className="swiper-slide">
+                                      <div className="image">
+                                          <SiteImage targetWidth={256} src={asset('assets/frontend/images/home/c4.png')} alt="image" />
+                                      </div>
+                                  </div>
+                                  <div className="swiper-slide">
+                                      <div className="image">
+                                          <SiteImage targetWidth={256} src={asset('assets/frontend/images/home/c5.png')} alt="image" />
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
+              </div>
+          </div>
+      </section>
+
+
+    </>
+  );
+}

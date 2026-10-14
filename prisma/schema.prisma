@@ -1,0 +1,1022 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model activity_log {
+  id           BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  log_name     String?
+  description  String    @db.Text
+  subject_type String?
+  subject_id   BigInt?   @db.UnsignedBigInt
+  causer_type  String?
+  causer_id    BigInt?   @db.UnsignedBigInt
+  properties   String?   @db.Text
+  batch_uuid   String?   @db.Char(36)
+  created_at   DateTime? @db.Timestamp(0)
+  updated_at   DateTime? @db.Timestamp(0)
+
+  @@index([log_name], map: "activity_log_log_name_index")
+  @@index([causer_type, causer_id], map: "causer")
+  @@index([subject_type, subject_id], map: "subject")
+}
+
+model addresses {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  owner_id   Int?
+  owner_type String?
+  street     String?
+  city       String?
+  state      String?
+  zip        String?
+  country    String?
+  type       String?
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model admin_chat_messages {
+  id          BigInt   @id @default(autoincrement())
+  sender_id   BigInt
+  receiver_id BigInt
+  message     String?  @db.Text
+  type        String?  @db.VarChar(255)
+  file_path   String?  @db.VarChar(255)
+  is_read     Int      @default(0)
+  created_at  DateTime @default(now()) @db.Timestamp(0)
+  updated_at  DateTime @default(now()) @db.Timestamp(0)
+}
+
+model announcements {
+  id              Int       @id @default(autoincrement()) @db.UnsignedInt
+  subject         String
+  date            DateTime  @db.DateTime(0)
+  message         String?   @db.Text
+  show_to_clients Boolean?  @default(false)
+  status          Boolean   @default(false)
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+}
+
+model app_general_setting {
+  id         Int       @id @default(autoincrement())
+  u_key      String?   @db.VarChar(255)
+  value      String    @db.VarChar(255)
+  created_at DateTime? @db.DateTime(0)
+  updated_at DateTime? @db.DateTime(0)
+}
+
+model blog_categories {
+  id                 BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  blog_category_name String    @db.VarChar(255)
+  is_deleted         Boolean   @default(false)
+  created_at         DateTime? @db.Timestamp(0)
+  updated_at         DateTime? @db.Timestamp(0)
+}
+
+model blogs {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  title      String?   @db.VarChar(255)
+  blog_image String?   @db.VarChar(255)
+  content    String?   @db.LongText
+  is_deleted Int
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model business_settings {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  type       String    @db.VarChar(50)
+  value      String    @db.LongText
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model career_applications {
+  id               BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name             String    @db.VarChar(255)
+  mobile           String    @db.VarChar(20)
+  email            String    @unique(map: "career_applications_email_unique") @db.VarChar(255)
+  resume_path      String    @db.VarChar(255)
+  qualification    String?   @db.VarChar(255)
+  dob              String?   @db.VarChar(55)
+  whatsappMobile   String?   @db.VarChar(55)
+  gender           String?   @db.VarChar(55)
+  yearofexperience String?   @db.VarChar(255)
+  address          String    @db.Text
+  created_at       DateTime? @db.Timestamp(0)
+  updated_at       DateTime? @db.Timestamp(0)
+}
+
+model categories {
+  id              Int      @id @default(autoincrement())
+  category_name   String   @db.VarChar(255)
+  category_logo   String?  @db.VarChar(255)
+  category_photo  String?  @db.VarChar(255)
+  category_url    String?  @db.VarChar(255)
+  is_deleted      Int      @default(0)
+  is_popular      Int      @default(0)
+  home_status     Int      @default(0)
+  primary_color   String?  @db.VarChar(255)
+  secondary_color String?  @db.VarChar(255)
+  created_at      DateTime @default(now()) @db.Timestamp(0)
+  updated_at      DateTime @default(now()) @db.Timestamp(0)
+}
+
+model cities {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  name       String?   @db.VarChar(255)
+  state_id   Int?
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model consultations {
+  id               Int      @id @default(autoincrement())
+  name             String   @db.VarChar(255)
+  designation      String   @db.VarChar(50)
+  lab_type         String   @db.VarChar(50)
+  school           String   @db.VarChar(255)
+  city             String   @db.VarChar(255)
+  mobile           String   @db.VarChar(10)
+  email            String   @db.VarChar(255)
+  class_range      String   @db.VarChar(100)
+  student_strength Int
+  preferred_date   DateTime @db.Date
+  preferred_time   DateTime @db.Time(0)
+  preferred_mode   String   @db.VarChar(50)
+  heard_about      String   @db.VarChar(50)
+  questions        String   @db.Text
+  created_at       DateTime @default(now()) @db.Timestamp(0)
+  updated_at       DateTime @default(now()) @db.Timestamp(0)
+}
+
+model contact_email_notifications {
+  id                    Int                 @id @default(autoincrement()) @db.UnsignedInt
+  contact_id            Int                 @db.UnsignedInt
+  email_notification_id Int                 @db.UnsignedInt
+  created_at            DateTime?           @db.Timestamp(0)
+  updated_at            DateTime?           @db.Timestamp(0)
+  contacts              contacts            @relation(fields: [contact_id], references: [id], onDelete: Cascade, map: "contact_email_notifications_contact_id_foreign")
+  email_notifications   email_notifications @relation(fields: [email_notification_id], references: [id], onDelete: Cascade, map: "contact_email_notifications_email_notification_id_foreign")
+
+  @@index([contact_id], map: "contact_email_notifications_contact_id_foreign")
+  @@index([email_notification_id], map: "contact_email_notifications_email_notification_id_foreign")
+}
+
+model contact_messages {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String    @db.VarChar(255)
+  email      String    @db.VarChar(255)
+  subject    String    @db.VarChar(255)
+  mobile     String    @db.VarChar(20)
+  message    String    @db.Text
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  updated_at DateTime? @default(now()) @db.Timestamp(0)
+}
+
+model contacts {
+  id                          Int                           @id @default(autoincrement()) @db.UnsignedInt
+  customer_id                 Int                           @db.UnsignedInt
+  user_id                     Int?                          @db.UnsignedInt
+  position                    String?
+  primary_contact             Boolean                       @default(false)
+  send_welcome_email          Boolean                       @default(false)
+  send_password_email         Boolean                       @default(false)
+  created_at                  DateTime?                     @db.Timestamp(0)
+  updated_at                  DateTime?                     @db.Timestamp(0)
+  contact_email_notifications contact_email_notifications[]
+  customers                   customers                     @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "contacts_customer_id_foreign")
+  users                       users?                        @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "contacts_user_id_foreign")
+
+  @@index([customer_id], map: "contacts_customer_id_foreign")
+  @@index([user_id], map: "contacts_user_id_foreign")
+}
+
+model countries {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  name       String
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model credit_note_addresses {
+  id             Int          @id @default(autoincrement()) @db.UnsignedInt
+  credit_note_id Int          @db.UnsignedInt
+  type           Int
+  street         String?      @db.Text
+  city           String?
+  state          String?
+  zip_code       String?
+  country        String?
+  created_at     DateTime?    @db.Timestamp(0)
+  updated_at     DateTime?    @db.Timestamp(0)
+  credit_notes   credit_notes @relation(fields: [credit_note_id], references: [id], onDelete: Cascade, map: "credit_note_addresses_credit_note_id_foreign")
+
+  @@index([credit_note_id], map: "credit_note_addresses_credit_note_id_foreign")
+}
+
+model credit_notes {
+  id                    Int                     @id @default(autoincrement()) @db.UnsignedInt
+  title                 String
+  customer_id           Int                     @db.UnsignedInt
+  credit_note_number    String
+  credit_note_date      DateTime                @db.DateTime(0)
+  currency              Int
+  discount_type         Int?
+  reference             String?
+  discount              Float?
+  admin_text            String?                 @db.Text
+  unit                  Int
+  client_note           String?                 @db.Text
+  term_conditions       String?                 @db.Text
+  sub_total             Float?
+  adjustment            String                  @default("0")
+  total_amount          Float?
+  payment_status        Int?
+  discount_symbol       Int?
+  created_at            DateTime?               @db.Timestamp(0)
+  updated_at            DateTime?               @db.Timestamp(0)
+  credit_note_addresses credit_note_addresses[]
+  customers             customers               @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "credit_notes_customer_id_foreign")
+
+  @@index([customer_id], map: "credit_notes_customer_id_foreign")
+}
+
+model customer_groups {
+  id                          Int                           @id @default(autoincrement()) @db.UnsignedInt
+  name                        String                        @unique(map: "customer_groups_name_unique")
+  description                 String?                       @db.Text
+  created_at                  DateTime?                     @db.Timestamp(0)
+  updated_at                  DateTime?                     @db.Timestamp(0)
+  customer_to_customer_groups customer_to_customer_groups[]
+}
+
+model customer_to_customer_groups {
+  id                Int             @id @default(autoincrement()) @db.UnsignedInt
+  customer_id       Int             @db.UnsignedInt
+  customer_group_id Int             @db.UnsignedInt
+  created_at        DateTime?       @db.Timestamp(0)
+  updated_at        DateTime?       @db.Timestamp(0)
+  customer_groups   customer_groups @relation(fields: [customer_group_id], references: [id], onDelete: Cascade, map: "customer_to_customer_groups_customer_group_id_foreign")
+  customers         customers       @relation(fields: [customer_id], references: [id], onDelete: Cascade, map: "customer_to_customer_groups_customer_id_foreign")
+
+  @@index([customer_group_id], map: "customer_to_customer_groups_customer_group_id_foreign")
+  @@index([customer_id], map: "customer_to_customer_groups_customer_id_foreign")
+}
+
+model customers {
+  id                          Int                           @id @default(autoincrement()) @db.UnsignedInt
+  user_id                     Int                           @db.UnsignedInt
+  username                    String                        @db.VarChar(255)
+  userbusiness_name           String?                       @db.VarChar(255)
+  mobile_number               String                        @unique(map: "mobile_number") @db.VarChar(15)
+  address                     String?                       @db.Text
+  userphoto                   String?                       @db.VarChar(255)
+  userbusiness_photo          String?                       @db.VarChar(255)
+  phone                       String?                       @db.VarChar(15)
+  currency                    String?                       @db.VarChar(10)
+  default_language            String?                       @db.VarChar(10)
+  created_at                  DateTime                      @default(now()) @db.Timestamp(0)
+  updated_at                  DateTime                      @default(now()) @db.Timestamp(0)
+  contacts                    contacts[]
+  credit_notes                credit_notes[]
+  customer_to_customer_groups customer_to_customer_groups[]
+
+  @@index([user_id], map: "user_id")
+}
+
+model dashboard_slider {
+  id          BigInt                @id @default(autoincrement()) @db.UnsignedBigInt
+  title       String
+  description String?               @db.Text
+  image       String?
+  type        dashboard_slider_type
+  status      Boolean               @default(true)
+  created_at  DateTime?             @db.Timestamp(0)
+  updated_at  DateTime?             @db.Timestamp(0)
+}
+
+model departments {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  name       String    @unique(map: "departments_name_unique")
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model designation {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(255)
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  updated_at DateTime @default(now()) @db.Timestamp(0)
+}
+
+model email_notifications {
+  id                          Int                           @id @default(autoincrement()) @db.UnsignedInt
+  name                        String
+  created_at                  DateTime?                     @db.Timestamp(0)
+  updated_at                  DateTime?                     @db.Timestamp(0)
+  contact_email_notifications contact_email_notifications[]
+}
+
+model email_templates {
+  id              Int       @id @default(autoincrement()) @db.UnsignedInt
+  template_name   String
+  template_type   Int
+  subject         String?
+  from_name       String
+  send_plain_text Boolean   @default(false)
+  disabled        Boolean   @default(false)
+  email_message   String    @db.Text
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+}
+
+model events {
+  id           BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  title        String    @db.VarChar(255)
+  main_image   String    @db.VarChar(255)
+  start_image  String    @db.VarChar(255)
+  middle_image String?   @db.VarChar(255)
+  end_image    String?   @db.VarChar(255)
+  content      String?   @db.Text
+  main_condent String?   @db.LongText
+  image_4      String?   @db.LongText
+  image_5      String?   @db.LongText
+  image_6      String?   @db.LongText
+  is_deleted   Int
+  type         String    @db.VarChar(255)
+  created_at   DateTime? @db.Timestamp(0)
+  updated_at   DateTime? @db.Timestamp(0)
+  date         String?   @db.VarChar(255)
+  venue        String?   @db.VarChar(255)
+  author_name  String?   @db.VarChar(255)
+  orderby_no   Int?
+  category_id  BigInt?   @db.UnsignedBigInt
+  price        Decimal   @default(0.00) @db.Decimal(15, 2)
+}
+
+model failed_jobs {
+  id         BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  uuid       String?  @unique(map: "failed_jobs_uuid_unique")
+  connection String   @db.Text
+  queue      String   @db.Text
+  payload    String   @db.LongText
+  exception  String   @db.LongText
+  failed_at  DateTime @default(now()) @db.Timestamp(0)
+}
+
+model help_topics {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  type       String    @default("default")
+  question   String?   @db.Text
+  answer     String?   @db.Text
+  ranking    Int       @default(1)
+  status     Boolean   @default(true)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model invoice_addresses {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  invoice_id Int       @db.UnsignedInt
+  type       Int
+  street     String?   @db.Text
+  city       String?
+  state      String?
+  zip_code   String?
+  country    String?
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+
+  @@index([invoice_id], map: "invoice_addresses_invoice_id_foreign")
+}
+
+model invoice_payment_modes {
+  id              Int       @id @default(autoincrement()) @db.UnsignedInt
+  payment_mode_id Int       @db.UnsignedInt
+  invoice_id      Int       @db.UnsignedInt
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+
+  @@index([invoice_id], map: "invoice_payment_modes_invoice_id_foreign")
+  @@index([payment_mode_id], map: "invoice_payment_modes_payment_mode_id_foreign")
+}
+
+model invoices {
+  id              Int       @id @default(autoincrement()) @db.UnsignedInt
+  title           String
+  customer_id     Int       @db.UnsignedInt
+  invoice_number  String
+  invoice_date    DateTime  @db.Date
+  due_date        DateTime? @db.Date
+  sales_agent_id  Int?      @db.UnsignedInt
+  currency        Int       @default(0)
+  discount_type   Int?
+  discount        Float?
+  admin_text      String?   @db.Text
+  unit            Int
+  client_note     String?   @db.Text
+  term_conditions String?   @db.Text
+  sub_total       Float?
+  adjustment      String    @default("0")
+  total_amount    Float?
+  payment_status  Int?
+  discount_symbol Int?
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+  hsn_tax         String?
+
+  @@index([customer_id], map: "invoices_customer_id_foreign")
+  @@index([sales_agent_id], map: "invoices_sales_agent_id_foreign")
+}
+
+model languages {
+  id              Int       @id @default(autoincrement()) @db.UnsignedInt
+  name            String
+  description     String?   @db.Text
+  is_default      Boolean   @default(false)
+  is_app_language Int       @default(1)
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+}
+
+model media {
+  id                    BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  model_type            String
+  model_id              BigInt    @db.UnsignedBigInt
+  collection_name       String
+  name                  String
+  file_name             String
+  mime_type             String?
+  disk                  String
+  size                  BigInt    @db.UnsignedBigInt
+  manipulations         String    @db.Text
+  custom_properties     String    @db.Text
+  responsive_images     String    @db.Text
+  order_column          Int?      @db.UnsignedInt
+  created_at            DateTime? @db.Timestamp(0)
+  updated_at            DateTime? @db.Timestamp(0)
+  conversions_disk      String?
+  uuid                  String?   @unique(map: "media_uuid_unique") @db.Char(36)
+  generated_conversions String    @db.Text
+
+  @@index([model_type, model_id], map: "media_model_type_model_id_index")
+}
+
+model migrations {
+  id        Int    @id @default(autoincrement()) @db.UnsignedInt
+  migration String
+  batch     Int
+}
+
+model model_has_permissions {
+  permission_id BigInt @db.UnsignedBigInt
+  model_type    String
+  model_id      BigInt @db.UnsignedBigInt
+
+  @@id([permission_id, model_id, model_type])
+  @@index([model_id, model_type], map: "model_has_permissions_model_id_model_type_index")
+}
+
+model model_has_roles {
+  role_id    BigInt @db.UnsignedBigInt
+  model_type String
+  model_id   BigInt @db.UnsignedBigInt
+
+  @@id([role_id, model_id, model_type])
+  @@index([model_id, model_type], map: "model_has_roles_model_id_model_type_index")
+}
+
+model notes {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  owner_id   Int
+  owner_type String
+  note       String?   @db.Text
+  added_by   Int       @db.UnsignedInt
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+
+  @@index([added_by], map: "notes_added_by_foreign")
+}
+
+model notifications {
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  title       String?
+  type        String?
+  description String?   @db.Text
+  read_at     DateTime? @db.Timestamp(0)
+  user_id     Int?      @db.UnsignedInt
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+
+  @@index([user_id], map: "notifications_user_id_foreign")
+}
+
+model order_items {
+  id              Int      @id @default(autoincrement())
+  order_id        Int      @db.UnsignedInt
+  product_id      Int      @db.UnsignedInt
+  category_id     Int      @db.UnsignedInt
+  sub_category_id Int      @db.UnsignedInt
+  quantity        Int
+  price_per_unit  Decimal  @db.Decimal(10, 2)
+  total_price     Decimal  @db.Decimal(10, 2)
+  created_at      DateTime @default(now()) @db.Timestamp(0)
+  updated_at      DateTime @default(now()) @db.Timestamp(0)
+}
+
+model orders {
+  id                  Int      @id @default(autoincrement())
+  user_id             Int      @db.UnsignedInt
+  customer_id         Int      @db.UnsignedInt
+  previous_balance    Decimal  @default(0.00) @db.Decimal(15, 2)
+  subtotal            Decimal  @db.Decimal(10, 2)
+  paid_amount         Decimal  @db.Decimal(10, 2)
+  current_day_balance Decimal  @db.Decimal(10, 2)
+  remaining_balance   Decimal  @default(0.00) @db.Decimal(15, 2)
+  is_deleted          Int      @default(0)
+  created_at          DateTime @default(now()) @db.Timestamp(0)
+  updated_at          DateTime @default(now()) @db.Timestamp(0)
+
+  @@index([customer_id], map: "customer_id")
+  @@index([user_id], map: "user_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model password_resets {
+  email      String
+  token      String
+  created_at DateTime? @db.Timestamp(0)
+
+  @@index([email], map: "password_resets_email_index")
+  @@ignore
+}
+
+model payment_modes {
+  id          Int       @id @default(autoincrement()) @db.UnsignedInt
+  name        String    @unique(map: "payment_modes_name_unique")
+  description String?   @db.Text
+  active      Boolean
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+}
+
+model payments {
+  id                             Int       @id @default(autoincrement()) @db.UnsignedInt
+  owner_id                       Int
+  owner_type                     String
+  amount_received                Float
+  payment_date                   DateTime  @db.DateTime(0)
+  payment_mode                   Int       @db.UnsignedInt
+  transaction_id                 String?
+  note                           String?   @db.Text
+  send_mail_to_customer_contacts Boolean?
+  stripe_id                      String?
+  meta                           String?   @db.Text
+  created_at                     DateTime? @db.Timestamp(0)
+  updated_at                     DateTime? @db.Timestamp(0)
+
+  @@index([payment_mode], map: "payments_payment_mode_foreign")
+}
+
+model permissions {
+  id           BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name         String
+  display_name String?
+  description  String?
+  type         String?
+  guard_name   String
+  created_at   DateTime? @db.Timestamp(0)
+  updated_at   DateTime? @db.Timestamp(0)
+}
+
+model personal_access_tokens {
+  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  tokenable_type String
+  tokenable_id   BigInt    @db.UnsignedBigInt
+  name           String
+  token          String    @unique(map: "personal_access_tokens_token_unique") @db.VarChar(64)
+  abilities      String?   @db.Text
+  last_used_at   DateTime? @db.Timestamp(0)
+  expires_at     DateTime? @db.Timestamp(0)
+  created_at     DateTime? @db.Timestamp(0)
+  updated_at     DateTime? @db.Timestamp(0)
+
+  @@index([tokenable_type, tokenable_id], map: "personal_access_tokens_tokenable_type_tokenable_id_index")
+}
+
+model popular_location {
+  id         Int       @id @default(autoincrement())
+  location   String?   @db.Text
+  latitude   String?   @db.VarChar(255)
+  longitude  String?   @db.VarChar(255)
+  state_name String?   @db.VarChar(255)
+  city_name  String?   @db.VarChar(255)
+  status     Int       @default(1)
+  created_at DateTime? @db.DateTime(0)
+  updated_at DateTime? @db.DateTime(0)
+}
+
+model predefined_replies {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  reply_name String
+  body       String?   @db.Text
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model product_returns {
+  id            Int      @id @default(autoincrement())
+  customer_id   Int
+  product_id    Int
+  product_name  String   @db.VarChar(255)
+  product_qty   Int
+  return_reason String   @db.Text
+  created_at    DateTime @default(now()) @db.Timestamp(0)
+  updated_at    DateTime @default(now()) @db.Timestamp(0)
+}
+
+model product_stock {
+  id              Int      @id @default(autoincrement())
+  product_id      Int      @db.UnsignedInt
+  user_id         Int      @db.UnsignedInt
+  total_stock_in  Int      @default(0)
+  total_stock_out Int      @default(0)
+  current_stock   Int?
+  created_at      DateTime @default(now()) @db.Timestamp(0)
+  updated_at      DateTime @default(now()) @db.Timestamp(0)
+
+  @@index([product_id], map: "product_id")
+  @@index([user_id], map: "user_id")
+}
+
+model products {
+  id              Int      @id @default(autoincrement()) @db.UnsignedInt
+  user_id         Int
+  category_id     Int      @db.UnsignedInt
+  sub_category_id Int      @db.UnsignedInt
+  product_name    String   @db.VarChar(255)
+  product_qty     Int
+  stock           String   @default("0") @db.VarChar(255)
+  product_amount  Decimal  @db.Decimal(10, 2)
+  product_logo    String   @db.VarChar(255)
+  product_photo   String   @db.VarChar(255)
+  product_url     String   @db.VarChar(255)
+  is_delete       Boolean? @default(false)
+  created_at      DateTime @default(now()) @db.Timestamp(0)
+  updated_at      DateTime @default(now()) @db.Timestamp(0)
+}
+
+model projects {
+  id                               Int       @id @default(autoincrement()) @db.UnsignedInt
+  project_name                     String
+  customer_id                      Int       @db.UnsignedInt
+  calculate_progress_through_tasks Boolean?
+  progress                         String?
+  billing_type                     Int
+  status                           Int
+  estimated_hours                  String?
+  start_date                       DateTime  @db.Date
+  deadline                         DateTime  @db.Date
+  description                      String?   @db.Text
+  send_email                       Boolean
+  created_at                       DateTime? @db.Timestamp(0)
+  updated_at                       DateTime? @db.Timestamp(0)
+
+  @@index([customer_id], map: "projects_customer_id_foreign")
+}
+
+model proposals {
+  id               Int       @id @default(autoincrement()) @db.UnsignedInt
+  proposal_number  String    @unique(map: "proposals_proposal_number_unique")
+  title            String
+  related_to       String?
+  date             DateTime  @db.DateTime(0)
+  open_till        DateTime? @db.DateTime(0)
+  currency         Int
+  discount_type    Int?
+  status           Int
+  assigned_user_id Int?
+  phone            String?
+  discount         Float?
+  unit             Int
+  sub_total        Float?
+  adjustment       String    @default("0")
+  total_amount     Float?
+  payment_status   Int?
+  owner_id         Int?
+  owner_type       String?
+  discount_symbol  Int?
+  created_at       DateTime? @db.Timestamp(0)
+  updated_at       DateTime? @db.Timestamp(0)
+  hsn_tax          String?
+}
+
+model reminders {
+  id            Int       @id @default(autoincrement()) @db.UnsignedInt
+  owner_id      Int
+  owner_type    String
+  notified_date DateTime  @db.DateTime(0)
+  reminder_to   Int       @db.UnsignedInt
+  added_by      Int
+  description   String    @db.Text
+  is_notified   Boolean?  @default(false)
+  status        Boolean   @default(false)
+  created_at    DateTime? @db.Timestamp(0)
+  updated_at    DateTime? @db.Timestamp(0)
+
+  @@index([reminder_to], map: "reminders_reminder_to_foreign")
+}
+
+model role_has_permissions {
+  permission_id BigInt @db.UnsignedBigInt
+  role_id       BigInt @db.UnsignedBigInt
+
+  @@id([permission_id, role_id])
+  @@index([role_id], map: "role_has_permissions_role_id_foreign")
+}
+
+model roles {
+  id           BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name         String
+  display_name String?
+  description  String?
+  guard_name   String
+  is_default   Boolean   @default(false)
+  created_at   DateTime? @db.Timestamp(0)
+  updated_at   DateTime? @db.Timestamp(0)
+}
+
+model services {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  name       String    @unique(map: "services_name_unique")
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model settings {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  key        String
+  value      String?   @db.Text
+  group      Int
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model sliders {
+  id                 Int       @id @default(autoincrement())
+  slider_title       String?   @db.VarChar(255)
+  slider_image       String?   @db.VarChar(255)
+  slider_description String?   @db.LongText
+  state_id           Int?
+  start_date         String?   @db.VarChar(255)
+  end_date           String?   @db.VarChar(255)
+  status             Int       @default(1)
+  created_at         DateTime? @db.DateTime(0)
+  updated_at         DateTime? @db.DateTime(0)
+}
+
+model states {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  name       String    @db.VarChar(255)
+  country_id Int
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model sub_categories {
+  id                 Int      @id @default(autoincrement())
+  category_id        Int      @db.UnsignedInt
+  sub_category_name  String   @db.VarChar(255)
+  sub_category_logo  String?  @db.VarChar(255)
+  sub_category_photo String?  @db.VarChar(255)
+  sub_category_url   String?  @db.VarChar(255)
+  is_deleted         Boolean? @default(false)
+  created_at         DateTime @default(now()) @db.Timestamp(0)
+  updated_at         DateTime @default(now()) @db.Timestamp(0)
+}
+
+model support_ticket_convs {
+  id                BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  support_ticket_id BigInt?
+  admin_id          BigInt?
+  customer_message  String?
+  msg_type          String?   @db.VarChar(255)
+  attachment        String?   @db.LongText
+  admin_message     String?
+  position          Int       @default(0)
+  created_at        DateTime? @db.Timestamp(0)
+  updated_at        DateTime? @db.Timestamp(0)
+}
+
+model support_tickets {
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  customer_id BigInt?
+  subject     String?   @db.VarChar(150)
+  type        String?   @db.VarChar(50)
+  msg_type    String?   @db.VarChar(255)
+  priority    String    @default("low") @db.VarChar(15)
+  description String?   @db.VarChar(255)
+  attachment  String?   @db.LongText
+  reply       String?   @db.VarChar(255)
+  status      String    @default("open") @db.VarChar(15)
+  created_at  DateTime? @db.Timestamp(0)
+  updated_at  DateTime? @db.Timestamp(0)
+}
+
+model ticket_booking {
+  id          Int       @id @default(autoincrement())
+  user_id     Int?
+  seller_id   Int?
+  ticket_id   Int?
+  ticket_type String?   @db.VarChar(55)
+  created_at  DateTime? @db.DateTime(0)
+  updated_at  DateTime? @db.DateTime(0)
+}
+
+model ticket_booking_convs {
+  id                BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  ticket_booking_id BigInt?
+  user_id           BigInt?
+  customer_message  String?
+  msg_type          String?   @db.VarChar(255)
+  attachment        String?   @db.LongText
+  admin_message     String?
+  position          Int       @default(0)
+  created_at        DateTime? @db.Timestamp(0)
+  updated_at        DateTime? @db.Timestamp(0)
+  isDeleted         Int       @default(0)
+  deleted_by        Int?
+  deleted_at        DateTime? @db.DateTime(0)
+}
+
+model ticket_priorities {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  name       String    @unique(map: "ticket_priorities_name_unique")
+  status     Boolean
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model ticket_replies {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  ticket_id  Int       @db.UnsignedInt
+  user_id    Int       @db.UnsignedInt
+  reply      String    @db.Text
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+
+  @@index([ticket_id], map: "ticket_replies_ticket_id_foreign")
+  @@index([user_id], map: "ticket_replies_user_id_foreign")
+}
+
+model ticket_statuses {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  name       String    @unique(map: "ticket_statuses_name_unique")
+  pick_color String
+  is_default Int?      @default(0)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
+}
+
+model tickets {
+  id                  Int       @id @default(autoincrement()) @db.UnsignedInt
+  subject             String
+  contact_id          Int?      @db.UnsignedInt
+  name                String?
+  email               String?
+  department_id       Int?      @db.UnsignedInt
+  cc                  String?
+  assign_to           Int?      @db.UnsignedInt
+  priority_id         Int?      @db.UnsignedInt
+  service_id          Int?      @db.UnsignedInt
+  predefined_reply_id Int?      @db.UnsignedInt
+  body                String?   @db.Text
+  ticket_status_id    Int?      @db.UnsignedInt
+  created_at          DateTime? @db.Timestamp(0)
+  updated_at          DateTime? @db.Timestamp(0)
+
+  @@index([assign_to], map: "tickets_assign_to_foreign")
+  @@index([contact_id], map: "tickets_contact_id_foreign")
+  @@index([department_id], map: "tickets_department_id_foreign")
+  @@index([predefined_reply_id], map: "tickets_predefined_reply_id_foreign")
+  @@index([priority_id], map: "tickets_priority_id_foreign")
+  @@index([service_id], map: "tickets_service_id_foreign")
+  @@index([ticket_status_id], map: "tickets_ticket_status_id_foreign")
+}
+
+model transactions {
+  id            BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id       BigInt              @db.UnsignedBigInt
+  customer_id   Int
+  amount        Decimal             @db.Decimal(10, 2)
+  type          transactions_type
+  reference     String              @db.VarChar(255)
+  balance_after Decimal             @db.Decimal(10, 2)
+  status        transactions_status
+  created_at    DateTime?           @db.Timestamp(0)
+  updated_at    DateTime?           @db.Timestamp(0)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model user_departments {
+  user_id       Int @db.UnsignedInt
+  department_id Int @db.UnsignedInt
+
+  @@index([department_id], map: "user_departments_department_id_foreign")
+  @@index([user_id], map: "user_departments_user_id_foreign")
+  @@ignore
+}
+
+model useraddress {
+  user_id        Int      @id
+  blobk_no       String?  @db.VarChar(50)
+  street         String?  @db.VarChar(255)
+  address        String?  @db.Text
+  landmark       String?  @db.VarChar(255)
+  city           String?  @db.VarChar(100)
+  unit_no        String?  @db.VarChar(50)
+  pincode        String?  @db.VarChar(20)
+  contact_person String?  @db.VarChar(255)
+  contact_number String?  @db.VarChar(20)
+  latitude       Decimal? @db.Decimal(10, 8)
+  longitude      Decimal? @db.Decimal(11, 8)
+  created_at     DateTime @default(now()) @db.Timestamp(0)
+  updated_at     DateTime @default(now()) @db.Timestamp(0)
+}
+
+model users {
+  id                        Int        @id @default(autoincrement()) @db.UnsignedInt
+  first_name                String?
+  last_name                 String?
+  gender                    String?    @db.VarChar(255)
+  alternate_number          String?    @db.VarChar(255)
+  business_name             String?    @db.VarChar(255)
+  address                   String?    @db.LongText
+  state_name                String?    @db.VarChar(255)
+  city_name                 String?    @db.VarChar(255)
+  state_id                  Int?
+  city_id                   Int?
+  latitude                  String?    @db.VarChar(255)
+  longitude                 String?    @db.VarChar(255)
+  email                     String?    @unique(map: "users_email_unique")
+  phone                     String?
+  otp                       String?    @db.VarChar(10)
+  is_location_verrify       Int        @default(0)
+  is_selfi_get              Int        @default(0)
+  is_profile_update         Int        @default(0)
+  referral_code             String?    @db.VarChar(50)
+  security_token            String?    @db.VarChar(255)
+  css_no                    String?    @db.VarChar(255)
+  branch                    String?    @db.VarChar(255)
+  password                  String?
+  owner_id                  Int?
+  owner_type                String?
+  is_enable                 Boolean    @default(true)
+  is_admin                  Boolean    @default(false)
+  image                     String?
+  facebook                  String?
+  linkedin                  String?
+  skype                     String?
+  staff_member              Boolean?
+  send_welcome_email        Boolean?
+  default_language          String?
+  email_verified_at         DateTime?  @db.Timestamp(0)
+  remember_token            String?    @db.VarChar(100)
+  created_at                DateTime?  @db.Timestamp(0)
+  updated_at                DateTime?  @db.Timestamp(0)
+  stripe_id                 String?
+  pm_type                   String?
+  pm_last_four              String?    @db.VarChar(4)
+  trial_ends_at             DateTime?  @db.Timestamp(0)
+  api_token                 String?    @db.LongText
+  device_id                 String?    @db.VarChar(255)
+  verification_code         String?    @db.VarChar(255)
+  is_verified_device        Int        @default(0)
+  isBlocked                 Int        @default(0)
+  blocked_reason            String?    @db.Text
+  secondary_mobile_verified Int        @default(0)
+  contacts                  contacts[]
+
+  @@index([stripe_id], map: "users_stripe_id_index")
+}
+
+enum dashboard_slider_type {
+  customer
+  driver
+}
+
+enum transactions_type {
+  debit
+  credit
+}
+
+enum transactions_status {
+  pending
+  completed
+}

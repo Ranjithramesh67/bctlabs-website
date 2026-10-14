@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: ["master", "main"]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      # The build only needs these to be present and well-formed; it does not
+      # connect to a database (all DB-backed pages are rendered at request time).
+      DATABASE_URL: "mysql://ci:ci@127.0.0.1:3306/ci"
+      SESSION_SECRET: "ci-only-secret-ci-only-secret-ci-only"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `postinstall` runs `prisma generate`.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build

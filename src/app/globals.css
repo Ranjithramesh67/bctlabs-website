@@ -1,0 +1,10 @@
+/*
+ * This app is a faithful port of a legacy Bootstrap/Stisla theme. Tailwind's
+ * preflight reset is intentionally NOT loaded: it overrides the legacy body
+ * background, font family and element defaults, and its dark-mode body colours
+ * made the admin/auth pages render with the wrong theme. Only the utility
+ * layer is kept for incidental use.
+ */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
