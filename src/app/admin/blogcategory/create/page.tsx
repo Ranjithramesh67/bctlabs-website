@@ -12,7 +12,7 @@ export default function BlogCategoryCreatePage() {
     >
       <div className="card">
         <div className="card-body">
-          <form action={storeBlogCategory} method="post">
+          <form action={storeBlogCategory}>
             <div className="row">
               <div className="col-xl-6 col-md-6 mb-4">
                 <label className="form-label font-w600">

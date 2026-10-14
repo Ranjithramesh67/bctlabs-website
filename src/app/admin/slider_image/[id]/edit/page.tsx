@@ -42,7 +42,6 @@ export default async function SliderImageEditPage({
         <div className="card-body">
           <form
             action={updateSlider}
-            method="post"
             encType="multipart/form-data"
           >
             <input type="hidden" name="id" value={id} />

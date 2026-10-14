@@ -25,7 +25,6 @@ export default async function SliderImageCreatePage() {
         <div className="card-body">
           <form
             action={storeSlider}
-            method="post"
             encType="multipart/form-data"
           >
             <div className="row">

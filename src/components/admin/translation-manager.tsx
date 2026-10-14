@@ -164,7 +164,7 @@ export function TranslationManager({
                     &times;
                   </button>
                 </div>
-                <form action={storeLanguage} method="post" id="addNewForm">
+                <form action={storeLanguage} id="addNewForm">
                   <div className="modal-body">
                     <div
                       className="alert alert-danger d-none"
@@ -237,7 +237,7 @@ export function TranslationManager({
                 </div>
                 <form
                   action={updateLanguage}
-                  method="post"
+                 
                   id="editLanguageForm"
                 >
                   <div className="modal-body">

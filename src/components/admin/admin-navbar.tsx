@@ -1,37 +1,53 @@
 "use client";
 
+import { useRef } from "react";
+
 import { NotificationBell } from "@/components/admin/notification-bell";
+import { useDropdown } from "@/components/admin/use-dropdown";
 import { t } from "@/lib/i18n";
 
 type Props = {
   firstName: string;
   fullName: string;
   imageUrl: string;
+  /** Opens/closes the off-canvas sidebar on small screens. */
+  onToggleSidebar: () => void;
+  sidebarOpen: boolean;
 };
 
-export function AdminNavbar({ firstName, fullName, imageUrl }: Props) {
+export function AdminNavbar({
+  firstName,
+  fullName,
+  imageUrl,
+  onToggleSidebar,
+  sidebarOpen,
+}: Props) {
+  const userMenuRef = useRef<HTMLLIElement>(null);
+  const userMenu = useDropdown(userMenuRef);
+
   return (
     <>
       <form className="form-inline mr-auto" action="#">
         <ul className="navbar-nav mr-3">
           <li>
-            <a
-              href="#"
-              data-toggle="sidebar"
-              className="nav-link nav-link-lg"
+            <button
+              type="button"
+              onClick={onToggleSidebar}
+              className="nav-link nav-link-lg admin-sidebar-toggle border-0 bg-transparent d-lg-none"
               aria-label="Toggle sidebar"
+              aria-expanded={sidebarOpen}
             >
               <i className="fas fa-bars"></i>
-            </a>
+            </button>
           </li>
           <li>
-            <a
-              href="#"
-              data-toggle="search"
-              className="nav-link nav-link-lg d-sm-none"
+            <button
+              type="button"
+              className="nav-link nav-link-lg d-none border-0 bg-transparent"
+              aria-label="Search"
             >
               <i className="fas fa-search"></i>
-            </a>
+            </button>
           </li>
         </ul>
         <div className="search-element">
@@ -51,11 +67,16 @@ export function AdminNavbar({ firstName, fullName, imageUrl }: Props) {
       </form>
       <NotificationBell />
       <ul className="navbar-nav navbar-right">
-        <li className="dropdown">
+        <li className={`dropdown ${userMenu.open ? "show" : ""}`} ref={userMenuRef}>
           <a
             href="#"
-            data-toggle="dropdown"
             className="nav-link dropdown-toggle nav-link-lg nav-link-user"
+            aria-haspopup="true"
+            aria-expanded={userMenu.open}
+            onClick={(event) => {
+              event.preventDefault();
+              userMenu.toggle();
+            }}
           >
             <img
               alt=""
@@ -68,7 +89,9 @@ export function AdminNavbar({ firstName, fullName, imageUrl }: Props) {
               {t("edit_profile.hi")}, {firstName}
             </div>
           </a>
-          <div className="dropdown-menu dropdown-menu-right">
+          <div
+            className={`dropdown-menu dropdown-menu-right ${userMenu.open ? "show" : ""}`}
+          >
             <div className="dropdown-title">
               {t("edit_profile.welcome")}, {fullName}
             </div>

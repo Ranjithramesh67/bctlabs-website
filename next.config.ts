@@ -4,6 +4,11 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
+  // The hosted preview serves the dev server through a proxied
+  // `*.monkeycode-ai.live` host. Next 16 blocks cross-origin requests to its
+  // dev-only assets/endpoints (including the HMR socket the client bootstrap
+  // needs) unless the requesting host is explicitly allowed.
+  allowedDevOrigins: ["127.0.0.1", "*.monkeycode-ai.live", "**.monkeycode-ai.live"],
   images: {
     // Content images are effectively immutable; keep optimized variants warm.
     minimumCacheTTL: 86400,

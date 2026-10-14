@@ -168,7 +168,7 @@ export function CitiesGrid({
                   &times;
                 </button>
               </div>
-              <form action={storeCity} method="post">
+              <form action={storeCity}>
                 <div className="modal-content">
                   <div className="modal-body">
                     <div className="mb-3">
@@ -237,7 +237,7 @@ export function CitiesGrid({
                   &times;
                 </button>
               </div>
-              <form action={updateCity} method="post">
+              <form action={updateCity}>
                 <div className="modal-content">
                   <div className="modal-body">
                     <input type="hidden" name="id" value={editing.id} />

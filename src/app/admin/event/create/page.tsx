@@ -43,7 +43,7 @@ export default async function EventCreatePage({
     <AdminSection title="Create" backHref="/admin/get_category">
       <div className="card">
         <div className="card-body">
-          <form action={storeEvent} method="post">
+          <form action={storeEvent}>
             <div className="row">
               <div className="col-xl-12 col-md-12 mb-4">
                 <label className="form-label font-w600">

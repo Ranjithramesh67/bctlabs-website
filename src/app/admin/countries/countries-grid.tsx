@@ -160,7 +160,7 @@ export function CountriesGrid({
                   &times;
                 </button>
               </div>
-              <form id="addNewForm" action={storeCountry} method="post">
+              <form id="addNewForm" action={storeCountry}>
                 <div className="modal-body">
                   <div
                     className="alert alert-danger d-none"
@@ -225,7 +225,7 @@ export function CountriesGrid({
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-              <form id="editForm" action={updateCountry} method="post">
+              <form id="editForm" action={updateCountry}>
                 <div className="modal-body">
                   <div
                     className="alert alert-danger d-none"

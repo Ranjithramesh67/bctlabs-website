@@ -65,7 +65,7 @@ export default async function EventEditPage({
     <AdminSection title="Edit" backHref="/admin/event/index">
       <div className="card">
         <div className="card-body">
-          <form action={updateEvent} method="post">
+          <form action={updateEvent}>
             <input type="hidden" name="id" value={id} />
             <div className="row">
               <div className="col-xl-12 col-md-12 mb-4">

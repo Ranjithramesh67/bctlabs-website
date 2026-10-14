@@ -96,59 +96,53 @@ export function MembersIndex({
 
   return (
     <section className="section">
-      <div className="section-header mobile-sec-header" style={{ display: "block" }}>
-        <div className="d-flex">
-          <h1>{t("members")}</h1>
-          <div className="section-header-breadcrumb float-right">
-            <div className="section-header-breadcrumb float-right">
-              <div className="card-header-action mr-3 select2-mobile-margin">
-                <select
-                  id="memberStatus"
-                  name="is_enable"
-                  className="form-control"
-                  value={filters.status}
-                  onChange={(event) =>
-                    applyFilters({ status: event.target.value })
-                  }
-                >
-                  <option value="">{t("placeholder.select_status")}</option>
-                  <option value="1">Active</option>
-                  <option value="0">Deactive</option>
-                </select>
-              </div>
-            </div>
-            <div className="card-header-action mr-3">
-              <input
-                type="date"
-                id="fromDate"
-                className="form-control"
-                placeholder="From Date"
-                value={fromDate}
-                onChange={(event) => {
-                  setFromDate(event.target.value);
-                  applyFilters({
-                    fromDate: event.target.value,
-                    toDate,
-                  });
-                }}
-              />
-            </div>
-            <div className="card-header-action mr-3">
-              <input
-                type="date"
-                id="toDate"
-                className="form-control"
-                placeholder="To Date"
-                value={toDate}
-                onChange={(event) => {
-                  setToDate(event.target.value);
-                  applyFilters({
-                    fromDate,
-                    toDate: event.target.value,
-                  });
-                }}
-              />
-            </div>
+      <div className="section-header mobile-sec-header">
+        <h1>{t("members")}</h1>
+        <div className="section-header-breadcrumb float-right">
+          <div className="card-header-action mr-3 select2-mobile-margin">
+            <select
+              id="memberStatus"
+              name="is_enable"
+              className="form-control"
+              value={filters.status}
+              onChange={(event) => applyFilters({ status: event.target.value })}
+            >
+              <option value="">{t("placeholder.select_status")}</option>
+              <option value="1">Active</option>
+              <option value="0">Deactive</option>
+            </select>
+          </div>
+          <div className="card-header-action mr-3">
+            <input
+              type="date"
+              id="fromDate"
+              className="form-control"
+              placeholder="From Date"
+              value={fromDate}
+              onChange={(event) => {
+                setFromDate(event.target.value);
+                applyFilters({
+                  fromDate: event.target.value,
+                  toDate,
+                });
+              }}
+            />
+          </div>
+          <div className="card-header-action mr-3">
+            <input
+              type="date"
+              id="toDate"
+              className="form-control"
+              placeholder="To Date"
+              value={toDate}
+              onChange={(event) => {
+                setToDate(event.target.value);
+                applyFilters({
+                  fromDate,
+                  toDate: event.target.value,
+                });
+              }}
+            />
           </div>
         </div>
       </div>

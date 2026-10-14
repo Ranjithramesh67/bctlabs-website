@@ -1,13 +1,8 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { connection } from "next/server";
 
-import { AdminNavbar } from "@/components/admin/admin-navbar";
-import {
-  AdminSidebar,
-  type NavEntry,
-} from "@/components/admin/admin-sidebar";
-import { Flash } from "@/components/admin/flash";
+import { AdminChrome } from "@/components/admin/admin-chrome";
+import { type NavEntry } from "@/components/admin/admin-sidebar";
 import { getCurrentUser } from "@/lib/auth";
 import { can } from "@/lib/admin/permissions";
 import { readFlash } from "@/lib/admin/flash";
@@ -42,6 +37,7 @@ function AdminStyles() {
       <link rel="stylesheet" href="/assets/web/css/style.css" precedence="high" />
       <link rel="stylesheet" href="/assets/web/css/components.css" />
       <link rel="stylesheet" href="/assets/css/custom.css" />
+      <link rel="stylesheet" href="/assets/css/admin-responsive.css" />
     </>
   );
 }
@@ -59,6 +55,10 @@ export default async function AdminLayout({
     getAppName(),
     getAppLogo(),
     can(user, "manage_staff_member"),
+  ]);
+  const [imageUrl, flash] = await Promise.all([
+    userAvatarUrl(user),
+    readFlash(),
   ]);
 
   const entries: NavEntry[] = [];
@@ -143,27 +143,17 @@ export default async function AdminLayout({
   return (
     <div id="app">
       <AdminStyles />
-      <div className="main-wrapper main-wrapper-1">
-        <div className="navbar-bg"></div>
-        <nav className="navbar navbar-expand-lg main-navbar">
-          <AdminNavbar
-            firstName={user.firstName ?? user.fullName}
-            fullName={user.fullName}
-            imageUrl={await userAvatarUrl(user)}
-          />
-        </nav>
-        <Suspense fallback={<div className="main-sidebar" />}>
-          <AdminSidebar
-            appName={appName}
-            appLogo={appLogo}
-            entries={entries}
-            hasDashboardHeader={canManageStaff}
-          />
-        </Suspense>
-        <div className="main-content">
-          <Flash flash={await readFlash()} />
-          {children}
-        </div>
+      <AdminChrome
+        appName={appName}
+        appLogo={appLogo}
+        entries={entries}
+        hasDashboardHeader={canManageStaff}
+        firstName={user.firstName ?? user.fullName}
+        fullName={user.fullName}
+        imageUrl={imageUrl}
+        flash={flash}
+      >
+        {children}
         <footer className="main-footer">
           <div className="row mx-0 productFooter">
             <div className="col-md-12">
@@ -173,7 +163,7 @@ export default async function AdminLayout({
             </div>
           </div>
         </footer>
-      </div>
+      </AdminChrome>
     </div>
   );
 }

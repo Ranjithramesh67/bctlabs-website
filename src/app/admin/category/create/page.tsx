@@ -18,7 +18,7 @@ export default async function CategoryCreatePage() {
     >
       <div className="card">
         <div className="card-body">
-          <form action={storeCategory} method="post">
+          <form action={storeCategory}>
             <div className="row">
               <div className="col-xl-6 col-md-6 mb-4">
                 <label className="form-label font-w600">

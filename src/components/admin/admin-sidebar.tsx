@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 import { AppLogo } from "@/components/app-logo";
@@ -28,6 +29,8 @@ type Props = {
   appLogo: string;
   entries: NavEntry[];
   hasDashboardHeader: boolean;
+  /** Called when a menu link is followed, so the mobile drawer can close. */
+  onNavigate?: () => void;
 };
 
 function isSubmenu(entry: NavEntry): entry is NavSubmenu {
@@ -62,18 +65,29 @@ export function AdminSidebar({
   appLogo,
   entries,
   hasDashboardHeader,
+  onNavigate,
 }: Props) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const pages = searchParams.get("pages");
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   return (
     <div className="main-sidebar">
       <aside id="sidebar-wrapper">
         <div className="sidebar-brand sidebar-sticky sidebar-bottom-padding h-auto line-height-0 padding-bottom-zero">
+          <button
+            type="button"
+            className="admin-sidebar-close d-lg-none"
+            aria-label="Close menu"
+            onClick={onNavigate}
+          >
+            <i className="fas fa-times"></i>
+          </button>
           <a
             className="navbar-brand d-flex align-items-center justify-content-center py-3 px-2"
             href="/admin/dashboard"
+            onClick={onNavigate}
           >
             <AppLogo
               className="navbar-brand-full w-50"
@@ -104,7 +118,11 @@ export function AdminSidebar({
           </div>
         </div>
         <div className="sidebar-brand sidebar-brand-sm">
-          <a href="/admin/dashboard" className="small text-white">
+          <a
+            href="/admin/dashboard"
+            className="small text-white"
+            onClick={onNavigate}
+          >
             <AppLogo className="navbar-brand-full" src={appLogo} width={50} alt="" />
           </a>
         </div>
@@ -118,16 +136,29 @@ export function AdminSidebar({
                 (prefix) =>
                   pathname === prefix || pathname.startsWith(`${prefix}/`),
               );
+              const isOpen = expanded[entry.label] ?? active;
               return (
                 <li
                   key={entry.label}
-                  className={`side-menus has-submenu ${active ? "active" : ""}`}
+                  className={`side-menus has-submenu ${active ? "active" : ""} ${
+                    isOpen ? "submenu-open" : ""
+                  }`}
                 >
-                  <a className="nav-link" href="#">
+                  <button
+                    type="button"
+                    className="nav-link has-submenu-toggle"
+                    aria-expanded={isOpen}
+                    onClick={() =>
+                      setExpanded((current) => ({
+                        ...current,
+                        [entry.label]: !isOpen,
+                      }))
+                    }
+                  >
                     <i className={entry.icon}></i>
                     <span className="menu-text-wrap">{entry.label}</span>
                     <i className="fas fa-chevron-down submenu-toggle"></i>
-                  </a>
+                  </button>
                   <ul className="submenu">
                     {entry.items.map((item) => (
                       <li
@@ -136,7 +167,11 @@ export function AdminSidebar({
                           isItemActive(pathname, pages, item) ? "active" : ""
                         }
                       >
-                        <a className="nav-link" href={item.href}>
+                        <a
+                          className="nav-link"
+                          href={item.href}
+                          onClick={onNavigate}
+                        >
                           <i className={item.icon}></i>
                           <span className="menu-text-wrap">{item.label}</span>
                         </a>
@@ -152,7 +187,7 @@ export function AdminSidebar({
                 key={entry.href}
                 className={`side-menus ${isItemActive(pathname, pages, entry) ? "active" : ""}`}
               >
-                <a className="nav-link" href={entry.href}>
+                <a className="nav-link" href={entry.href} onClick={onNavigate}>
                   <i className={entry.icon}></i>
                   <span className="menu-text-wrap">{entry.label}</span>
                 </a>

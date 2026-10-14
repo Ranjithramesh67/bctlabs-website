@@ -147,7 +147,7 @@ export function MembersCreateForm({
   permissionGroups: PermissionGroup[];
 }) {
   return (
-    <form action={storeMember} method="post" id="createMember">
+    <form action={storeMember} id="createMember">
       <div className="row">
         <div className="form-group col-sm-6">
           <label htmlFor="first_name">{t("member.first_name")}:</label>
@@ -375,7 +375,7 @@ export function MembersEditForm({
   };
 }) {
   return (
-    <form action={updateMember} method="post" id="editMember">
+    <form action={updateMember} id="editMember">
       <input type="hidden" name="id" value={member.id} />
       <div className="row">
         <div className="form-group col-sm-6">

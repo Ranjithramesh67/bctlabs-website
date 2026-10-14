@@ -1,0 +1,295 @@
+/* ==========================================================================
+   Admin shell responsiveness (Next.js port)
+
+   The Laravel admin relied on Stisla's scripts.js to toggle body.sidebar-gone
+   on small screens and to run the dropdowns. Those jQuery bundles are not part
+   of the Next.js app, so this stylesheet reproduces the behaviour using a
+   React-managed `admin-sidebar-open` class on `.main-wrapper`, and improves the
+   small-screen layout (off-canvas drawer, scrollable tables, stacked headers).
+   Loaded last so it wins over the vendored Stisla/custom stylesheets.
+   ========================================================================== */
+
+/* Never let the page itself scroll sideways. */
+#app {
+  overflow-x: hidden;
+}
+
+.main-content,
+.main-footer {
+  max-width: 100%;
+}
+
+/* --- Sidebar submenu collapse -------------------------------------------- */
+
+/* The submenu trigger is a <button> (React-controlled); style it to match the
+   theme's sidebar anchors. */
+.main-sidebar .sidebar-menu li > .has-submenu-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 50px;
+  padding: 0 20px;
+  border: 0;
+  text-align: left;
+  letter-spacing: 0.3px;
+  color: #ffffff;
+  background-color: #071251;
+  cursor: pointer;
+}
+
+.main-sidebar .sidebar-menu li > .has-submenu-toggle:hover {
+  background-color: #f8fafb;
+  color: #0578e8;
+}
+
+.main-sidebar .sidebar-menu li.active > .has-submenu-toggle {
+  color: #0578e8;
+  font-weight: 600;
+  background-color: #f8fafb;
+}
+
+.main-sidebar .sidebar-menu li > .has-submenu-toggle i {
+  width: 28px;
+  margin-right: 20px;
+  text-align: center;
+}
+
+.main-sidebar .sidebar-menu li > .has-submenu-toggle .submenu-toggle {
+  width: auto;
+  margin-right: 0;
+  margin-left: auto;
+  font-size: 12px;
+  transition: transform 0.25s ease;
+}
+
+.main-sidebar .sidebar-menu li.submenu-open > .has-submenu-toggle .submenu-toggle {
+  transform: rotate(180deg);
+}
+
+/* Collapsed by default; the active group starts open (see React state). */
+.main-sidebar .sidebar-menu li > .submenu {
+  display: none;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.main-sidebar .sidebar-menu li.submenu-open > .submenu {
+  display: block;
+}
+
+.main-sidebar .sidebar-menu li > .submenu li > a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 46px;
+  padding: 0 20px 0 60px;
+  color: #c9d4e8;
+  background-color: #0a1660;
+  text-decoration: none;
+}
+
+.main-sidebar .sidebar-menu li > .submenu li > a:hover {
+  color: #ffffff;
+  background-color: #12208a;
+}
+
+.main-sidebar .sidebar-menu li > .submenu li.active > a {
+  color: #ffffff;
+  font-weight: 600;
+  background-color: #0578e8;
+}
+
+.main-sidebar .sidebar-menu li > .submenu li > a i {
+  width: 22px;
+  margin-right: 14px;
+  text-align: center;
+}
+
+/* --- Sidebar behaviour --------------------------------------------------- */
+
+/* The drawer list scrolls on its own; the brand stays pinned. */
+.main-sidebar {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.main-sidebar .sidebar-brand {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: inherit;
+}
+
+.admin-sidebar-backdrop {
+  display: none;
+}
+
+/* Close affordance inside the drawer (mobile only). */
+.admin-sidebar-close {
+  display: none;
+  position: absolute;
+  top: 12px;
+  right: 10px;
+  z-index: 3;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.14);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.admin-sidebar-close:hover {
+  background-color: rgba(255, 255, 255, 0.26);
+}
+
+/* --- Phone / tablet: off-canvas drawer ----------------------------------- */
+
+@media (max-width: 991.98px) {
+  .main-wrapper .main-sidebar {
+    left: 0;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 1050;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.45);
+  }
+
+  .main-wrapper.admin-sidebar-open .main-sidebar {
+    transform: translateX(0);
+  }
+
+  .main-wrapper .admin-sidebar-close {
+    display: block;
+  }
+
+  .main-wrapper.admin-sidebar-open .admin-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1040;
+    padding: 0;
+    border: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .main-wrapper .main-content {
+    padding: 76px 15px 0 !important;
+    overflow-x: hidden;
+  }
+
+  .main-wrapper .main-footer {
+    padding: 15px 15px 20px !important;
+    text-align: center;
+  }
+
+  .main-wrapper .main-footer .float-right {
+    display: block;
+    float: none !important;
+    margin-top: 4px;
+  }
+
+  /* Navbar: drop the disabled search box, tighten the gaps. */
+  .main-navbar .search-element {
+    display: none !important;
+  }
+
+  .main-navbar .form-inline {
+    flex-grow: 1;
+  }
+
+  .main-navbar .navbar-nav .nav-link {
+    padding-right: 0.6rem;
+    padding-left: 0.6rem;
+  }
+
+  /* Section headers stack their action button under the title. */
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    height: auto;
+    gap: 10px;
+  }
+
+  .section-header h1 {
+    font-size: 20px;
+    line-height: 1.3;
+  }
+
+  .section-header .section-header-breadcrumb {
+    width: 100%;
+    margin-left: 0;
+    flex-wrap: wrap;
+  }
+
+  /* Filter controls sit full width and wrap instead of squeezing the title. */
+  .section-header .section-header-breadcrumb .card-header-action {
+    margin-right: 0 !important;
+  }
+
+  .float-right-mobile {
+    float: none !important;
+    width: 100%;
+  }
+
+  /* Card toolbars and filter rows wrap instead of overflowing. */
+  .card-body > .row,
+  .row.mb-3 {
+    row-gap: 10px;
+  }
+
+  /* Wide tables scroll inside their wrapper, not the whole page. */
+  .table-responsive {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* --- Small phones --------------------------------------------------------- */
+
+@media (max-width: 575.98px) {
+  .main-wrapper .main-content {
+    padding-right: 12px !important;
+    padding-left: 12px !important;
+  }
+
+  .card {
+    border-radius: 6px;
+  }
+
+  .users-listing-details {
+    padding: 12px;
+  }
+
+  h1,
+  h2 {
+    overflow-wrap: break-word;
+  }
+}
+
+/* --- Header filters (mirrors the theme's own `projects.css` rules that the
+   Laravel layout shipped but the Next.js port never loaded) ----------------- */
+
+@media (max-width: 620px) {
+  .section .mobile-sec-header {
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .section .mobile-sec-header .section-header-breadcrumb {
+    flex-basis: 100%;
+    margin-top: 10px;
+  }
+
+  .section .mobile-sec-header .section-header-breadcrumb .card-header-action {
+    flex: 1 1 100%;
+  }
+
+  .section .mobile-sec-header .section-header-breadcrumb .form-control {
+    width: 100%;
+  }
+}

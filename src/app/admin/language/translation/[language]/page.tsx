@@ -106,7 +106,7 @@ export default async function TranslationEditPage({
       </div>
       <div className="section-body">
         <div className="card">
-          <form action={updateTranslation} method="post">
+          <form action={updateTranslation}>
             <input type="hidden" name="language_id" value={language.id} />
             <div className="card-header d-flex">
               <div className="subFolderFiles">

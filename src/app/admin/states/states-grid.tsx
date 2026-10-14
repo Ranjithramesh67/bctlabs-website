@@ -171,7 +171,7 @@ export function StatesGrid({
                   &times;
                 </button>
               </div>
-              <form action={storeState} method="post">
+              <form action={storeState}>
                 <div className="modal-content">
                   <div className="modal-body">
                     <div className="mb-3">
@@ -240,7 +240,7 @@ export function StatesGrid({
                   &times;
                 </button>
               </div>
-              <form action={updateState} method="post">
+              <form action={updateState}>
                 <div className="modal-content">
                   <div className="modal-body">
                     <input type="hidden" name="id" value={editing.id} />

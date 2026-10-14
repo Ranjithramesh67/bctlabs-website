@@ -38,7 +38,7 @@ export default async function CategoryEditPage({
     >
       <div className="card">
         <div className="card-body">
-          <form action={updateCategory} method="post">
+          <form action={updateCategory}>
             <input type="hidden" name="id" value={id} />
             <div className="row">
               <div className="col-xl-6 col-md-6 mb-4">

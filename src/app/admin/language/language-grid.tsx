@@ -64,7 +64,7 @@ export function LanguageGrid({
                 </button>
               </div>
               <div className="modal-body">
-                <form action={saveLanguage} method="post">
+                <form action={saveLanguage}>
                   {editing ? (
                     <input
                       type="hidden"

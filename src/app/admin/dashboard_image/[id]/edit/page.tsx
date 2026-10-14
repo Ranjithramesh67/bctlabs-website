@@ -40,7 +40,6 @@ export default async function DashboardImageEditPage({
         <div className="card-body">
           <form
             action={updateDashboardImage}
-            method="post"
             encType="multipart/form-data"
           >
             <input type="hidden" name="id" value={id} />

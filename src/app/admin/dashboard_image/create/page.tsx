@@ -20,7 +20,6 @@ export default async function DashboardImageCreatePage() {
         <div className="card-body">
           <form
             action={storeDashboardImage}
-            method="post"
             encType="multipart/form-data"
           >
             <div className="row">

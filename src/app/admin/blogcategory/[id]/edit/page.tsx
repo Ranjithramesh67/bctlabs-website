@@ -35,7 +35,7 @@ export default async function BlogCategoryEditPage({
     >
       <div className="card">
         <div className="card-body">
-          <form action={updateBlogCategory} method="post">
+          <form action={updateBlogCategory}>
             <input type="hidden" name="id" value={id} />
             <div className="row">
               <div className="col-xl-6 col-md-6 mb-4">

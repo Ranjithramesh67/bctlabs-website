@@ -5,6 +5,7 @@ import {
 } from "@/components/frontend/site-image";
 import { getCategoryNames, getEventWithStyledContent } from "@/lib/content";
 import { connection } from "next/server";
+import LegacyScripts from "@/components/frontend/legacy-scripts";
 
 export const instant = false;
 
@@ -241,26 +242,24 @@ const PRODUCT_CSS = `
   `;
 
 const PRODUCT_SCRIPT = `
-      document.addEventListener('DOMContentLoaded', () => {
-        const thumbnails = document.querySelectorAll('.thumb-img');
-        const mainImage = document.getElementById('mainImage');
-        const modalImage = document.getElementById('modalImage');
-        const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
-    
-        thumbnails.forEach(img => {
-          img.addEventListener('click', () => {
-            thumbnails.forEach(i => i.classList.remove('active'));
-            img.classList.add('active');
-            const newSrc = img.getAttribute('data-large');
-            mainImage.src = newSrc;
-          });
-        });
-    
-        mainImage.addEventListener('click', () => {
-          modalImage.src = mainImage.src;
-          imageModal.show();
-        });
-      });
+const thumbnails = document.querySelectorAll('.thumb-img');
+const mainImage = document.getElementById('mainImage');
+const modalImage = document.getElementById('modalImage');
+const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+
+thumbnails.forEach(img => {
+  img.addEventListener('click', () => {
+    thumbnails.forEach(i => i.classList.remove('active'));
+    img.classList.add('active');
+    const newSrc = img.getAttribute('data-large');
+    mainImage.src = newSrc;
+  });
+});
+
+mainImage.addEventListener('click', () => {
+  modalImage.src = mainImage.src;
+  imageModal.show();
+});
     `;
 
 /** Laravel `ucfirst()` for a single ASCII-cased title. */
@@ -446,9 +445,11 @@ export default async function ProductDetailsPage({
         </div>
       </div>
 
-      {/* Bootstrap JS (includes Popper) */}
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-      <script dangerouslySetInnerHTML={{ __html: PRODUCT_SCRIPT }} />
+      {/* Bootstrap 5 bundle (includes Popper) powers the image modal. */}
+      <LegacyScripts
+        src={["https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"]}
+        inline={[PRODUCT_SCRIPT]}
+      />
     </>
   );
 }

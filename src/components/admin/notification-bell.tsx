@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 
+import { useDropdown } from "@/components/admin/use-dropdown";
 import { t } from "@/lib/i18n";
 
 type Notification = {
@@ -70,6 +71,8 @@ function diffForHumans(value: string | null): string {
  */
 export function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const menuRef = useRef<HTMLLIElement>(null);
+  const menu = useDropdown(menuRef);
 
   useEffect(() => {
     let active = true;
@@ -132,19 +135,27 @@ export function NotificationBell() {
 
   return (
     <ul className="navbar-nav navbar-right">
-      <li className="dropdown dropdown-list-toggle">
+      <li
+        className={`dropdown dropdown-list-toggle ${menu.open ? "show" : ""}`}
+        ref={menuRef}
+      >
         <a
           href="#"
-          data-toggle="dropdown"
           className={`nav-link notification-toggle nav-link-lg${
             unreadCount > 0 ? " beep" : ""
           }`}
           title={t("notification.notifications")}
+          aria-haspopup="true"
+          aria-expanded={menu.open}
+          onClick={(event) => {
+            event.preventDefault();
+            menu.toggle();
+          }}
         >
           <i className="far fa-bell"></i>
         </a>
         <div
-          className="dropdown-menu dropdown-list dropdown-menu-right"
+          className={`dropdown-menu dropdown-list dropdown-menu-right ${menu.open ? "show" : ""}`}
           id="notification"
         >
           <div className="dropdown-header">

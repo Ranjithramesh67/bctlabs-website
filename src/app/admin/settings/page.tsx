@@ -132,7 +132,6 @@ export default async function SettingsPage({
             <div className="col-md-9">
               <form
                 action={updateSetting}
-                method="post"
                 id="settingUpdate"
                 encType="multipart/form-data"
               >

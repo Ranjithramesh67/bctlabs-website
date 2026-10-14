@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import SiteHeader from "@/components/frontend/site-header";
 import SiteFooter from "@/components/frontend/site-footer";
+import LegacyScripts from "@/components/frontend/legacy-scripts";
+import {
+  LEGACY_SCRIPTS,
+  SITE_INLINE_SCRIPTS,
+  TOASTIFY_STYLESHEET,
+} from "@/lib/legacy-site-scripts";
 
 /**
  * Layout for the public marketing site.
@@ -30,40 +36,23 @@ const STYLESHEETS = [
   "/assets/frontend/css/font-awesome.css",
 ];
 
-// jQuery must stay first so the plugins below find it.
-const SCRIPTS = [
-  "/assets/frontend/js/jquery-3.7.1.min.js",
-  "/assets/frontend/js/bootstrap.min.js",
-  "/assets/frontend/js/meanmenu.js",
-  "/assets/frontend/js/swiper-bundle.min.js",
-  "/assets/frontend/js/jquery.counterup.min.js",
-  "/assets/frontend/js/wow.min.js",
-  "/assets/frontend/js/magnific-popup.min.js",
-  "/assets/frontend/js/nice-select.min.js",
-  "/assets/frontend/js/isotope.pkgd.min.html",
-  "/assets/frontend/js/jquery.waypoints.js",
-  "/assets/frontend/js/script.js",
-];
-
 export default function SiteLayout({ children }: LayoutProps<"/">) {
   return (
     <>
       {STYLESHEETS.map((href) => (
         <link key={href} rel="stylesheet" href={href} />
       ))}
+      <link rel="stylesheet" href={TOASTIFY_STYLESHEET} />
 
       <SiteHeader />
       <main>{children}</main>
       <SiteFooter />
 
-      {SCRIPTS.map((src) => (
-        <script key={src} src={src} />
-      ))}
-      <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+      <LegacyScripts
+        src={LEGACY_SCRIPTS}
+        inline={SITE_INLINE_SCRIPTS}
+        replayContentLoaded
       />
-      <script src="https://cdn.jsdelivr.net/npm/toastify-js" />
     </>
   );
 }
