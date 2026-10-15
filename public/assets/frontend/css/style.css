@@ -2684,6 +2684,19 @@ input {
     .header__main {
         padding: 15px 0;
     }
+    /*
+     * Hide the desktop navigation at meanmenu's own 991px breakpoint.
+     *
+     * `script.js` swaps the desktop nav for the meanmenu bar, but it now runs
+     * after React hydrates, so on a phone the desktop nav painted first: 682px
+     * wide on a 390px screen, which stretched the document to 694px and showed
+     * a horizontal scrollbar until meanmenu hid it a moment later. Hiding it up
+     * front removes that flash; meanmenu still builds the mobile bar from this
+     * same markup.
+     */
+    .header-area .main-menu {
+        display: none;
+    }
 }
 .header__main .bars i {
     font-size: 18px;
