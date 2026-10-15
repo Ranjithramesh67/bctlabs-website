@@ -40,7 +40,7 @@ export default async function BlogCategoryEditPage({
             <div className="row">
               <div className="col-xl-6 col-md-6 mb-4">
                 <label className="form-label font-w600">
-                  Category Name<span className="text-danger">*</span>
+                  Category Name<span className="text-danger ms-2">*</span>
                 </label>
                 <input
                   type="text"
@@ -51,7 +51,7 @@ export default async function BlogCategoryEditPage({
                 />
               </div>
             </div>
-            <button type="submit" className="btn btn-primary mt-3">
+            <button type="submit" className="btn btn-primary mt-3 mr-2">
               Update
             </button>
             <a href="/admin/get_blogcategory" className="btn btn-secondary mt-3">

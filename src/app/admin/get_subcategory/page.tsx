@@ -42,9 +42,27 @@ export default async function SubCategoryIndexPage({
 
   return (
     <AdminSection title="Sub-Category">
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            /* Below md the col-2 "Add" column is too narrow for the button,
+               so it wrapped onto two lines. Stack the toolbar instead. */
+            @media (max-width: 767.98px) {
+              .subc-toolbar > .col-10,
+              .subc-toolbar > .col-2 {
+                flex: 0 0 100%;
+                max-width: 100%;
+              }
+              .subc-toolbar > .col-2 {
+                margin-top: 10px;
+              }
+            }
+          `,
+        }}
+      />
       <div className="card">
         <div className="card-body">
-          <div className="row mb-3 justify-content-end flex-wrap">
+          <div className="row mb-3 justify-content-end flex-wrap subc-toolbar">
             <div className="col-10">
               <form className="selectgroup float-right" method="get">
                 <input
@@ -70,85 +88,89 @@ export default async function SubCategoryIndexPage({
             </div>
           </div>
           <div className="users-card">
-            <div className="row">
-              {subcategories.map((category) => (
-                <div
-                  className="col-xl-4 col-md-6"
-                  key={category.id.toString()}
-                >
-                  <div className="hover-effect-users position-relative mb-5 users-card-hover-border users-border">
-                    <div className="users-listing-details">
-                      <div className="d-flex users-listing-description align-items-center justify-content-center flex-column">
-                        <div className="pl-0 mb-2 users-avatar">
-                          <img
-                            src={
-                              category.sub_category_photo
-                                ? `/${category.sub_category_photo}`
-                                : ""
-                            }
-                            alt={category.sub_category_name}
-                            className="img-responsive users-avatar-img users-img mr-2"
-                          />
-                        </div>
-                        <div className="mb-auto w-100 users-data">
-                          <div className="d-flex justify-content-center align-items-center w-100">
-                            <div>
-                              <a
-                                href="#"
-                                className="users-listing-title text-decoration-none"
-                              >
-                                {strLimit(
-                                  htmlDecode(category.sub_category_name),
-                                  15,
-                                  "...",
-                                )}
-                              </a>
+            {subcategories.length === 0 ? (
+              <p className="text-center text-muted my-4">
+                {term ? "No Sub-Category Found" : "No Sub-Category Available"}
+              </p>
+            ) : (
+              <div className="row">
+                {subcategories.map((category) => (
+                  <div
+                    className="col-xl-4 col-md-6"
+                    key={category.id.toString()}
+                  >
+                    <div className="hover-effect-users position-relative mb-5 users-card-hover-border users-border">
+                      <div className="users-listing-details">
+                        <div className="d-flex users-listing-description align-items-center justify-content-center flex-column">
+                          {category.sub_category_photo ? (
+                            <div className="pl-0 mb-2 users-avatar">
+                              <img
+                                src={`/${category.sub_category_photo}`}
+                                alt={category.sub_category_name}
+                                className="img-responsive users-avatar-img users-img mr-2"
+                              />
+                            </div>
+                          ) : null}
+                          <div className="mb-auto w-100 users-data">
+                            <div className="d-flex justify-content-center align-items-center w-100">
+                              <div>
+                                <a
+                                  href="#"
+                                  className="users-listing-title text-decoration-none"
+                                >
+                                  {strLimit(
+                                    htmlDecode(category.sub_category_name),
+                                    15,
+                                    "...",
+                                  )}
+                                </a>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="edit">
-                          <span>
-                            <a
-                              href={`/admin/subcategory/${category.id}/edit`}
-                            >
-                              <i className="fas fa-edit mr-2 card-edit-icon"></i>
-                            </a>
-                          </span>
-                        </div>
-                        <div className="del">
-                          <span>
-                            <form action={deleteSubCategory}>
-                              <input
-                                type="hidden"
-                                name="id"
-                                value={category.id.toString()}
-                              />
-                              <button
-                                type="submit"
-                                className="border-0 bg-transparent p-0"
-                                aria-label="Delete"
+                          <div className="edit">
+                            <span>
+                              <a
+                                href={`/admin/subcategory/${category.id}/edit`}
                               >
-                                <i className="fas fa-trash mr-2 card-delete-icon"></i>
-                              </button>
-                            </form>
-                          </span>
+                                <i className="fas fa-edit mr-2 card-edit-icon"></i>
+                              </a>
+                            </span>
+                          </div>
+                          <div className="del">
+                            <span>
+                              <form action={deleteSubCategory}>
+                                <input
+                                  type="hidden"
+                                  name="id"
+                                  value={category.id.toString()}
+                                />
+                                <button
+                                  type="submit"
+                                  className="border-0 bg-transparent p-0"
+                                  aria-label="Delete"
+                                >
+                                  <i className="fas fa-trash mr-2 card-delete-icon"></i>
+                                </button>
+                              </form>
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="d-flex align-items-center justify-content-between assigned-user pt-0 pl-3 px-5">
-                      <div>
-                        <div
-                          className="text-center badge badge-success font-weight-bold"
-                          data-toggle="tooltip"
-                          data-placement="top"
-                          title="Total Categories"
-                        ></div>
+                      <div className="d-flex align-items-center justify-content-between assigned-user pt-0 pl-3 px-5">
+                        <div>
+                          <div
+                            className="text-center badge badge-success font-weight-bold"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title="Total Categories"
+                          ></div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
           <PaginatorRow
             currentPage={page}

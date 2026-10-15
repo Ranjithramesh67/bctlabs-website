@@ -134,102 +134,110 @@ export function NotificationBell() {
   };
 
   return (
-    <ul className="navbar-nav navbar-right">
-      <li
-        className={`dropdown dropdown-list-toggle ${menu.open ? "show" : ""}`}
-        ref={menuRef}
-      >
-        <a
-          href="#"
-          className={`nav-link notification-toggle nav-link-lg${
-            unreadCount > 0 ? " beep" : ""
-          }`}
-          title={t("notification.notifications")}
-          aria-haspopup="true"
-          aria-expanded={menu.open}
-          onClick={(event) => {
-            event.preventDefault();
-            menu.toggle();
-          }}
+    <>
+      <style>{`
+        #notification { max-height: calc(100vh - 56px); }
+        #notification .notification-content {
+          max-height: calc(100vh - 120px);
+        }
+      `}</style>
+      <ul className="navbar-nav navbar-right">
+        <li
+          className={`dropdown dropdown-list-toggle ${menu.open ? "show" : ""}`}
+          ref={menuRef}
         >
-          <i className="far fa-bell"></i>
-        </a>
-        <div
-          className={`dropdown-menu dropdown-list dropdown-menu-right ${menu.open ? "show" : ""}`}
-          id="notification"
-        >
-          <div className="dropdown-header">
-            <div className="row justify-content-between">
-              <div className="px-3">{t("notification.notifications")}</div>
-              <div
-                className={`px-3${unreadCount === 0 ? " d-none" : ""}`}
-                id="allRead"
-              >
-                <a
-                  href="#"
-                  className="text-decoration-none"
-                  onClick={handleReadAll}
-                >
-                  {t("notification.mark_all_as_read")}
-                </a>
-              </div>
-            </div>
-          </div>
-          <div
-            className="dropdown-list-content dropdown-list-icons notification-content"
-            style={{ overflowY: "auto" }}
+          <a
+            href="#"
+            className={`nav-link notification-toggle nav-link-lg${
+              unreadCount > 0 ? " beep" : ""
+            }`}
+            title={t("notification.notifications")}
+            aria-haspopup="true"
+            aria-expanded={menu.open}
+            onClick={(event) => {
+              event.preventDefault();
+              menu.toggle();
+            }}
           >
-            <div
-              className={`empty-state empty-notification${
-                unreadCount > 0 ? " d-none" : ""
-              }`}
-              data-height="300"
-              style={{ padding: "0px 40px" }}
-            >
-              <div className="empty-state-icon">
-                <i className="fas fa-question mt-4"></i>
-              </div>
-              <h2>{t("notification.empty_notifications")}</h2>
-            </div>
-            {notifications.map((notification) => (
-              <a
-                key={notification.id}
-                href="#"
-                data-id={notification.id}
-                className="dropdown-item dropdown-item-unread readNotification"
-                id="readNotification"
-                onClick={(event) => void handleRead(notification.id, event)}
-              >
-                <div className="dropdown-item-icon bg-primary text-white">
-                  <i
-                    className={headerNotificationIcon(notification.type)}
-                    style={{ lineHeight: "unset" }}
-                  ></i>
-                </div>
+            <i className="far fa-bell"></i>
+          </a>
+          <div
+            className={`dropdown-menu dropdown-list dropdown-menu-right ${menu.open ? "show" : ""}`}
+            id="notification"
+          >
+            <div className="dropdown-header">
+              <div className="row justify-content-between">
+                <div className="px-3">{t("notification.notifications")}</div>
                 <div
-                  className="dropdown-item-desc text-dark notification-title"
-                  style={{ width: "100%" }}
+                  className={`px-3${unreadCount === 0 ? " d-none" : ""}`}
+                  id="allRead"
                 >
-                  {notification.title}
-                  <div className="">
-                    <span
-                      className="notification-for-text"
-                      style={{ lineBreak: "anywhere", color: "grey" }}
-                    >
-                      {notification.description}
-                    </span>
-                  </div>
-                  <div className="float-right">
-                    <small className="notification-time">
-                      {diffForHumans(notification.created_at)}
-                    </small>
-                  </div>
+                  <a
+                    href="#"
+                    className="text-decoration-none"
+                    onClick={handleReadAll}
+                  >
+                    {t("notification.mark_all_as_read")}
+                  </a>
                 </div>
-              </a>
-            ))}
+              </div>
+            </div>
+            <div
+              className="dropdown-list-content dropdown-list-icons notification-content"
+              style={{ overflowY: "auto" }}
+            >
+              <div
+                className={`empty-state empty-notification${
+                  unreadCount > 0 ? " d-none" : ""
+                }`}
+                data-height="300"
+                style={{ padding: "0px 40px" }}
+              >
+                <div className="empty-state-icon">
+                  <i className="fas fa-question mt-4"></i>
+                </div>
+                <h2>{t("notification.empty_notifications")}</h2>
+              </div>
+              {notifications.map((notification) => (
+                <a
+                  key={notification.id}
+                  href="#"
+                  data-id={notification.id}
+                  className="dropdown-item dropdown-item-unread readNotification"
+                  id="readNotification"
+                  onClick={(event) => void handleRead(notification.id, event)}
+                >
+                  <div className="dropdown-item-icon bg-primary text-white">
+                    <i
+                      className={headerNotificationIcon(notification.type)}
+                      style={{ lineHeight: "unset" }}
+                    ></i>
+                  </div>
+                  <div
+                    className="dropdown-item-desc text-dark notification-title"
+                    style={{ width: "100%" }}
+                  >
+                    {notification.title}
+                    <div className="">
+                      <span
+                        className="notification-for-text"
+                        style={{ lineBreak: "anywhere", color: "grey" }}
+                      >
+                        {notification.description}
+                      </span>
+                    </div>
+                    <div className="float-right">
+                      <small className="notification-time">
+                        {diffForHumans(notification.created_at)}
+                      </small>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
-      </li>
-    </ul>
+        </li>
+      </ul>
+    </>
   );
 }

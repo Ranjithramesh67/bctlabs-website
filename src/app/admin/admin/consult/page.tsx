@@ -68,7 +68,23 @@ export default async function ConsultIndexPage({
   const lastPage = Math.max(1, Math.ceil(total / PER_PAGE));
 
   return (
-    <div className="container-fluid">
+    <div className="container-fluid cc-consult">
+      {/*
+        The 9-column table is 64px wider than the card at 1440, which used to
+        clip the trailing "Actions" column. Tightening the horizontal cell
+        padding lets it fit the card so the action buttons stay visible.
+      */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            .cc-consult .table:not(.table-sm):not(.table-md):not(.dataTable) th,
+            .cc-consult .table:not(.table-sm):not(.table-md):not(.dataTable) td {
+              padding-left: 10px;
+              padding-right: 10px;
+            }
+          `,
+        }}
+      />
       <div className="row">
         <div className="col-12">
           <div className="card">
@@ -98,7 +114,7 @@ export default async function ConsultIndexPage({
                   <tbody>
                     {applications.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="text-center">
+                        <td colSpan={9} className="text-center text-muted py-5">
                           No applications found
                         </td>
                       </tr>

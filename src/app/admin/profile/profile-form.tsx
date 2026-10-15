@@ -11,6 +11,27 @@ export type LanguageOption = {
   label: string;
 };
 
+/**
+ * The `.row` title block is a direct child of the form, so Bootstrap's -15px
+ * gutters bleed past the page edge; the preview thumbnail also overflows its
+ * narrow column. Scope both to this page and keep the previews a fixed size.
+ */
+const PROFILE_PAGE_CSS = `
+.admin-profile #updateProfile > .row {
+  margin-left: 0;
+  margin-right: 0;
+}
+.admin-profile .user-profile-image,
+.admin-profile .thumbnail-preview {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+}
+.admin-profile .preview-image-video-container {
+  max-width: 100%;
+}
+`;
+
 type ProfileUser = {
   id: number;
   fullName: string;
@@ -65,7 +86,8 @@ export function ProfileForm({
   };
 
   return (
-    <>
+    <div className="admin-profile">
+      <style dangerouslySetInnerHTML={{ __html: PROFILE_PAGE_CSS }} />
       <form id="updateProfile" action={updateProfile} className="needs-validation">
         <div className="row">
           <div className="col-sm-6">
@@ -258,8 +280,8 @@ export function ProfileForm({
                         />
                       </label>
                     </div>
-                    <div className="col-2">
-                      <div className="col-sm-4 preview-image-video-container pl-0 mt-1">
+                    <div className="col-4">
+                      <div className="preview-image-video-container pl-0 mt-1">
                         <img
                           id="previewImage"
                           className="img-thumbnail thumbnail-preview"
@@ -503,6 +525,6 @@ export function ProfileForm({
           </div>
         </div>
       ) : null}
-    </>
+    </div>
   );
 }

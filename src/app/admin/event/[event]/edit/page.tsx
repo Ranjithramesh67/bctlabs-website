@@ -65,7 +65,7 @@ export default async function EventEditPage({
     <AdminSection title="Edit" backHref="/admin/event/index">
       <div className="card">
         <div className="card-body">
-          <form action={updateEvent}>
+          <form action={updateEvent} className="evt-form">
             <input type="hidden" name="id" value={id} />
             <div className="row">
               <div className="col-xl-12 col-md-12 mb-4">
@@ -327,12 +327,15 @@ export default async function EventEditPage({
                 ) : null}
               </div>
 
-              <ContentEditor
-                name="content"
-                id="editor"
-                className="form-control"
-                defaultValue={data.content ?? ""}
-              />
+              <div className="col-xl-12 col-md-12 mb-4">
+                <label className="form-label font-w600">Content</label>
+                <ContentEditor
+                  name="content"
+                  id="editor"
+                  className="form-control"
+                  defaultValue={data.content ?? ""}
+                />
+              </div>
             </div>
             <button type="submit" className="btn btn-primary mt-3">
               Update
@@ -342,15 +345,23 @@ export default async function EventEditPage({
         </div>
       </div>
       <style>{`
-        .image-preview-container {
+        .evt-form .image-preview-container {
           position: relative;
           display: inline-block;
+          max-width: 100%;
         }
-        .delete-image {
+
+        .evt-form .image-preview-container img {
+          max-width: 100%;
+          height: auto;
+        }
+
+        .evt-form .delete-image {
           position: absolute;
-          top: 0;
-          right: 0;
-          transform: translate(50%, -50%);
+          top: 4px;
+          right: 4px;
+          z-index: 2;
+          line-height: 1;
         }
       `}</style>
     </AdminSection>

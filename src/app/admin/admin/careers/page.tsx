@@ -95,7 +95,7 @@ export default async function CareersIndexPage({
                   <tbody>
                     {applications.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="text-center">
+                        <td colSpan={6} className="text-center text-muted py-5">
                           No applications found
                         </td>
                       </tr>

@@ -141,11 +141,9 @@ export function StatesGrid({
             </div>
           ) : (
             <div className="col-lg-12 col-md-12 d-flex justify-content-center">
-              {term ? (
-                <p className="text-dark text-capitalize">No State Found</p>
-              ) : (
-                <p className="text-dark text-capitalize">No State Available</p>
-              )}
+              <p className="text-center text-muted my-4">
+                {term ? "No State Found" : "No State Available"}
+              </p>
             </div>
           )}
         </div>

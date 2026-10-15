@@ -138,11 +138,9 @@ export function CitiesGrid({
             </div>
           ) : (
             <div className="col-lg-12 col-md-12 d-flex justify-content-center">
-              {term ? (
-                <p className="text-dark text-capitalize">No Cities Found</p>
-              ) : (
-                <p className="text-dark text-capitalize">No Cities Available</p>
-              )}
+              <p className="text-center text-muted my-4">
+                {term ? "No Cities Found" : "No Cities Available"}
+              </p>
             </div>
           )}
         </div>

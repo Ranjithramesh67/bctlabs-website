@@ -7,6 +7,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { can } from "@/lib/admin/permissions";
 import { readFlash } from "@/lib/admin/flash";
 import { getAppLogo, getAppName } from "@/lib/admin/settings";
+import { t } from "@/lib/i18n";
 import { userAvatarUrl } from "@/lib/api-users";
 
 export const instant = false;
@@ -36,6 +37,18 @@ function AdminStyles() {
       />
       <link rel="stylesheet" href="/assets/web/css/style.css" precedence="high" />
       <link rel="stylesheet" href="/assets/web/css/components.css" />
+      {/*
+        Laravel loaded these per page via `@yield('page_css')`. The port never
+        did, so the card grids that rely on them (customers, countries, slider/
+        dashboard image, activity logs) rendered their images at full
+        resolution. They only contain namespaced selectors, so loading them in
+        the shell is safe.
+      */}
+      <link rel="stylesheet" href="/assets/css/customers/customers.css" precedence="high" />
+      <link rel="stylesheet" href="/assets/css/countries/country.css" />
+      <link rel="stylesheet" href="/assets/css/activity_logs/activity_log.css" />
+      <link rel="stylesheet" href="/assets/css/daterangepicker.css" />
+      <link rel="stylesheet" href="/assets/css/int-tel/css/intlTelInput.css" />
       <link rel="stylesheet" href="/assets/css/custom.css" />
       <link rel="stylesheet" href="/assets/css/admin-responsive.css" />
     </>
@@ -56,6 +69,7 @@ export default async function AdminLayout({
     getAppLogo(),
     can(user, "manage_staff_member"),
   ]);
+  const canManageSettings = await can(user, "manage_settings");
   const [imageUrl, flash] = await Promise.all([
     userAvatarUrl(user),
     readFlash(),
@@ -137,6 +151,15 @@ export default async function AdminLayout({
           pages: "products",
         },
       ],
+    });
+  }
+
+  if (canManageSettings) {
+    entries.push({
+      label: t("settings"),
+      href: "/admin/settings?group=general",
+      icon: "nav-icon fa-lg fas fa-cogs",
+      match: "/admin/settings",
     });
   }
 

@@ -8,6 +8,26 @@ import { getCurrentUser } from "@/lib/auth";
 
 export const instant = false;
 
+// Keep the stored/selected image preview bounded (see dashboard_image/create).
+const DASHBOARD_IMG_STYLE = `.dashimg .thumbnail-preview{height:70px;max-width:100%;object-fit:contain}@media (max-width:575.98px){.dashimg .form-control{width:100%}.dashimg .btn{min-height:40px}}`;
+
+const DASHBOARD_IMG_PREVIEW_SCRIPT = `(function () {
+  if (window.__dashboardImgPreviewBound) return;
+  window.__dashboardImgPreviewBound = true;
+  document.addEventListener("change", function (event) {
+    var target = event.target;
+    if (!target || target.tagName !== "INPUT" || target.type !== "file") return;
+    if (target.id !== "image") return;
+    var img = document.getElementById("dashimg-preview");
+    if (!img) return;
+    var file = target.files && target.files[0];
+    if (!file) return;
+    img.src = URL.createObjectURL(file);
+    var wrap = document.getElementById("dashimg-preview-wrap");
+    if (wrap) wrap.hidden = false;
+  });
+})();`;
+
 export default async function DashboardImageEditPage({
   params,
 }: {
@@ -36,9 +56,11 @@ export default async function DashboardImageEditPage({
       backHref="/admin/dashboard_image"
       backLabel="Dashboard image"
     >
+      <style dangerouslySetInnerHTML={{ __html: DASHBOARD_IMG_STYLE }} />
       <div className="card">
         <div className="card-body">
           <form
+            className="dashimg"
             action={updateDashboardImage}
             encType="multipart/form-data"
           >
@@ -62,8 +84,21 @@ export default async function DashboardImageEditPage({
                 <input
                   type="file"
                   className="form-control solid"
+                  id="image"
                   name="image"
                 />
+                <div
+                  id="dashimg-preview-wrap"
+                  className="mt-2"
+                  hidden={!data.image}
+                >
+                  <img
+                    id="dashimg-preview"
+                    className="img-thumbnail thumbnail-preview"
+                    src={data.image ? `/${data.image}` : undefined}
+                    alt=""
+                  />
+                </div>
               </div>
 
               <div className="col-xl-12 col-md-12 mb-4">
@@ -90,6 +125,9 @@ export default async function DashboardImageEditPage({
             >
               Back
             </a>
+            <script
+              dangerouslySetInnerHTML={{ __html: DASHBOARD_IMG_PREVIEW_SCRIPT }}
+            />
           </form>
         </div>
       </div>

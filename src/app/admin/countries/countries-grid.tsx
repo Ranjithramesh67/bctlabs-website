@@ -130,11 +130,11 @@ export function CountriesGrid({
             </div>
           ) : (
             <div className="col-lg-12 col-md-12 d-flex justify-content-center">
-              {term ? (
-                <p className="text-dark">{t("country.no_country_found")}</p>
-              ) : (
-                <p className="text-dark">{t("country.no_country_available")}</p>
-              )}
+              <p className="text-center text-muted my-4">
+                {term
+                  ? t("country.no_country_found")
+                  : t("country.no_country_available")}
+              </p>
             </div>
           )}
         </div>

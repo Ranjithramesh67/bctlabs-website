@@ -172,7 +172,27 @@ export default async function ActivityLogsPage({
 
   return (
     <AdminSection title={t("activity_log.activity_logs")}>
-      <form method="get" className="d-flex flex-wrap align-items-center mb-3">
+      {/*
+        The theme ships `.date_range_for_created_at_date { width: 100% }` for the
+        daterangepicker placeholder. In Laravel that control lived in the section
+        header breadcrumb; here it sits in the filter row, so the full width made
+        it claim a whole line and pushed the real date inputs down. Constrain it
+        to its content so all filters stay on one row (and wrap on phones).
+      */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            .activity-log-filter #time_range {
+              width: auto;
+              flex: 0 1 auto;
+            }
+          `,
+        }}
+      />
+      <form
+        method="get"
+        className="activity-log-filter d-flex flex-wrap align-items-center mb-3"
+      >
         <div
           id="time_range"
           className="time_range date_range_for_created_at_date"

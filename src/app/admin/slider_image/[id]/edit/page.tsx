@@ -8,6 +8,27 @@ import { getCurrentUser } from "@/lib/auth";
 
 export const instant = false;
 
+// Keep the state <select> aligned with the theme `.form-control` fields and the
+// stored/selected image preview bounded (see slider_image/create for details).
+const SLIDER_IMG_STYLE = `.sliderimg select.form-control{display:block;width:100%;height:42px;padding:10px 15px;font-size:14px;line-height:1.5;color:#495057;background-color:#fdfdff;border:1px solid #e4e6fc;border-radius:4px}.sliderimg select.form-control:focus{border-color:#80bdff;outline:0;box-shadow:0 0 0 .2rem rgba(0,123,255,.25)}.sliderimg .thumbnail-preview{height:70px;max-width:100%;object-fit:contain}@media (max-width:575.98px){.sliderimg .form-control,.sliderimg select.form-control{width:100%}.sliderimg .btn{min-height:40px}}`;
+
+const SLIDER_IMG_PREVIEW_SCRIPT = `(function () {
+  if (window.__sliderImgPreviewBound) return;
+  window.__sliderImgPreviewBound = true;
+  document.addEventListener("change", function (event) {
+    var target = event.target;
+    if (!target || target.tagName !== "INPUT" || target.type !== "file") return;
+    if (target.id !== "image") return;
+    var img = document.getElementById("sliderimg-preview");
+    if (!img) return;
+    var file = target.files && target.files[0];
+    if (!file) return;
+    img.src = URL.createObjectURL(file);
+    var wrap = document.getElementById("sliderimg-preview-wrap");
+    if (wrap) wrap.hidden = false;
+  });
+})();`;
+
 export default async function SliderImageEditPage({
   params,
 }: {
@@ -38,9 +59,11 @@ export default async function SliderImageEditPage({
       backHref="/admin/slider_image"
       backLabel="Slider image"
     >
+      <style dangerouslySetInnerHTML={{ __html: SLIDER_IMG_STYLE }} />
       <div className="card">
         <div className="card-body">
           <form
+            className="sliderimg"
             action={updateSlider}
             encType="multipart/form-data"
           >
@@ -64,8 +87,23 @@ export default async function SliderImageEditPage({
                 <input
                   type="file"
                   className="form-control solid"
+                  id="image"
                   name="image"
                 />
+                <div
+                  id="sliderimg-preview-wrap"
+                  className="mt-2"
+                  hidden={!data.slider_image}
+                >
+                  <img
+                    id="sliderimg-preview"
+                    className="img-thumbnail thumbnail-preview"
+                    src={
+                      data.slider_image ? `/${data.slider_image}` : undefined
+                    }
+                    alt=""
+                  />
+                </div>
               </div>
 
               <div className="col-xl-4 col-md-4 mb-4">
@@ -131,6 +169,9 @@ export default async function SliderImageEditPage({
             >
               Back
             </a>
+            <script
+              dangerouslySetInnerHTML={{ __html: SLIDER_IMG_PREVIEW_SCRIPT }}
+            />
           </form>
         </div>
       </div>

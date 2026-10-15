@@ -9,6 +9,10 @@ export const instant = false;
 
 const PER_PAGE = 15;
 
+// Page-scoped tweaks: keep the toolbar "Add" button on one line on phones and
+// hold the table thumbnails at the 50px avatar size the Laravel view uses.
+const SLIDER_LIST_STYLE = `.slider-list .form-btn{white-space:nowrap}.slider-list table td{vertical-align:middle}.slider-list .user-avatar-image{width:50px;height:50px;object-fit:cover}`;
+
 export default async function SliderImageIndexPage({
   searchParams,
 }: {
@@ -50,7 +54,8 @@ export default async function SliderImageIndexPage({
 
   return (
     <AdminSection title="Slider image">
-      <div className="card">
+      <style dangerouslySetInnerHTML={{ __html: SLIDER_LIST_STYLE }} />
+      <div className="card slider-list">
         <div className="card-body">
           <div className="row">
             <div className="mt-0 mb-3 col-12 d-flex justify-content-end">
@@ -95,11 +100,11 @@ export default async function SliderImageIndexPage({
                 <tbody>
                   {sliders.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="text-center">
-                        <p className="text-dark">
+                      <td colSpan={8} className="text-center">
+                        <p className="text-center text-muted my-4">
                           {term === ""
-                            ? t("member.no_member_available")
-                            : t("member.no_member_found")}
+                            ? t("common.no_data_available_in_table")
+                            : t("common.no_matching")}
                         </p>
                       </td>
                     </tr>

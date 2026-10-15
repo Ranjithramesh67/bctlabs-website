@@ -188,6 +188,8 @@ export function ChatClient({ user }: { user: ChatUser | null }) {
           min-width: 1.875rem;
         }
         .chatbox1 .img_cont_msg img { width: 100%; height: 100%; }
+        .chatbox1 .img_cont_msg img,
+        .chatbox1 .img_cont .user_img { object-fit: cover; }
         .chatbox1 .msg_cotainer .msg_time {
           display: block;
           font-size: 0.6875rem;
@@ -292,7 +294,21 @@ export function ChatClient({ user }: { user: ChatUser | null }) {
           align-items: center;
           border-radius: 5%;
         }
-        .img-container-logo img { width: 100%; }
+        .img-container-logo img {
+          width: 100%;
+          max-width: 100%;
+          height: auto;
+        }
+        .chatbox1 .msg_cotainer .msg_image,
+        .chatbox1 .msg_cotainer_send .msg_image {
+          max-width: 100%;
+          height: auto;
+        }
+        #imageModal #modalImage {
+          max-width: 100%;
+          max-height: 60vh;
+          object-fit: contain;
+        }
         .copyright { margin-top: 0px; }
         .chatbox1 .active-chat {
           background-color: #f0f0f0;
@@ -326,18 +342,18 @@ export function ChatClient({ user }: { user: ChatUser | null }) {
                 >
                   {messages.map((message, index) => {
                     const body =
-                      message.type === "image" ? (
+                      message.type === "image" && message.file_url ? (
                         <a
                           href="#"
                           className="imagePreview"
                           onClick={(event) => {
                             event.preventDefault();
-                            setModalImage(message.file_url ?? "");
+                            setModalImage(message.file_url);
                           }}
                         >
                           <img
-                            style={{ width: 100 }}
-                            src={message.file_url ?? ""}
+                            style={{ width: 100, maxWidth: "100%", height: "auto" }}
+                            src={message.file_url}
                             className="msg_image"
                             alt="Image"
                           />
@@ -436,24 +452,28 @@ export function ChatClient({ user }: { user: ChatUser | null }) {
                     </div>
                   </div>
 
-                  <div
-                    className="image-preview-container mt-2"
-                    style={{ display: imagePreview ? "block" : "none" }}
-                  >
-                    <img
-                      id="imagePreview"
-                      src={imagePreview ?? ""}
-                      alt="Image Preview"
-                      className="img-thumbnail"
-                      style={{ maxWidth: 150, maxHeight: 150 }}
-                    />
-                  </div>
+                  {imagePreview ? (
+                    <div className="image-preview-container mt-2">
+                      <img
+                        id="imagePreview"
+                        src={imagePreview}
+                        alt="Image Preview"
+                        className="img-thumbnail"
+                        style={{ maxWidth: 150, maxHeight: 150 }}
+                      />
+                    </div>
+                  ) : null}
                 </div>
               </>
             ) : (
               <div className="empty-chat-section">
                 <div className="img-container-logo">
-                  <img src="/assets/images/veelgo-chat.png" alt="Chat" />
+                  <img
+                    src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22250%22%20height%3D%22250%22%20viewBox%3D%220%200%20250%20250%22%3E%3Ccircle%20cx%3D%22125%22%20cy%3D%22125%22%20r%3D%22118%22%20fill%3D%22%23eef1fe%22%2F%3E%3Crect%20x%3D%2252%22%20y%3D%2282%22%20width%3D%22146%22%20height%3D%2292%22%20rx%3D%2218%22%20fill%3D%22%236777ef%22%2F%3E%3Cpath%20d%3D%22M86%20174l-4%2026%2030-26z%22%20fill%3D%22%236777ef%22%2F%3E%3Ccircle%20cx%3D%2298%22%20cy%3D%22128%22%20r%3D%229%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%22125%22%20cy%3D%22128%22%20r%3D%229%22%20fill%3D%22%23fff%22%2F%3E%3Ccircle%20cx%3D%22152%22%20cy%3D%22128%22%20r%3D%229%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fsvg%3E"
+                    alt="Chat"
+                    width={250}
+                    height={250}
+                  />
                 </div>
                 <h4>Support Chat</h4>
                 <p>
@@ -544,12 +564,14 @@ export function ChatClient({ user }: { user: ChatUser | null }) {
               ></button>
             </div>
             <div className="modal-body" style={{ height: 400, overflowY: "auto" }}>
-              <img
-                src={modalImage ?? ""}
-                id="modalImage"
-                alt="Image Preview"
-                className="img-fluid"
-              />
+              {modalImage ? (
+                <img
+                  src={modalImage}
+                  id="modalImage"
+                  alt="Image Preview"
+                  className="img-fluid"
+                />
+              ) : null}
             </div>
           </div>
         </div>

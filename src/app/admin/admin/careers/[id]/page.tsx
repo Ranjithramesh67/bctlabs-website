@@ -76,7 +76,33 @@ export default async function CareerApplicationShowPage({
   const extension = pathinfoExtension(application.resume_path).toUpperCase();
 
   return (
-    <div className="container-fluid">
+    <div className="container-fluid cc-career-detail">
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            /* Push the "Back to List" button to the far right of the header. */
+            @media (min-width: 768px) {
+              .cc-career-detail .card-header .card-tools {
+                margin-left: auto;
+              }
+            }
+            /* On phones let the value column wrap (and drop the theme's forced
+               800px min-width) so nothing is clipped or needs sideways scroll. */
+            @media (max-width: 575.98px) {
+              .cc-career-detail .table:not(.table-sm):not(.table-md):not(.dataTable) th {
+                white-space: normal;
+              }
+              .cc-career-detail .table:not(.table-sm):not(.table-md):not(.dataTable) td {
+                white-space: normal;
+                overflow-wrap: anywhere;
+              }
+              .cc-career-detail .table-responsive table {
+                min-width: 0;
+              }
+            }
+          `,
+        }}
+      />
       <div className="row">
         <div className="col-12">
           <div className="card">
@@ -95,46 +121,48 @@ export default async function CareerApplicationShowPage({
               <div className="row">
                 <div className="col-md-6">
                   <h4>Personal Information</h4>
-                  <table className="table table-bordered">
-                    <tbody>
-                      <tr>
-                        <th style={{ width: "30%" }}>Name:</th>
-                        <td>{application.name}</td>
-                      </tr>
-                      <tr>
-                        <th>Email:</th>
-                        <td>{application.email}</td>
-                      </tr>
-                      <tr>
-                        <th>Mobile:</th>
-                        <td>{application.mobile}</td>
-                      </tr>
-                      <tr>
-                        <th>Qualification:</th>
-                        <td>{application.qualification}</td>
-                      </tr>
-                      <tr>
-                        <th>Date Of Birth:</th>
-                        <td>{application.dob}</td>
-                      </tr>
-                      <tr>
-                        <th>Gender:</th>
-                        <td>{application.gender}</td>
-                      </tr>
-                      <tr>
-                        <th>Whatsapp Mobile:</th>
-                        <td>{application.whatsappMobile}</td>
-                      </tr>
-                      <tr>
-                        <th>Year of Experience :</th>
-                        <td>{application.yearofexperience}</td>
-                      </tr>
-                      <tr>
-                        <th>Applied On:</th>
-                        <td>{formatDateTime(application.created_at)}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <div className="table-responsive">
+                    <table className="table table-bordered">
+                      <tbody>
+                        <tr>
+                          <th style={{ width: "30%" }}>Name:</th>
+                          <td>{application.name}</td>
+                        </tr>
+                        <tr>
+                          <th>Email:</th>
+                          <td>{application.email}</td>
+                        </tr>
+                        <tr>
+                          <th>Mobile:</th>
+                          <td>{application.mobile}</td>
+                        </tr>
+                        <tr>
+                          <th>Qualification:</th>
+                          <td>{application.qualification}</td>
+                        </tr>
+                        <tr>
+                          <th>Date Of Birth:</th>
+                          <td>{application.dob}</td>
+                        </tr>
+                        <tr>
+                          <th>Gender:</th>
+                          <td>{application.gender}</td>
+                        </tr>
+                        <tr>
+                          <th>Whatsapp Mobile:</th>
+                          <td>{application.whatsappMobile}</td>
+                        </tr>
+                        <tr>
+                          <th>Year of Experience :</th>
+                          <td>{application.yearofexperience}</td>
+                        </tr>
+                        <tr>
+                          <th>Applied On:</th>
+                          <td>{formatDateTime(application.created_at)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
                 <div className="col-md-6">
                   <h4>Address</h4>
@@ -151,7 +179,9 @@ export default async function CareerApplicationShowPage({
                     >
                       <i className="fas fa-download"></i> Download Resume
                     </a>
-                    <span className="ml-3">{extension} File</span>
+                    {extension ? (
+                      <span className="ml-3">{extension} File</span>
+                    ) : null}
                   </div>
                 </div>
               </div>

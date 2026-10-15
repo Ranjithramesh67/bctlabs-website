@@ -140,19 +140,18 @@ export default async function EventIndexPage({
                         </div>
                       </div>
                     </div>
-                    <div className="d-flex align-items-center justify-content-between assigned-user pt-0 pl-3 px-5">
-                      <div>
-                        <div
-                          className="text-center badge badge-success font-weight-bold"
-                          data-toggle="tooltip"
-                          data-placement="top"
-                          title="Total Events"
-                        ></div>
-                      </div>
-                    </div>
                   </div>
                 </div>
               ))}
+              {events.length === 0 ? (
+                <div className="col-12">
+                  <p className="text-center text-muted my-4">
+                    {term
+                      ? t("common.no_matching")
+                      : t("common.no_data_available_in_table")}
+                  </p>
+                </div>
+              ) : null}
             </div>
           </div>
           <PaginatorRow

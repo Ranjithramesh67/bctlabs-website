@@ -198,6 +198,7 @@ export function MembersIndex({
                               <img
                                 alt="image"
                                 width="50"
+                                height="50"
                                 src={member.imageUrl}
                                 className="rounded-circle user-avatar-image"
                               />

@@ -125,6 +125,8 @@ export function ImagePreviewDelete({
         className="btn btn-danger btn-sm delete-image"
         data-id={id}
         data-field={field}
+        title="Delete image"
+        aria-label="Delete image"
         onClick={onClick}
         disabled={busy}
       >

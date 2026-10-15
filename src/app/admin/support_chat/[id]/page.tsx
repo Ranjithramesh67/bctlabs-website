@@ -72,6 +72,17 @@ export default async function SupportChatPage({
           height: 40px;
           object-fit: cover;
         }
+        #chatBox { overflow-wrap: anywhere; }
+        #imageModal #modalImage {
+          max-width: 100%;
+          max-height: 80vh;
+          object-fit: contain;
+        }
+        .support-chat-input { flex-wrap: nowrap; }
+        .support-chat-input textarea { min-width: 0; }
+        @media (max-width: 575.98px) {
+          #chatBox { height: 60vh !important; }
+        }
       `}</style>
       <div className="container">
         <div className="row">
@@ -100,7 +111,7 @@ export default async function SupportChatPage({
                     id="msgType"
                     defaultValue="text"
                   />
-                  <div className="input-group">
+                  <div className="input-group support-chat-input">
                     <label
                       className="input-group-text bg-white border-end-0"
                       htmlFor="chatFile"

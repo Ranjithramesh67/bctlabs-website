@@ -80,7 +80,7 @@ export function TranslationManager({
       <div className="section-body">
         <div className="card">
           <div className="card-body">
-            <div className="table-responsive-sm table-responsive-md overflow-hidden">
+            <div className="table-responsive">
               <table
                 className="table table-responsive-sm table-responsive-md table-striped table-bordered"
                 id="translatorManagerTbl"
@@ -97,45 +97,56 @@ export function TranslationManager({
                   </tr>
                 </thead>
                 <tbody>
-                  {languages.map((language) => (
-                    <tr key={language.id}>
-                      <td>{language.name}</td>
-                      <td>
-                        <a
-                          href={`/admin/language/translation/${language.id}`}
-                          className="text-decoration-none"
-                        >
-                          Edit Translation
-                        </a>
-                      </td>
-                      <td className="text-center" style={{ width: "8%" }}>
-                        <button
-                          type="button"
-                          title={t("common.edit")}
-                          className="btn btn-warning action-btn has-icon edit-translator-btn"
-                          data-id={language.id}
-                          onClick={() => openEdit(language.id)}
-                        >
-                          <i className="fa fa-edit"></i>
-                        </button>
-                        <form action={destroyLanguage} className="d-inline">
-                          <input
-                            type="hidden"
-                            name="id"
-                            value={language.id}
-                          />
-                          <button
-                            type="submit"
-                            title={t("common.delete")}
-                            className="btn btn-danger action-btn has-icon delete-translate-language"
-                            data-id={language.id}
-                          >
-                            <i className="fa fa-trash"></i>
-                          </button>
-                        </form>
+                  {languages.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={3}
+                        className="text-center text-muted dataTables_empty"
+                      >
+                        {t("common.no_data_available_in_table")}
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    languages.map((language) => (
+                      <tr key={language.id}>
+                        <td>{language.name}</td>
+                        <td>
+                          <a
+                            href={`/admin/language/translation/${language.id}`}
+                            className="text-decoration-none"
+                          >
+                            Edit Translation
+                          </a>
+                        </td>
+                        <td className="text-center" style={{ width: "8%" }}>
+                          <button
+                            type="button"
+                            title={t("common.edit")}
+                            className="btn btn-warning action-btn has-icon edit-translator-btn"
+                            data-id={language.id}
+                            onClick={() => openEdit(language.id)}
+                          >
+                            <i className="fa fa-edit"></i>
+                          </button>
+                          <form action={destroyLanguage} className="d-inline">
+                            <input
+                              type="hidden"
+                              name="id"
+                              value={language.id}
+                            />
+                            <button
+                              type="submit"
+                              title={t("common.delete")}
+                              className="btn btn-danger action-btn has-icon delete-translate-language"
+                              data-id={language.id}
+                            >
+                              <i className="fa fa-trash"></i>
+                            </button>
+                          </form>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

@@ -115,6 +115,36 @@
   overflow-x: hidden;
 }
 
+/* --- Card grid action icons --------------------------------------------- */
+
+/* Laravel's category / blog-category views shipped these positions in an
+   inline `@section('css')` block that the port never carried over, so the edit
+   and delete glyphs fell back to normal flow and stacked on top of each other.
+   Anchor them to the card's top-right corner like the original.
+   Both are placed from the right edge so the icon pair never depends on the
+   title length. */
+.users-card .edit,
+.users-card .del {
+  position: absolute;
+  top: 10px;
+  z-index: 2;
+  line-height: 1;
+}
+
+.users-card .edit {
+  right: 10px;
+}
+
+.users-card .del {
+  right: 45px;
+}
+
+/* No card image may ever exceed its column (the avatar size itself comes from
+   customers.css). */
+.users-card img {
+  max-width: 100%;
+}
+
 .main-sidebar .sidebar-brand {
   position: sticky;
   top: 0;
@@ -179,7 +209,9 @@
   }
 
   .main-wrapper .main-content {
-    padding: 76px 15px 0 !important;
+    /* Reserve room for the fixed footer so the last row / pagination can never
+       hide underneath it on small screens. */
+    padding: 76px 15px 90px !important;
     overflow-x: hidden;
   }
 

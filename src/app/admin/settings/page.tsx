@@ -18,6 +18,32 @@ export const instant = false;
 const APP_VERSION = "1.0.0";
 const FALLBACK_LOGO = "/assets/img/infyom-logo.png";
 
+/**
+ * The theme's `.thumbnail-preview` uses `max-width: max-content` and
+ * `.faviconPreview` resets the height to `auto`, so a large upload would render
+ * at (or near) its natural size. Scope the previews to this page and bound them
+ * so they can never overflow the card.
+ */
+const SETTINGS_PAGE_CSS = `
+.settings-page .thumbnail-preview {
+  height: auto;
+  max-height: 70px;
+  max-width: 160px;
+  width: auto;
+  object-fit: contain;
+}
+.settings-page .thumbnail-preview.faviconPreview {
+  max-width: 70px;
+  margin-top: 0 !important;
+}
+.settings-page .form-control {
+  max-width: 100%;
+}
+.settings-page .settings-version label {
+  white-space: nowrap;
+}
+`;
+
 /** `Setting::CURRENCIES`. */
 const CURRENCIES: Record<string, string> = {
   eur: "Euro (EUR)",
@@ -91,8 +117,9 @@ export default async function SettingsPage({
 
   return (
     <AdminSection title={t("settings")}>
+      <style dangerouslySetInnerHTML={{ __html: SETTINGS_PAGE_CSS }} />
       <div className="alert alert-danger display-none" id="validationErrorsBox"></div>
-      <div className="card">
+      <div className="card settings-page">
         <div className="card-body">
           <div className="row">
             <div className="col-md-3">
@@ -133,7 +160,6 @@ export default async function SettingsPage({
               <form
                 action={updateSetting}
                 id="settingUpdate"
-                encType="multipart/form-data"
               >
                 {groupName === "general" ? (
                   <>
@@ -257,7 +283,7 @@ export default async function SettingsPage({
                           </div>
                         </div>
                       </div>
-                      <div className="form-group col-xl-2 col-sm-12">
+                      <div className="form-group col-xl-2 col-sm-12 settings-version">
                         <div className="row">
                           <div className="px-3">
                             <label

@@ -124,46 +124,54 @@ export default async function TranslationEditPage({
               </div>
             </div>
             <div className="card-body">
-              <div className="row">
-                {Object.entries(translations).map(([key, value]) => {
-                  if (isArrayValue(value)) {
-                    return Object.entries(value).map(
-                      ([nestedKey, nestedValue]) => {
-                        if (isArrayValue(nestedValue)) {
-                          return null;
-                        }
-                        return (
-                          <div
-                            className="col-lg-4 col-md-6 mb-4"
-                            key={`${key}.${nestedKey}`}
-                          >
-                            <label>{humaniseKey(nestedKey)} :</label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              name={`${key}[${nestedKey}]`}
-                              defaultValue={
-                                nestedValue === null ? "" : String(nestedValue)
-                              }
-                            />
-                          </div>
-                        );
-                      },
+              {Object.keys(translations).length === 0 ? (
+                <p className="text-center text-muted my-4">
+                  {t("common.no_data_available_in_table")}
+                </p>
+              ) : (
+                <div className="row">
+                  {Object.entries(translations).map(([key, value]) => {
+                    if (isArrayValue(value)) {
+                      return Object.entries(value).map(
+                        ([nestedKey, nestedValue]) => {
+                          if (isArrayValue(nestedValue)) {
+                            return null;
+                          }
+                          return (
+                            <div
+                              className="col-lg-4 col-md-6 mb-4"
+                              key={`${key}.${nestedKey}`}
+                            >
+                              <label>{humaniseKey(nestedKey)} :</label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                name={`${key}[${nestedKey}]`}
+                                defaultValue={
+                                  nestedValue === null
+                                    ? ""
+                                    : String(nestedValue)
+                                }
+                              />
+                            </div>
+                          );
+                        },
+                      );
+                    }
+                    return (
+                      <div className="col-lg-4 col-md-6 mb-4" key={key}>
+                        <label>{humaniseKey(key)} :</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          name={key}
+                          defaultValue={value === null ? "" : String(value)}
+                        />
+                      </div>
                     );
-                  }
-                  return (
-                    <div className="col-lg-4 col-md-6 mb-4" key={key}>
-                      <label>{humaniseKey(key)} :</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name={key}
-                        defaultValue={value === null ? "" : String(value)}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
+                  })}
+                </div>
+              )}
             </div>
           </form>
         </div>

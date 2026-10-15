@@ -34,7 +34,7 @@ export default async function CategoryCreatePage() {
                 />
               </div>
             </div>
-            <button type="submit" className="btn btn-primary mt-3">
+            <button type="submit" className="btn btn-primary mt-3 mr-2">
               Save
             </button>
             <a href="/admin/get_category" className="btn btn-secondary mt-3">

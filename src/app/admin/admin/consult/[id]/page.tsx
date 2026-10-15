@@ -111,7 +111,33 @@ export default async function ConsultShowPage({
   }
 
   return (
-    <div className="container-fluid">
+    <div className="container-fluid cc-consult-detail">
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            /* Push the "Back to List" button to the far right of the header. */
+            @media (min-width: 768px) {
+              .cc-consult-detail .card-header .card-tools {
+                margin-left: auto;
+              }
+            }
+            /* On phones let the value column wrap (and drop the theme's forced
+               800px min-width) so nothing is clipped or needs sideways scroll. */
+            @media (max-width: 575.98px) {
+              .cc-consult-detail .table:not(.table-sm):not(.table-md):not(.dataTable) th {
+                white-space: normal;
+              }
+              .cc-consult-detail .table:not(.table-sm):not(.table-md):not(.dataTable) td {
+                white-space: normal;
+                overflow-wrap: anywhere;
+              }
+              .cc-consult-detail .table-responsive table {
+                min-width: 0;
+              }
+            }
+          `,
+        }}
+      />
       <div className="row">
         <div className="col-12">
           <div className="card">
@@ -127,71 +153,75 @@ export default async function ConsultShowPage({
               <div className="row">
                 <div className="col-md-6">
                   <h4>Information</h4>
-                  <table className="table table-bordered">
-                    <tbody>
-                      <tr>
-                        <th style={{ width: "30%" }}>Name:</th>
-                        <td>{application.name}</td>
-                      </tr>
-                      <tr>
-                        <th>Email:</th>
-                        <td>{application.email}</td>
-                      </tr>
-                      <tr>
-                        <th>Mobile:</th>
-                        <td>{application.mobile}</td>
-                      </tr>
-                      <tr>
-                        <th>Designation:</th>
-                        <td>{application.designation}</td>
-                      </tr>
-                      <tr>
-                        <th>School | Institution:</th>
-                        <td>{application.school}</td>
-                      </tr>
-                      <tr>
-                        <th>Student Strength:</th>
-                        <td>{application.student_strength}</td>
-                      </tr>
-                      <tr>
-                        <th>City &amp; State:</th>
-                        <td>{application.city}</td>
-                      </tr>
-                      <tr>
-                        <th>Applied On:</th>
-                        <td>{formatDateTime(application.created_at)}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <div className="table-responsive">
+                    <table className="table table-bordered">
+                      <tbody>
+                        <tr>
+                          <th style={{ width: "30%" }}>Name:</th>
+                          <td>{application.name}</td>
+                        </tr>
+                        <tr>
+                          <th>Email:</th>
+                          <td>{application.email}</td>
+                        </tr>
+                        <tr>
+                          <th>Mobile:</th>
+                          <td>{application.mobile}</td>
+                        </tr>
+                        <tr>
+                          <th>Designation:</th>
+                          <td>{application.designation}</td>
+                        </tr>
+                        <tr>
+                          <th>School | Institution:</th>
+                          <td>{application.school}</td>
+                        </tr>
+                        <tr>
+                          <th>Student Strength:</th>
+                          <td>{application.student_strength}</td>
+                        </tr>
+                        <tr>
+                          <th>City &amp; State:</th>
+                          <td>{application.city}</td>
+                        </tr>
+                        <tr>
+                          <th>Applied On:</th>
+                          <td>{formatDateTime(application.created_at)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
                 <div className="col-md-6">
                   <br />
                   <br />
-                  <table className="table table-bordered">
-                    <tbody>
-                      <tr>
-                        <th style={{ width: "30%" }}>
-                          Type of Lab Intrested in:
-                        </th>
-                        <td>{application.lab_type}</td>
-                      </tr>
-                      <tr>
-                        <th>Preferred Date &amp; Time:</th>
-                        <td>
-                          {formatDate(application.preferred_date)},{" "}
-                          {formatTime(application.preferred_time)}
-                        </td>
-                      </tr>
-                      <tr>
-                        <th>Preferred Mode:</th>
-                        <td>{application.preferred_mode}</td>
-                      </tr>
-                      <tr>
-                        <th>How did you know:</th>
-                        <td>{application.heard_about}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <div className="table-responsive">
+                    <table className="table table-bordered">
+                      <tbody>
+                        <tr>
+                          <th style={{ width: "30%" }}>
+                            Type of Lab Intrested in:
+                          </th>
+                          <td>{application.lab_type}</td>
+                        </tr>
+                        <tr>
+                          <th>Preferred Date &amp; Time:</th>
+                          <td>
+                            {formatDate(application.preferred_date)},{" "}
+                            {formatTime(application.preferred_time)}
+                          </td>
+                        </tr>
+                        <tr>
+                          <th>Preferred Mode:</th>
+                          <td>{application.preferred_mode}</td>
+                        </tr>
+                        <tr>
+                          <th>How did you know:</th>
+                          <td>{application.heard_about}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                   <br />
                   <h4>Requirements or Queries</h4>
                   <div className="border p-3 bg-light">

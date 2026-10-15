@@ -6,6 +6,29 @@ import { getCurrentUser } from "@/lib/auth";
 
 export const instant = false;
 
+// The theme is Bootstrap 4.6 with select2 never initialised, so make the state
+// <select> match the 42px `.form-control` fields and keep the image preview
+// bounded instead of rendering at natural size (see subcategory/create).
+const SLIDER_IMG_STYLE = `.sliderimg select.form-control{display:block;width:100%;height:42px;padding:10px 15px;font-size:14px;line-height:1.5;color:#495057;background-color:#fdfdff;border:1px solid #e4e6fc;border-radius:4px}.sliderimg select.form-control:focus{border-color:#80bdff;outline:0;box-shadow:0 0 0 .2rem rgba(0,123,255,.25)}.sliderimg .thumbnail-preview{height:70px;max-width:100%;object-fit:contain}@media (max-width:575.98px){.sliderimg .form-control,.sliderimg select.form-control{width:100%}.sliderimg .btn{min-height:40px}}`;
+
+// Guarded delegate listener so the live preview also survives soft navigation.
+const SLIDER_IMG_PREVIEW_SCRIPT = `(function () {
+  if (window.__sliderImgPreviewBound) return;
+  window.__sliderImgPreviewBound = true;
+  document.addEventListener("change", function (event) {
+    var target = event.target;
+    if (!target || target.tagName !== "INPUT" || target.type !== "file") return;
+    if (target.id !== "image") return;
+    var img = document.getElementById("sliderimg-preview");
+    if (!img) return;
+    var file = target.files && target.files[0];
+    if (!file) return;
+    img.src = URL.createObjectURL(file);
+    var wrap = document.getElementById("sliderimg-preview-wrap");
+    if (wrap) wrap.hidden = false;
+  });
+})();`;
+
 export default async function SliderImageCreatePage() {
   // Session/DB-backed page: render at request time (Cache Components).
   await connection();
@@ -21,9 +44,11 @@ export default async function SliderImageCreatePage() {
       backHref="/admin/slider_image"
       backLabel="Slider image"
     >
+      <style dangerouslySetInnerHTML={{ __html: SLIDER_IMG_STYLE }} />
       <div className="card">
         <div className="card-body">
           <form
+            className="sliderimg"
             action={storeSlider}
             encType="multipart/form-data"
           >
@@ -45,8 +70,16 @@ export default async function SliderImageCreatePage() {
                 <input
                   type="file"
                   className="form-control solid"
+                  id="image"
                   name="image"
                 />
+                <div id="sliderimg-preview-wrap" className="mt-2" hidden>
+                  <img
+                    id="sliderimg-preview"
+                    className="img-thumbnail thumbnail-preview"
+                    alt=""
+                  />
+                </div>
               </div>
 
               <div className="col-xl-4 col-md-4 mb-4">
@@ -109,6 +142,9 @@ export default async function SliderImageCreatePage() {
             >
               Back
             </a>
+            <script
+              dangerouslySetInnerHTML={{ __html: SLIDER_IMG_PREVIEW_SCRIPT }}
+            />
           </form>
         </div>
       </div>

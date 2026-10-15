@@ -286,8 +286,8 @@ function MemberTasks() {
   return (
     <section className="section">
       <div className="section-body">
-        <div className="row w-100 justify-content-end">
-          <div className="justify-content-end mr-2">
+        <div className="d-flex justify-content-end flex-wrap mb-3">
+          <div className="mr-2">
             <select
               name="status"
               id="filter_status"
@@ -300,9 +300,9 @@ function MemberTasks() {
         </div>
         <div className="card">
           <div className="card-body">
-            <div className="table-responsive-sm table-responsive-md overflow-hidden">
+            <div className="table-responsive">
               <table
-                className="table table-responsive-sm table-responsive-md table-striped table-bordered"
+                className="table table-striped table-bordered"
                 id="member-tasksTbl"
               >
                 <thead>

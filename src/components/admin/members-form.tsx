@@ -28,6 +28,24 @@ const LANGUAGES = [
 
 const DEFAULT_AVATAR = "/assets/img/infyom-logo.png";
 
+/**
+ * Page-scoped CSS for the member form. The Laravel `.thumbnail-preview` rule
+ * (`height:70px; max-width:max-content`) let the preview render at its natural
+ * size, so a wide upload blew out of the card (and got clipped by `#app`'s
+ * `overflow-x:hidden`). Bound it to a fixed box that always fits the column.
+ */
+const FORM_STYLES = `
+.members-form .thumbnail-preview {
+  display: block;
+  width: 100px;
+  max-width: 100px;
+  height: 70px;
+  max-height: 70px;
+  object-fit: contain;
+  background-color: #fff;
+}
+`;
+
 function PasswordInput({
   name,
   id,
@@ -79,43 +97,46 @@ function PasswordInput({
 function ImageField({ defaultImage }: { defaultImage?: string }) {
   const [preview, setPreview] = useState(defaultImage ?? DEFAULT_AVATAR);
   return (
-    <div className="row">
-      <div className="form-group col-lg-3 col-md-6 col-sm-12">
-        <span id="validationErrorsBox" className="text-danger"></span>
-        <div className="row">
-          <div className="col-6">
-            <label htmlFor="logo" className="profile-label-color">
-              {t("member.profile")}:
-            </label>
-            <label className="image__file-upload text-white">
-              {" "}
-              {t("setting.choose")}
-              <input
-                type="file"
-                name="image"
-                id="logo"
-                className="d-none"
-                accept="image/*"
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-                  if (file) {
-                    setPreview(URL.createObjectURL(file));
-                  }
-                }}
+    <>
+      <style>{FORM_STYLES}</style>
+      <div className="row">
+        <div className="form-group col-lg-3 col-md-6 col-sm-12">
+          <span id="validationErrorsBox" className="text-danger"></span>
+          <div className="row">
+            <div className="col-6">
+              <label htmlFor="logo" className="profile-label-color">
+                {t("member.profile")}:
+              </label>
+              <label className="image__file-upload text-white">
+                {" "}
+                {t("setting.choose")}
+                <input
+                  type="file"
+                  name="image"
+                  id="logo"
+                  className="d-none"
+                  accept="image/*"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    if (file) {
+                      setPreview(URL.createObjectURL(file));
+                    }
+                  }}
+                />
+              </label>
+            </div>
+            <div className="col pl-0 mt-1">
+              <img
+                id="logoPreview"
+                className="img-thumbnail thumbnail-preview"
+                src={preview}
+                alt=""
               />
-            </label>
-          </div>
-          <div className="col-2 pl-0 mt-1">
-            <img
-              id="logoPreview"
-              className="img-thumbnail thumbnail-preview"
-              src={preview}
-              alt=""
-            />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -147,7 +168,7 @@ export function MembersCreateForm({
   permissionGroups: PermissionGroup[];
 }) {
   return (
-    <form action={storeMember} id="createMember">
+    <form action={storeMember} id="createMember" className="members-form">
       <div className="row">
         <div className="form-group col-sm-6">
           <label htmlFor="first_name">{t("member.first_name")}:</label>
@@ -375,7 +396,7 @@ export function MembersEditForm({
   };
 }) {
   return (
-    <form action={updateMember} id="editMember">
+    <form action={updateMember} id="editMember" className="members-form">
       <input type="hidden" name="id" value={member.id} />
       <div className="row">
         <div className="form-group col-sm-6">

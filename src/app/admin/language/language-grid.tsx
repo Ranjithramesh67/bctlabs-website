@@ -207,11 +207,9 @@ export function LanguageGrid({
             </div>
           ) : (
             <div className="col-lg-12 col-md-12 d-flex justify-content-center">
-              {term ? (
-                <p className="text-dark">No Language Found</p>
-              ) : (
-                <p className="text-dark">No Languages Available</p>
-              )}
+              <p className="text-center text-muted my-4">
+                {term ? "No Language Found" : "No Languages Available"}
+              </p>
             </div>
           )}
         </div>
