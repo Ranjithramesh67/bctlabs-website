@@ -1002,6 +1002,15 @@ export default function HomePage() {
           gap: 10px;
       }
 
+      /*
+       * See the testimonials-slider rules below: the forced 550px height
+       * also has to yield so the card can grow to fit a long quote.
+       */
+      .testimonial__slider .testimonial__item {
+          height: auto !important;
+          min-height: 550px;
+      }
+
       }
           /* Add this CSS to your stylesheet */
           .testimonial__item {
@@ -1053,6 +1062,33 @@ export default function HomePage() {
               position: absolute;
               bottom: 35px;
           }
+
+      /*
+       * A fixed card height combined with the absolutely positioned author
+       * block let long quotes run underneath the author details. The
+       * tallest quote also varies a lot with the card width (the slider
+       * shows 2 cards between 575px and 990px, so a quote can need twice
+       * the height it does at 1440px), which makes any single fixed height
+       * wrong somewhere. Let each card grow to its content and equalise
+       * the heights by stretching the slides, then pin the author block to
+       * the bottom with flex so short quotes keep the original look.
+       * Scoped to the testimonials slider so the achievements slider keeps
+       * its original sizing.
+       */
+      .testimonial__slider .swiper-slide {
+          display: flex;
+          height: auto;
+      }
+      .testimonial__slider .testimonial__item {
+          height: auto;
+          min-height: 500px;
+          flex: 1 1 auto;
+      }
+      .testimonial__slider .testimonial-image-user {
+          position: static;
+          margin-top: auto;
+          padding-top: 20px;
+      }
 
       ` }} />
 
