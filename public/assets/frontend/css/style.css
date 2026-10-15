@@ -4466,7 +4466,15 @@ p.team {
 .slideshow-container {
     position: relative;
     width: 100%;
-    height: 100vh; /* Adjust this based on your needs */
+    /*
+     * Fit the slideshow to the slide image instead of forcing the full
+     * viewport height. The slider images are very wide (1920x870), so at
+     * `100vh` the image only filled ~70% of the container and left a large
+     * blank band above the "About Us" section. `height: 100%` on the images
+     * cannot fill it either, because the intermediate `.slide-inner` has no
+     * height, and `object-fit: cover` would crop the built-in caption text.
+     */
+    height: auto;
     overflow: hidden;
 }
 
