@@ -23,6 +23,10 @@ export const metadata: Metadata = {
   },
 };
 
+// Bumped whenever `style.css` changes. The preview/CDN caches `/assets/**` for
+// hours, so without a new URL a returning visitor keeps the previous theme CSS.
+const THEME_CSS_VERSION = "20261015b";
+
 // Same stylesheets, in the same order, as the Blade `<head>`.
 const STYLESHEETS = [
   "/assets/frontend/css/bootstrap.min.css",
@@ -32,7 +36,7 @@ const STYLESHEETS = [
   "/assets/frontend/css/magnific-popup.css",
   "/assets/frontend/css/animate.css",
   "/assets/frontend/css/nice-select.css",
-  "/assets/frontend/css/style.css",
+  `/assets/frontend/css/style.css?v=${THEME_CSS_VERSION}`,
   "/assets/frontend/css/font-awesome.css",
 ];
 
@@ -43,6 +47,18 @@ export default function SiteLayout({ children }: LayoutProps<"/">) {
         <link key={href} rel="stylesheet" href={href} />
       ))}
       <link rel="stylesheet" href={TOASTIFY_STYLESHEET} />
+
+      {/*
+        Critical rule, inlined on purpose. `style.css` also carries this, but it
+        is a separate (cacheable) request, so a device holding a cached copy
+        painted the desktop nav for a few seconds on phones until meanmenu ran.
+        The HTML is never cached, so the first paint is always correct.
+      */}
+      <style>{`
+        @media (max-width: 991px) {
+          .header-area .main-menu { display: none; }
+        }
+      `}</style>
 
       <SiteHeader />
       <main>{children}</main>
