@@ -83,7 +83,7 @@ export default function WhatWeDoPage() {
                 </div>
                 <div className="blog__content  text-center pt-4 px-2">
                   <h4 className="mt-10 pb-15 ">
-                    <a href="stem_lab.php" className="primary-color">
+                    <a href="/stem_labs" className="primary-color">
                       STEM LAB
                     </a>
                   </h4>
@@ -116,7 +116,7 @@ export default function WhatWeDoPage() {
                 </div>
                 <div className="blog__content  text-center pt-4 px-2">
                   <h4 className="mt-10 pb-15 ">
-                    <a href="advanced_innovation_lab.php" className="primary-color">
+                    <a href="/advanced_innovation_lab" className="primary-color">
                       Advanced Innovation Lab
                     </a>
                   </h4>
@@ -150,7 +150,7 @@ export default function WhatWeDoPage() {
                 </div>
                 <div className="blog__content  text-center pt-4 px-2">
                   <h4 className="mt-10 pb-15 ">
-                    <a href="csr_stem_solutions.php" className="primary-color">
+                    <a href="/csr_stem_solutions" className="primary-color">
                       CSR STEM Solutions
                     </a>
                   </h4>
@@ -184,7 +184,7 @@ export default function WhatWeDoPage() {
                 </div>
                 <div className="blog__content  text-center pt-4 px-2">
                   <h4 className="mt-10 pb-15 ">
-                    <a href="stem_learning_programs.php" className="primary-color">
+                    <a href="/stem_learning_programs" className="primary-color">
                       STEM Learning Programs
                     </a>
                   </h4>
@@ -218,7 +218,7 @@ export default function WhatWeDoPage() {
                 </div>
                 <div className="blog__content  text-center pt-4 px-2">
                   <h4 className="mt-10 pb-15 ">
-                    <a href="stem_workshops.php" className="primary-color">
+                    <a href="/stem_workshops" className="primary-color">
                       STEM Workshops
                     </a>
                   </h4>
