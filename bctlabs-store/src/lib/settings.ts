@@ -1,6 +1,7 @@
 import "server-only";
 
 import { prisma } from "./prisma";
+import { BRAND } from "./site-content";
 
 export type StoreSettings = {
   name: string;
@@ -21,16 +22,16 @@ export type StoreSettings = {
 };
 
 const DEFAULTS: StoreSettings = {
-  name: "BCT Labs",
-  description: "Electronic components, development boards and STEM kits.",
+  name: BRAND.name,
+  description: BRAND.description,
   url: "http://localhost:4000",
   currency: "INR",
   currencySymbol: "\u20b9",
   country: "IN",
-  address: "",
-  city: "",
-  phone: "",
-  email: "info@bctlabs.com",
+  address: `${BRAND.address.line1}, ${BRAND.address.line2}`,
+  city: `${BRAND.address.city}, ${BRAND.address.state} ${BRAND.address.postcode}`,
+  phone: BRAND.phone,
+  email: BRAND.email,
   taxRate: 18,
   taxLabel: "GST",
   taxMode: "exclusive",
@@ -50,6 +51,8 @@ export async function getStoreSettings(): Promise<StoreSettings> {
           "woocommerce_store_address",
           "woocommerce_store_city",
           "woocommerce_store_country",
+          "bq_store_phone",
+          "bq_store_email",
           "woocommerce_free_shipping_1_settings",
           "woocommerce_flat_rate_2_settings",
           "bq_tax_global_rate",
@@ -79,8 +82,8 @@ export async function getStoreSettings(): Promise<StoreSettings> {
     country: opt.get("woocommerce_store_country") || DEFAULTS.country,
     address: opt.get("woocommerce_store_address") || DEFAULTS.address,
     city: opt.get("woocommerce_store_city") || DEFAULTS.city,
-    phone: DEFAULTS.phone,
-    email: DEFAULTS.email,
+    phone: opt.get("bq_store_phone") || DEFAULTS.phone,
+    email: opt.get("bq_store_email") || DEFAULTS.email,
     taxRate: num("bq_tax_global_rate", DEFAULTS.taxRate),
     taxLabel: opt.get("bq_tax_global_label") || DEFAULTS.taxLabel,
     taxMode: taxModeRaw === "inclusive" ? "inclusive" : "exclusive",

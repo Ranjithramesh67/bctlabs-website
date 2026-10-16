@@ -1,7 +1,8 @@
 import "server-only";
 
 import { prisma } from "./prisma";
-import { cleanContent, toNumber } from "./format";
+import { cleanContent, isPlaceholderContent, toNumber } from "./format";
+import { BLOG_POSTS } from "./site-content";
 
 export type Category = {
   id: number;
@@ -63,6 +64,11 @@ function htmlDecode(value: string): string {
     .replace(/&nbsp;/g, " ");
 }
 
+/** Normalise spacing around "&" so "Cable&Connectors" reads as "Cable & Connectors". */
+function displayName(name: string): string {
+  return name.replace(/\s*&\s*/g, " & ").replace(/\s+/g, " ").trim();
+}
+
 async function mediaUrls(ids: number[]): Promise<Map<number, string>> {
   const map = new Map<number, string>();
   const unique = [...new Set(ids.filter((id) => Number.isFinite(id) && id > 0))];
@@ -89,12 +95,14 @@ export async function getCategories(): Promise<Category[]> {
   });
   const termById = new Map(terms.map((t) => [toNumber(t.term_id), t]));
   return rows
-    .filter((r) => toNumber(r.term_id) !== 15)
+    // Skip the WooCommerce "Uncategorized" term (15) and empty categories so
+    // the navigation only lists categories that actually contain products.
+    .filter((r) => toNumber(r.term_id) !== 15 && toNumber(r.count) > 0)
     .map((r) => {
       const term = termById.get(toNumber(r.term_id));
       return {
         id: toNumber(r.term_id),
-        name: htmlDecode(term?.name ?? ""),
+        name: displayName(htmlDecode(term?.name ?? "")),
         slug: term?.slug ?? "",
         count: toNumber(r.count),
         parent: toNumber(r.parent),
@@ -310,6 +318,31 @@ export async function getFeaturedProducts(limit = 8): Promise<Product[]> {
   return (onSale.length >= limit ? onSale : products).slice(0, limit);
 }
 
+/** Categories that actually contain published products, most stocked first. */
+export async function getStorefrontCategories(): Promise<Category[]> {
+  const categories = await getCategories();
+  return categories.filter((c) => c.count > 0).sort((a, b) => b.count - a.count);
+}
+
+export type CategoryShowcase = Category & { image: string | null; sample: string | null };
+
+/** Categories paired with a representative product image for home-page tiles. */
+export async function getCategoryShowcase(limit = 8): Promise<CategoryShowcase[]> {
+  const [categories, products] = await Promise.all([getStorefrontCategories(), loadAllProducts()]);
+  return categories.slice(0, limit).map((category) => {
+    const sample = products.find(
+      (product) => product.image && product.categories.some((c) => c.slug === category.slug),
+    );
+    return { ...category, image: sample?.image ?? null, sample: sample?.name ?? null };
+  });
+}
+
+/** Products that have a photo, for visual merchandising rows. */
+export async function getVisualProducts(limit = 8, offset = 0): Promise<Product[]> {
+  const products = await loadAllProducts();
+  return products.filter((p) => p.image).slice(offset, offset + limit);
+}
+
 export async function getPages(): Promise<ContentPage[]> {
   const rows = await prisma.wp_posts.findMany({
     where: { post_type: "page", post_status: "publish" },
@@ -347,18 +380,33 @@ export async function getPosts(limit?: number): Promise<BlogPost[]> {
   const media = await mediaUrls(thumbIds);
   const thumbByPost = new Map(metas.map((m) => [toNumber(m.post_id), Number(m.meta_value || 0)]));
 
-  return rows.map((r) => {
-    const thumb = thumbByPost.get(toNumber(r.ID)) ?? 0;
-    return {
-      id: toNumber(r.ID),
-      slug: r.post_name,
-      title: htmlDecode(r.post_title),
-      excerpt: cleanContent(htmlDecode(r.post_excerpt)),
-      content: cleanContent(r.post_content),
-      date: r.post_date,
-      image: media.get(thumb) ?? null,
-    };
-  });
+  // Drop the old theme's Lorem Ipsum demo posts so only real articles show.
+  const dbPosts: BlogPost[] = rows
+    .filter((r) => !isPlaceholderContent(r.post_content))
+    .map((r) => {
+      const thumb = thumbByPost.get(toNumber(r.ID)) ?? 0;
+      return {
+        id: toNumber(r.ID),
+        slug: r.post_name,
+        title: htmlDecode(r.post_title),
+        excerpt: cleanContent(htmlDecode(r.post_excerpt)),
+        content: cleanContent(r.post_content),
+        date: r.post_date,
+        image: media.get(thumb) ?? null,
+      };
+    });
+
+  const staticPosts: BlogPost[] = BLOG_POSTS.map((post) => ({
+    id: post.id,
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.excerpt,
+    content: post.content,
+    date: new Date(post.date),
+    image: null,
+  }));
+
+  return [...staticPosts, ...dbPosts];
 }
 
 export async function getPostBySlug(slug: string): Promise<BlogPost | null> {

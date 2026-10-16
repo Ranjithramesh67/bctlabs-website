@@ -29,6 +29,31 @@ export function formatDate(value: Date | string | null | undefined): string {
   });
 }
 
+/**
+ * Price label for product listings. Products without a price are shown as
+ * "Price on request" instead of the misleading "0.00".
+ */
+export function formatProductPrice(value: number, currency = "INR"): string {
+  if (!Number.isFinite(value) || value <= 0) return "Price on request";
+  return formatPrice(value, currency);
+}
+
+/**
+ * Detects placeholder copy imported from the old theme (Lorem Ipsum and
+ * friends) so pages and posts can fall back to real content instead of
+ * showing dummy text to customers.
+ */
+export function isPlaceholderContent(html: string | null | undefined): boolean {
+  if (!html) return true;
+  const plain = html
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .toLowerCase();
+  return /lorem ipsum|dummy text|consectetur adipisicing|printing and typesetting|dolor sit amet/.test(
+    plain,
+  );
+}
+
 /** Strip WordPress shortcodes and Elementor/VBakery wrappers from raw content. */
 export function cleanContent(html: string): string {
   if (!html) return "";

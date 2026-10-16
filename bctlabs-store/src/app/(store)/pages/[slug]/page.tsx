@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 import { Container } from "@/components/ui";
-import { cleanContent, formatDate, truncate } from "@/lib/format";
+import { cleanContent, formatDate, isPlaceholderContent, truncate } from "@/lib/format";
 import { getPageBySlug } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
@@ -20,9 +20,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const page = await getPageBySlug(slug);
   if (!page) return { title: "Page not found" };
+  const realContent = !isPlaceholderContent(page.content);
   return {
     title: page.title,
-    description: truncate(page.content, 160),
+    description: realContent ? truncate(page.content, 160) : `${page.title} - BCTLABS.`,
   };
 }
 
@@ -32,7 +33,8 @@ export default async function ContentPage({ params }: PageProps) {
   if (!page) notFound();
 
   const updated = formatDate(page.updated);
-  const body = cleanContent(page.content);
+  const hasRealContent = !isPlaceholderContent(page.content);
+  const body = hasRealContent ? cleanContent(page.content) : "";
 
   return (
     <Container className="py-10">
@@ -59,7 +61,14 @@ export default async function ContentPage({ params }: PageProps) {
         {body ? (
           <div className={`mt-6 ${CONTENT_CLASS}`} dangerouslySetInnerHTML={{ __html: body }} />
         ) : (
-          <p className="mt-6 text-sm text-slate-500">This page has no content yet.</p>
+          <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
+            <p className="font-medium text-slate-800">This page is being updated.</p>
+            <p className="mt-1">
+              The full {page.title.toLowerCase()} content will be published shortly. In the
+              meantime, please <Link href="/contact-us" className="font-medium text-brand-600 underline decoration-brand-300 underline-offset-2 hover:text-brand-700">contact us</Link>{" "}
+              with any questions.
+            </p>
+          </div>
         )}
       </article>
     </Container>

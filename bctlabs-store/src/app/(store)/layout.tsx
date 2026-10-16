@@ -17,7 +17,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
   const customer = session.customerId ? await getCustomerById(session.customerId) : null;
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50">
+    <div className="flex min-h-screen flex-col bg-[#f7f5f9]">
       <StoreHeader
         storeName={settings.name}
         categories={categories}

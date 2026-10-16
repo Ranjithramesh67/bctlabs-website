@@ -1,20 +1,35 @@
 @import "tailwindcss";
 
+/*
+ * Brand palette sampled from the BCTLABS STEM Academy logo, so the store
+ * matches the primary brand: deep purple with magenta and amber accents.
+ */
 @theme {
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, "Noto Sans", sans-serif;
-  --color-brand-50: #eef2ff;
-  --color-brand-100: #e0e7ff;
-  --color-brand-200: #c7d2fe;
-  --color-brand-300: #a5b4fc;
-  --color-brand-400: #818cf8;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
-  --color-brand-800: #3730a3;
-  --color-brand-900: #312e81;
-  --color-ink-900: #0b1120;
-  --color-ink-800: #131c31;
+
+  --color-brand-50: #faf5fc;
+  --color-brand-100: #f4e8f8;
+  --color-brand-200: #e8d1f0;
+  --color-brand-300: #d4aee0;
+  --color-brand-400: #b985c9;
+  --color-brand-500: #9c5cac;
+  --color-brand-600: #83419a;
+  --color-brand-700: #6d3284;
+  --color-brand-800: #582a6b;
+  --color-brand-900: #482357;
+
+  --color-accent-400: #ff5c9b;
+  --color-accent-500: #f5177a;
+  --color-accent-600: #e51669;
+
+  --color-gold-400: #ffc266;
+  --color-gold-500: #ff934c;
+  --color-gold-600: #f57c1f;
+
+  --color-ink-700: #2a2333;
+  --color-ink-800: #1d1824;
+  --color-ink-900: #120e18;
 }
 
 html {
@@ -22,10 +37,52 @@ html {
 }
 
 body {
-  background: #f8fafc;
-  color: #0f172a;
+  background: #f7f5f9;
+  color: #1d1824;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-brand-200);
+  color: var(--color-brand-900);
+}
+
+/* Visually hidden but available to screen readers. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Hide the horizontal scrollbar on touch-friendly category rails. */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Animated brand gradient used behind hero sections. */
+.brand-mesh {
+  background-color: var(--color-brand-900);
+  background-image:
+    radial-gradient(at 12% 18%, rgba(229, 22, 105, 0.45) 0px, transparent 45%),
+    radial-gradient(at 88% 8%, rgba(255, 147, 76, 0.35) 0px, transparent 42%),
+    radial-gradient(at 72% 88%, rgba(109, 50, 132, 0.85) 0px, transparent 55%),
+    linear-gradient(135deg, var(--color-brand-900), var(--color-brand-700));
+}
+
+.brand-dots {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px);
+  background-size: 22px 22px;
 }
 
 /* Rich text coming from WordPress/Elementor content. */

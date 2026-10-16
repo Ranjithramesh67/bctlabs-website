@@ -67,6 +67,7 @@ export type Order = {
   dateCreated: Date | null;
   customerNote: string;
   orderKey: string;
+  transactionId: string;
   billing: Address | null;
   shippingAddress: Address | null;
   items: OrderItem[];
@@ -324,6 +325,7 @@ async function hydrateOrders(
     date_created_gmt: Date | null;
     payment_method: string | null;
     payment_method_title: string | null;
+    transaction_id: string | null;
     customer_note: string | null;
   }[],
 ): Promise<Order[]> {
@@ -392,6 +394,7 @@ async function hydrateOrders(
       dateCreated: o.date_created_gmt,
       customerNote: o.customer_note ?? "",
       orderKey: om.get("_order_key") || "",
+      transactionId: o.transaction_id || "",
       billing: billing ? mapAddress(billing) : null,
       shippingAddress: shipping ? mapAddress(shipping) : null,
       items: oItems,
@@ -436,6 +439,60 @@ export async function findOrderForTracking(id: number, email: string): Promise<O
 export async function updateOrderStatus(id: number, status: string): Promise<void> {
   await prisma.wp_wc_orders.update({ where: { id: BigInt(id) }, data: { status, date_updated_gmt: new Date() } });
   await prisma.wp_wc_order_stats.update({ where: { order_id: BigInt(id) }, data: { status } }).catch(() => undefined);
+}
+
+/** Read a single order meta value (HPOS `wp_wc_orders_meta`). */
+export async function getOrderMeta(id: number, key: string): Promise<string | null> {
+  const row = await prisma.wp_wc_orders_meta.findFirst({
+    where: { order_id: BigInt(id), meta_key: key },
+    select: { meta_value: true },
+  });
+  return row?.meta_value ?? null;
+}
+
+/** Insert or update a single order meta value. */
+export async function setOrderMeta(id: number, key: string, value: string): Promise<void> {
+  const existing = await prisma.wp_wc_orders_meta.findFirst({
+    where: { order_id: BigInt(id), meta_key: key },
+    select: { id: true },
+  });
+  if (existing) {
+    await prisma.wp_wc_orders_meta.update({ where: { id: existing.id }, data: { meta_value: value } });
+    return;
+  }
+  await prisma.wp_wc_orders_meta.create({
+    data: { order_id: BigInt(id), meta_key: key, meta_value: value },
+  });
+}
+
+/**
+ * Mark an order as paid after a successful online payment: records the
+ * transaction id, stamps the paid date and moves the order to "processing".
+ */
+export async function markOrderPaid(
+  id: number,
+  payment: { transactionId: string; paymentMethod?: string; paymentTitle?: string },
+): Promise<void> {
+  const now = new Date();
+  await prisma.wp_wc_orders.update({
+    where: { id: BigInt(id) },
+    data: {
+      status: "processing",
+      transaction_id: payment.transactionId,
+      date_updated_gmt: now,
+      ...(payment.paymentMethod ? { payment_method: payment.paymentMethod } : {}),
+      ...(payment.paymentTitle ? { payment_method_title: payment.paymentTitle } : {}),
+    },
+  });
+  await prisma.wp_wc_order_operational_data
+    .update({ where: { order_id: BigInt(id) }, data: { date_paid_gmt: now } })
+    .catch(() => undefined);
+  await prisma.wp_wc_order_stats
+    .update({ where: { order_id: BigInt(id) }, data: { status: "processing", date_paid: now } })
+    .catch(() => undefined);
+  await setOrderMeta(id, "_transaction_id", payment.transactionId);
+  await setOrderMeta(id, "_date_paid", String(Math.floor(now.getTime() / 1000)));
+  await setOrderMeta(id, "_paid_date", now.toISOString());
 }
 
 export async function getOrderStats(): Promise<{

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { formatPrice, truncate } from "@/lib/format";
+import { formatPrice, formatProductPrice, truncate } from "@/lib/format";
 import { AddToCartButton } from "./add-to-cart";
 import { Badge, ButtonLink } from "./ui";
 
@@ -118,7 +118,7 @@ export function ProductDetails({ product }: { product: ProductDetailsProduct }) 
       </div>
 
       <div className="mt-5 flex flex-wrap items-baseline gap-3">
-        <span className="text-3xl font-black text-slate-900">{formatPrice(displayPrice)}</span>
+        <span className="text-3xl font-black text-slate-900">{formatProductPrice(displayPrice)}</span>
         {salePrice !== null ? (
           <>
             <span className="text-lg text-slate-400 line-through">
@@ -182,7 +182,13 @@ export function ProductDetails({ product }: { product: ProductDetailsProduct }) 
           </div>
         </div>
 
-        <AddToCartButton productId={product.id} inStock={inStock} quantity={quantity} />
+        {displayPrice > 0 ? (
+          <AddToCartButton productId={product.id} inStock={inStock} quantity={quantity} />
+        ) : (
+          <ButtonLink href="/contact-us" className="w-full">
+            Enquire for price
+          </ButtonLink>
+        )}
         <ButtonLink href="/cart" variant="outline" className="w-full">
           View cart
         </ButtonLink>

@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCart, writeCart } from "@/lib/cart";
-import { createOrder } from "@/lib/orders";
+import { createOrder, setOrderMeta } from "@/lib/orders";
 import { computeTotals, type CartItem } from "@/lib/pricing";
 import { getSession } from "@/lib/session";
 import { getStoreSettings } from "@/lib/settings";
 import { getProductsByIds } from "@/lib/store";
+import { createCashfreeOrder, isCashfreeConfigured } from "@/lib/cashfree";
 
 const billingSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required"),
@@ -26,13 +27,13 @@ const shippingSchema = billingSchema.omit({ email: true, phone: true });
 const bodySchema = z.object({
   billing: billingSchema,
   shipping: shippingSchema.optional(),
-  paymentMethod: z.enum(["cod", "phonepe"]),
+  paymentMethod: z.enum(["cod", "cashfree"]),
   customerNote: z.string().trim().max(2000).optional().default(""),
 });
 
-const PAYMENT_METHODS: Record<"cod" | "phonepe", { title: string; status: string }> = {
+const PAYMENT_METHODS: Record<"cod" | "cashfree", { title: string; status: string }> = {
   cod: { title: "Cash on delivery", status: "processing" },
-  phonepe: { title: "PhonePe", status: "pending" },
+  cashfree: { title: "Cashfree (online payment)", status: "pending" },
 };
 
 export async function POST(request: Request) {
@@ -56,6 +57,13 @@ export async function POST(request: Request) {
 
   const { billing, shipping, paymentMethod, customerNote } = parsed.data;
   const payment = PAYMENT_METHODS[paymentMethod];
+
+  if (paymentMethod === "cashfree" && !isCashfreeConfigured()) {
+    return NextResponse.json(
+      { error: "Online payment is not available right now. Please choose cash on delivery." },
+      { status: 503 },
+    );
+  }
 
   try {
     // Never trust client-supplied prices or totals: the cart is the source of truth.
@@ -106,14 +114,38 @@ export async function POST(request: Request) {
 
     if (paymentMethod === "cod") {
       await writeCart([]);
-    } else {
-      // PhonePe is an online gateway. A real integration would redirect the
-      // customer to PhonePe and only clear the cart from the payment webhook
-      // once the payment is captured. That redirect is out of scope here, so
-      // the order stays "pending" and the cart is intentionally left intact.
+      return NextResponse.json({ id, key });
     }
 
-    return NextResponse.json({ id, key });
+    // Online payment: create the Cashfree order now and hand the payment
+    // session back to the browser. The cart is only cleared once Cashfree
+    // confirms the payment (return page or webhook).
+    const appUrl = (process.env.APP_URL ?? new URL(request.url).origin).replace(/\/+$/, "");
+    const returnUrl = `${appUrl}/checkout/cashfree/return?order=${id}&key=${encodeURIComponent(key)}`;
+    const cfOrder = await createCashfreeOrder({
+      orderId: `bct-${id}`,
+      amount: totals.total,
+      customerId: session.customerId ? `cust-${session.customerId}` : `guest-${billing.email}`,
+      customerEmail: billing.email ?? "",
+      customerPhone: billing.phone ?? "",
+      returnUrl,
+      notifyUrl: `${appUrl}/api/payments/cashfree/webhook`,
+      note: `BCTLABS order #${id}`,
+    });
+
+    await setOrderMeta(id, "_cashfree_order_id", String(cfOrder.cf_order_id));
+    await setOrderMeta(id, "_cashfree_order_status", cfOrder.order_status);
+
+    return NextResponse.json({
+      id,
+      key,
+      payment: {
+        provider: "cashfree" as const,
+        sessionId: cfOrder.payment_session_id,
+        cfOrderId: String(cfOrder.cf_order_id),
+        mode: (process.env.CASHFREE_ENV ?? "sandbox").toLowerCase() === "production" ? "production" : "sandbox",
+      },
+    });
   } catch (error) {
     console.error("Failed to create order", error);
     return NextResponse.json(

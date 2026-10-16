@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 import { ButtonLink, Card, Container } from "@/components/ui";
-import { cleanContent, formatDate } from "@/lib/format";
+import { cleanContent, formatDate, isPlaceholderContent } from "@/lib/format";
 import { getCustomerCount } from "@/lib/customers";
 import { getStoreSettings } from "@/lib/settings";
 import { getCategories, getPageBySlug, getProducts } from "@/lib/store";
@@ -42,7 +42,10 @@ export default async function AboutPage() {
     getPageBySlug("about"),
   ]);
 
-  const page = aboutUs ?? about;
+  const rawPage = aboutUs ?? about;
+  // The stored page still holds the old theme's Lorem Ipsum; ignore it and
+  // show the hand-written introduction instead.
+  const page = rawPage && !isPlaceholderContent(rawPage.content) ? rawPage : null;
   const body = page ? cleanContent(page.content) : "";
   const updated = page ? formatDate(page.updated) : "";
 

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { clsx } from "clsx";
 import { Button, Card, Input, Label, Select, Textarea } from "@/components/ui";
+import { IconLock, IconShield } from "@/components/icons";
 import type { Customer } from "@/lib/customers";
 import { formatPrice } from "@/lib/format";
 import type { CartItem, CartTotals } from "@/lib/pricing";
@@ -22,7 +23,7 @@ type AddressFields = {
 
 type BillingFields = AddressFields & { email: string; phone: string };
 
-type PaymentMethod = "cod" | "phonepe";
+type PaymentMethod = "cod" | "cashfree";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -37,9 +38,51 @@ const COUNTRIES = [
 ];
 
 const PAYMENT_OPTIONS: { value: PaymentMethod; title: string; description: string }[] = [
+  {
+    value: "cashfree",
+    title: "Pay online",
+    description: "UPI, credit/debit card, net banking and wallets via Cashfree.",
+  },
   { value: "cod", title: "Cash on delivery", description: "Pay in cash when your order is delivered." },
-  { value: "phonepe", title: "PhonePe", description: "Pay online securely with PhonePe." },
 ];
+
+const CASHFREE_SDK_URL = "https://sdk.cashfree.com/js/v3/cashfree.js";
+
+type CashfreeCheckout = {
+  checkout: (options: { paymentSessionId: string; redirectTarget: "_self" | "_blank" }) => Promise<unknown>;
+};
+
+declare global {
+  interface Window {
+    Cashfree?: (options: { mode: "sandbox" | "production" }) => CashfreeCheckout;
+  }
+}
+
+/** Load the Cashfree JS SDK once and resolve with the global factory. */
+function loadCashfreeSdk(): Promise<(options: { mode: "sandbox" | "production" }) => CashfreeCheckout> {
+  return new Promise((resolve, reject) => {
+    if (typeof window === "undefined") {
+      reject(new Error("Cashfree checkout is only available in the browser"));
+      return;
+    }
+    if (window.Cashfree) {
+      resolve(window.Cashfree);
+      return;
+    }
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${CASHFREE_SDK_URL}"]`);
+    const script = existing ?? document.createElement("script");
+    script.addEventListener("load", () => {
+      if (window.Cashfree) resolve(window.Cashfree);
+      else reject(new Error("Cashfree SDK failed to initialise"));
+    });
+    script.addEventListener("error", () => reject(new Error("Could not load the payment gateway")));
+    if (!existing) {
+      script.src = CASHFREE_SDK_URL;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  });
+}
 
 const FIELD_LABELS: Record<string, string> = {
   firstName: "First name",
@@ -155,10 +198,12 @@ export function CheckoutForm({
   items,
   totals,
   customer,
+  cashfreeEnabled,
 }: {
   items: CartItem[];
   totals: CartTotals;
   customer: Customer | null;
+  cashfreeEnabled: boolean;
 }) {
   const router = useRouter();
 
@@ -192,7 +237,7 @@ export function CheckoutForm({
 
   const [shipToDifferent, setShipToDifferent] = useState(false);
   const [note, setNote] = useState("");
-  const [payment, setPayment] = useState<PaymentMethod>("cod");
+  const [payment, setPayment] = useState<PaymentMethod>(cashfreeEnabled ? "cashfree" : "cod");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -295,7 +340,13 @@ export function CheckoutForm({
       });
 
       const data = (await response.json().catch(() => null)) as
-        | { id?: number; key?: string; error?: string; fields?: Record<string, string> }
+        | {
+            id?: number;
+            key?: string;
+            error?: string;
+            fields?: Record<string, string>;
+            payment?: { provider: "cashfree"; sessionId: string; mode: "sandbox" | "production" };
+          }
         | null;
 
       if (!response.ok) {
@@ -305,6 +356,16 @@ export function CheckoutForm({
       }
       if (!data?.id || !data?.key) {
         setFormError("We could not place your order. Please try again.");
+        return;
+      }
+
+      if (data.payment?.provider === "cashfree") {
+        // Hand off to the Cashfree checkout; the order is confirmed on return.
+        const cashfree = await loadCashfreeSdk();
+        await cashfree({ mode: data.payment.mode }).checkout({
+          paymentSessionId: data.payment.sessionId,
+          redirectTarget: "_self",
+        });
         return;
       }
 
@@ -389,7 +450,7 @@ export function CheckoutForm({
         <Card className="p-6">
           <h2 className="text-lg font-bold text-slate-900">Payment method</h2>
           <div className="mt-4 space-y-3">
-            {PAYMENT_OPTIONS.map((option) => (
+            {PAYMENT_OPTIONS.filter((option) => option.value !== "cashfree" || cashfreeEnabled).map((option) => (
               <label
                 key={option.value}
                 className={clsx(
@@ -414,6 +475,12 @@ export function CheckoutForm({
               </label>
             ))}
           </div>
+          {payment === "cashfree" ? (
+            <p className="mt-4 flex items-center gap-2 text-xs text-slate-500">
+              <IconLock className="h-4 w-4 text-emerald-600" />
+              You will be redirected to Cashfree&apos;s secure payment page to complete your purchase.
+            </p>
+          ) : null}
         </Card>
       </div>
 
@@ -472,10 +539,17 @@ export function CheckoutForm({
           </dl>
 
           <Button type="submit" size="lg" disabled={pending} className="mt-5 w-full">
-            {pending ? "Placing order..." : "Place order"}
+            {pending
+              ? payment === "cashfree"
+                ? "Redirecting to payment..."
+                : "Placing order..."
+              : payment === "cashfree"
+                ? `Pay ${formatPrice(totals.total)} securely`
+                : "Place order"}
           </Button>
-          <p className="mt-3 text-center text-xs text-slate-400">
-            By placing your order you agree to our terms. All prices in INR.
+          <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-slate-400">
+            <IconShield className="h-3.5 w-3.5" />
+            Secure checkout. By placing your order you agree to our terms. All prices in INR.
           </p>
         </Card>
       </aside>

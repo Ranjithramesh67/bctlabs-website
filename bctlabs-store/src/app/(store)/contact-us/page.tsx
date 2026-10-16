@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ContactForm } from "@/components/contact-form";
 import { Card, Container } from "@/components/ui";
 import { getStoreSettings } from "@/lib/settings";
+import { BRAND } from "@/lib/site-content";
 
 export const dynamic = "force-dynamic";
 
@@ -81,7 +82,7 @@ export default async function ContactUsPage() {
             <div>
               <dt className="font-semibold text-slate-500">Business hours</dt>
               <dd className="mt-1 text-slate-900">
-                Monday to Saturday: 10:00 AM - 6:30 PM IST
+                {BRAND.hours}
                 <br />
                 Sunday: Closed
               </dd>

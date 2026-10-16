@@ -37,16 +37,39 @@ The store runs on http://localhost:4000.
 | `DATABASE_URL` | yes | `mysql://user:pass@host:3306/u936390473_ny0Uv` (the WooCommerce database). |
 | `SESSION_SECRET` | yes | 32+ byte base64 secret. Generate with `openssl rand -base64 32`. |
 | `APP_URL` | no | Public base URL used in metadata. |
+| `CASHFREE_APP_ID` | no | Cashfree App ID (Developers -> API Keys). Enables online payment at checkout. |
+| `CASHFREE_SECRET_KEY` | no | Cashfree Secret Key. Required for online payment and webhook verification. |
+| `CASHFREE_ENV` | no | `sandbox` (default) or `production`. |
 
 ## Routes
 
 | Area | Routes |
 | --- | --- |
 | Storefront | `/`, `/shop`, `/category/[slug]`, `/product/[slug]`, `/search`, `/blog`, `/blog/[slug]`, `/pages/[slug]`, `/about-us`, `/contact-us` |
-| Cart & checkout | `/cart`, `/checkout`, `/checkout/success`, `/order-tracking` |
+| Cart & checkout | `/cart`, `/checkout`, `/checkout/success`, `/checkout/cashfree/return`, `/order-tracking` |
 | Account | `/account`, `/account/login`, `/account/register`, `/account/orders`, `/account/orders/[id]` |
 | Admin (staff only) | `/admin`, `/admin/orders`, `/admin/orders/[id]`, `/admin/products`, `/admin/customers`, `/admin/messages` |
-| API | `/api/cart`, `/api/orders`, `/api/track-order`, `/api/auth/*`, `/api/admin/*`, `/api/contact` |
+| API | `/api/cart`, `/api/orders`, `/api/track-order`, `/api/auth/*`, `/api/admin/*`, `/api/contact`, `/api/payments/cashfree/webhook` |
+
+## Payments (Cashfree)
+
+Checkout supports **cash on delivery** out of the box and **online payment via
+Cashfree** once credentials are configured. When `CASHFREE_APP_ID` and
+`CASHFREE_SECRET_KEY` are both set, a "Pay online" option appears at checkout;
+otherwise only cash on delivery is offered.
+
+Online flow:
+
+1. `POST /api/orders` creates the WooCommerce order and a matching Cashfree order
+   (`bct-<orderId>`), returning a payment session.
+2. The browser is handed to the Cashfree checkout SDK to collect the payment.
+3. Cashfree redirects back to `/checkout/cashfree/return`, which verifies the
+   payment and marks the order as paid.
+4. `POST /api/payments/cashfree/webhook` confirms payments server-side (HMAC
+   signature verified) even if the customer never returns.
+
+Register the webhook in the Cashfree dashboard pointing at
+`{APP_URL}/api/payments/cashfree/webhook`.
 
 ## Admin access
 

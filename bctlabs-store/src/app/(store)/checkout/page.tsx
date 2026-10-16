@@ -3,6 +3,7 @@ import { CheckoutForm } from "@/components/checkout-form";
 import { ButtonLink, Container, EmptyState } from "@/components/ui";
 import { getCart } from "@/lib/cart";
 import { getCustomerById } from "@/lib/customers";
+import { isCashfreeConfigured } from "@/lib/cashfree";
 import { computeTotals, type CartItem } from "@/lib/pricing";
 import { getSession } from "@/lib/session";
 import { getStoreSettings } from "@/lib/settings";
@@ -59,7 +60,12 @@ export default async function CheckoutPage() {
           You have {totals.count} {totals.count === 1 ? "item" : "items"} ready to order.
         </p>
       </div>
-      <CheckoutForm items={items} totals={totals} customer={customer} />
+      <CheckoutForm
+        items={items}
+        totals={totals}
+        customer={customer}
+        cashfreeEnabled={isCashfreeConfigured()}
+      />
     </Container>
   );
 }

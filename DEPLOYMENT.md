@@ -132,6 +132,12 @@ Each app reads its own `.env` (see `bctlabs-store/.env.example`). Both must
 point `DATABASE_URL` at the same database server (different database names) and
 use different `SESSION_SECRET` values.
 
+The store also reads the optional Cashfree payment variables
+(`CASHFREE_APP_ID`, `CASHFREE_SECRET_KEY`, `CASHFREE_ENV`). Set all three to
+enable online payment at checkout, then register the webhook URL
+`https://bctlabs.com/api/payments/cashfree/webhook` in the Cashfree dashboard.
+Without them, checkout offers cash on delivery only.
+
 ### Running both in production (single server)
 
 Run the two apps as separate Node processes behind one reverse proxy
