@@ -34,9 +34,7 @@ export function StoreFooter({ categories, settings }: { categories: Category[]; 
 
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-12 lg:px-8">
         <div className="lg:col-span-4">
-          <div className="rounded-2xl bg-white p-3">
-            <BrandLogo storeName={settings.name} />
-          </div>
+          <BrandLogo storeName={settings.name} variant="light" />
           <p className="mt-5 max-w-sm text-sm leading-relaxed text-slate-400">
             {settings.description}
           </p>
@@ -84,7 +82,7 @@ export function StoreFooter({ categories, settings }: { categories: Category[]; 
             {categories.slice(0, 7).map((category) => (
               <li key={category.id}>
                 <Link href={`/category/${category.slug}`} className="text-slate-400 hover:text-white">
-                  {category.name.replace(/&amp;/g, "&")}
+                  {category.name}
                 </Link>
               </li>
             ))}

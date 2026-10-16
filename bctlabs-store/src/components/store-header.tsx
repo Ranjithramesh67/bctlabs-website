@@ -141,7 +141,7 @@ export function StoreHeader({
                     href={`/category/${category.slug}`}
                     className="flex items-center justify-between rounded-lg px-3 py-2 text-slate-600 hover:bg-brand-50 hover:text-brand-700"
                   >
-                    <span>{category.name.replace(/&amp;/g, "&")}</span>
+                    <span>{category.name}</span>
                     <span className="text-xs text-slate-400">{category.count}</span>
                   </Link>
                 ))}
@@ -219,7 +219,7 @@ export function StoreHeader({
                 onClick={() => setOpen(false)}
                 className="rounded-lg px-3 py-2 text-slate-600 hover:bg-slate-100"
               >
-                {category.name.replace(/&amp;/g, "&")}
+                {category.name}
               </Link>
             ))}
           </div>

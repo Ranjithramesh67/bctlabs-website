@@ -16,7 +16,7 @@ export function Container({
   );
 }
 
-type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger";
+type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger" | "inverse" | "onDark";
 type ButtonSize = "sm" | "md" | "lg";
 
 const BUTTON_BASE =
@@ -30,6 +30,10 @@ const VARIANTS: Record<ButtonVariant, string> = {
     "border border-slate-300 bg-white text-slate-700 hover:border-brand-500 hover:text-brand-700 hover:bg-brand-50",
   ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
   danger: "bg-rose-600 text-white hover:bg-rose-700",
+  // Used on the dark brand-gradient hero / CTA sections.
+  inverse: "bg-white text-brand-800 hover:bg-white/90 shadow-sm",
+  onDark:
+    "border border-white/30 bg-white/5 text-white backdrop-blur hover:border-white hover:bg-white/10",
 };
 
 const SIZES: Record<ButtonSize, string> = {

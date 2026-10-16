@@ -54,7 +54,7 @@ export default async function HomePage() {
               <ButtonLink
                 href="/shop"
                 size="lg"
-                className="bg-white text-brand-800 hover:bg-white/90"
+                variant="inverse"
               >
                 Shop all products
                 <IconArrowRight className="h-4 w-4" />
@@ -62,8 +62,7 @@ export default async function HomePage() {
               <ButtonLink
                 href="/shop?onSale=1"
                 size="lg"
-                variant="outline"
-                className="border-white/30 bg-white/5 text-white backdrop-blur hover:border-white hover:bg-white/10 hover:text-white"
+                variant="onDark"
               >
                 View today&apos;s deals
               </ButtonLink>
@@ -103,7 +102,7 @@ export default async function HomePage() {
                 </Link>
               ))}
             </div>
-            <div className="absolute -bottom-5 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-white px-4 py-2 shadow-lg">
+            <div className="mx-auto mt-8 flex w-fit items-center gap-2 rounded-full bg-white px-4 py-2 shadow-lg">
               <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
               <span className="text-xs font-semibold text-ink-900">
                 Free shipping over {formatPrice(settings.freeShippingMin)}
@@ -157,7 +156,7 @@ export default async function HomePage() {
                   className="h-24 w-full transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
-              <p className="mt-3 text-sm font-bold text-ink-900">{category.name.replace(/&amp;/g, "&")}</p>
+              <p className="mt-3 text-sm font-bold text-ink-900">{category.name}</p>
               <p className="mt-0.5 text-xs text-slate-500">{category.count} products</p>
               <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-brand-700">
                 Shop now
@@ -228,7 +227,8 @@ export default async function HomePage() {
               <ButtonLink
                 href="/shop?sort=popular"
                 size="lg"
-                className="mt-7 bg-white text-brand-800 hover:bg-white/90"
+                variant="inverse"
+                className="mt-7"
               >
                 Browse bestsellers
                 <IconArrowRight className="h-4 w-4" />
@@ -349,7 +349,8 @@ export default async function HomePage() {
             <ButtonLink
               href="/contact-us"
               size="sm"
-              className="mt-3 w-full bg-white text-brand-800 hover:bg-white/90"
+              variant="inverse"
+              className="mt-3 w-full"
             >
               Send an enquiry
             </ButtonLink>

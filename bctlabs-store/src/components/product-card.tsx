@@ -50,7 +50,7 @@ export function ProductCard({ product }: { product: Product }) {
             href={`/category/${product.categories[0].slug}`}
             className="text-[11px] font-bold uppercase tracking-wider text-brand-600 hover:text-brand-800"
           >
-            {product.categories[0].name.replace(/&amp;/g, "&")}
+            {product.categories[0].name}
           </Link>
         ) : null}
 

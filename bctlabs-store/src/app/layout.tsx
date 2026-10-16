@@ -11,11 +11,12 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: settings.description,
     metadataBase: new URL(settings.url),
+    icons: { icon: "/brand/icon.png", apple: "/brand/icon.png" },
   };
 }
 
 export const viewport: Viewport = {
-  themeColor: "#4f46e5",
+  themeColor: "#6d3284",
   width: "device-width",
   initialScale: 1,
 };

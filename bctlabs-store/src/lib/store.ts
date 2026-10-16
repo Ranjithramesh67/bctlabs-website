@@ -108,7 +108,8 @@ export async function getCategories(): Promise<Category[]> {
         parent: toNumber(r.parent),
       };
     })
-    .filter((c) => c.slug);
+    .filter((c) => c.slug)
+    .sort(sortByPopularity);
 }
 
 /** Load every published product with its price, stock, media and categories. */
@@ -180,7 +181,7 @@ export async function loadAllProducts(): Promise<Product[]> {
     if (toNumber(tt.term_id) === 15) continue; // Uncategorized
     const cat: Category = {
       id: toNumber(tt.term_id),
-      name: htmlDecode(term.name),
+      name: displayName(htmlDecode(term.name)),
       slug: term.slug,
       count: toNumber(tt.count),
       parent: toNumber(tt.parent),
@@ -281,7 +282,9 @@ export async function getProducts(query: ProductQuery = {}): Promise<{
       products.sort((a, b) => b.totalSales - a.totalSales);
       break;
     default:
-      products.sort((a, b) => b.id - a.id);
+      // Newest first, but keep buyable products (with a price) ahead of
+      // "price on request" items so the default grid is ready to shop.
+      products.sort((a, b) => Number(b.price > 0) - Number(a.price > 0) || b.id - a.id);
   }
 
   const total = products.length;
@@ -320,8 +323,13 @@ export async function getFeaturedProducts(limit = 8): Promise<Product[]> {
 
 /** Categories that actually contain published products, most stocked first. */
 export async function getStorefrontCategories(): Promise<Category[]> {
-  const categories = await getCategories();
-  return categories.filter((c) => c.count > 0).sort((a, b) => b.count - a.count);
+  // getCategories already drops empty terms and sorts by popularity.
+  return getCategories();
+}
+
+/** Most-stocked categories first, with a stable alphabetical tie-break. */
+function sortByPopularity(a: Category, b: Category): number {
+  return b.count - a.count || a.name.localeCompare(b.name);
 }
 
 export type CategoryShowcase = Category & { image: string | null; sample: string | null };
