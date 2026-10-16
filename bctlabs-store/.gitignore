@@ -1,0 +1,27 @@
+/node_modules
+/.next/
+/out/
+/build
+.DS_Store
+*.pem
+npm-debug.log*
+.env*
+!.env.example
+*.tsbuildinfo
+next-env.d.ts
+/src/generated/
+
+# WordPress uploads: keep only the assets the storefront actually serves.
+# The rest are WooCommerce logs, generated customer invoices, plugin caches and
+# fonts that contain PII and are never referenced by the app or the database.
+/public/media/wc-logs/
+/public/media/print-invoices-packing-slip-labels-for-woocommerce/
+/public/media/print-invoices-packing-slip-labels-for-woocommerce-lock/
+/public/media/wpo_wcpdf_*/
+/public/media/revslider/
+/public/media/nasa-cache/
+/public/media/nasa-dynamic/
+/public/media/nasa-custom-fonts/
+/public/media/elementor/
+/public/media/wpcf7_uploads/
+/public/media/woocommerce_uploads/

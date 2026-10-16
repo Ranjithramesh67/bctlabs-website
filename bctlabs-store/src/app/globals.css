@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", sans-serif;
+  --color-brand-50: #eef2ff;
+  --color-brand-100: #e0e7ff;
+  --color-brand-200: #c7d2fe;
+  --color-brand-300: #a5b4fc;
+  --color-brand-400: #818cf8;
+  --color-brand-500: #6366f1;
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4338ca;
+  --color-brand-800: #3730a3;
+  --color-brand-900: #312e81;
+  --color-ink-900: #0b1120;
+  --color-ink-800: #131c31;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #f8fafc;
+  color: #0f172a;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Rich text coming from WordPress/Elementor content. */
+.prose-content {
+  line-height: 1.7;
+  color: #334155;
+}
+.prose-content h1,
+.prose-content h2,
+.prose-content h3 {
+  color: #0f172a;
+  font-weight: 700;
+  margin: 1.4em 0 0.6em;
+  line-height: 1.25;
+}
+.prose-content h2 {
+  font-size: 1.5rem;
+}
+.prose-content h3 {
+  font-size: 1.2rem;
+}
+.prose-content p {
+  margin: 0.85em 0;
+}
+.prose-content ul,
+.prose-content ol {
+  margin: 0.85em 0;
+  padding-left: 1.4rem;
+}
+.prose-content ul {
+  list-style: disc;
+}
+.prose-content ol {
+  list-style: decimal;
+}
+.prose-content li {
+  margin: 0.3em 0;
+}
+.prose-content a {
+  color: var(--color-brand-600);
+  text-decoration: underline;
+}
+.prose-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  margin: 1rem 0;
+}
+.prose-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+.prose-content th,
+.prose-content td {
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fade-up 0.4s ease-out both;
+}

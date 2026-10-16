@@ -1,0 +1,5 @@
+// Placeholder; replaced by `prisma db pull` output.
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}

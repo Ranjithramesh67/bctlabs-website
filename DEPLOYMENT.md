@@ -98,3 +98,71 @@ npm run dev
 
 Admin panel: `/admin` (for example `admin@job.com` / `123456` in the seeded
 data).
+
+## 8. Dual-app hosting (bctlabsedu.com + bctlabs.com store)
+
+This repository hosts two independent Next.js applications that share one
+MariaDB/MySQL server but use **separate databases**:
+
+| App | Path | Port | Database | Public URL |
+| --- | --- | --- | --- | --- |
+| Education site (this root app) | `/` | 3000 | `u936390473_bct_labs` | bctlabsedu.com |
+| Store / bctlabs.com | `/bctlabs-store` | 4000 | `u936390473_ny0Uv` | bctlabs.com |
+
+The store app is a Next.js 16 re-implementation of the WordPress + WooCommerce
+site. It maps its Prisma models straight onto the existing WordPress/WooCommerce
+tables (including WooCommerce HPOS order tables), so the original WordPress
+database keeps working unchanged and new orders created by the store app are
+visible to WooCommerce (and vice versa).
+
+### Running both apps locally
+
+```bash
+# Education site (root app) on http://localhost:3000
+npm install
+npm run dev
+
+# Store (bctlabs.com) on http://localhost:4000
+cd bctlabs-store
+npm install
+npm run dev
+```
+
+Each app reads its own `.env` (see `bctlabs-store/.env.example`). Both must
+point `DATABASE_URL` at the same database server (different database names) and
+use different `SESSION_SECRET` values.
+
+### Running both in production (single server)
+
+Run the two apps as separate Node processes behind one reverse proxy
+(nginx/OpenLiteSpeed/Caddy), routing each hostname to its port:
+
+- `bctlabsedu.com` -> `127.0.0.1:3000`
+- `bctlabs.com` and `www.bctlabs.com` -> `127.0.0.1:4000`
+
+```bash
+# Education site
+npm run build && npm run start -- -p 3000
+
+# Store
+cd bctlabs-store
+npm run build && npm run start -- -p 4000
+```
+
+### Store admin
+
+The store has its own admin area at `/admin` (staff-only; WordPress
+`administrator` and `shop_manager` roles can sign in). See
+`bctlabs-store/README.md` for details.
+
+### Deployment checklist
+
+- `bctlabs-store/prisma/schema.prisma` is introspected from the WooCommerce
+  database; run `npx prisma generate` (also runs on `npm install`) after any
+  schema change.
+- Copy `bctlabs-store/public/media/` (the WordPress uploads) alongside a
+  production build, or serve those files from the same origin.
+- Remove the web-exposed WordPress archives before go-live
+  (`wp-content/ai1wm-backups/*.wpress`, `.trash/`).
+- Do not reuse the WordPress `db_user` credentials; use a dedicated database
+  user for the store app.
