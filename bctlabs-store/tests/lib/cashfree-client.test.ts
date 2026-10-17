@@ -86,6 +86,51 @@ describe("Cashfree Payment Gateway client", () => {
     ).rejects.toThrow("authentication Failed");
   });
 
+  it("rejects non-HTTPS return URLs in production before calling Cashfree", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      createCashfreeOrder({
+        orderId: "bct-4401",
+        amount: 499,
+        customerId: "guest-asha@example.com",
+        customerEmail: "asha@example.com",
+        customerPhone: "9876543210",
+        returnUrl: "http://localhost:4000/checkout/cashfree/return?order=4401",
+        notifyUrl: "http://localhost:4000/api/webhooks/cashfree",
+      }),
+    ).rejects.toThrow(/must use https/i);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("allows http URLs against the sandbox host", async () => {
+    process.env.CASHFREE_ENV = "sandbox";
+    const fetchMock = vi.fn().mockResolvedValue(
+      json({
+        cf_order_id: 123456,
+        order_id: "bct-4402",
+        order_status: "ACTIVE",
+        payment_session_id: "session_sandbox",
+        order_amount: 499,
+        order_currency: "INR",
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const order = await createCashfreeOrder({
+      orderId: "bct-4402",
+      amount: 499,
+      customerId: "guest-asha@example.com",
+      customerEmail: "asha@example.com",
+      customerPhone: "9876543210",
+      returnUrl: "http://localhost:4000/checkout/cashfree/return?order=4402",
+    });
+
+    expect(order.payment_session_id).toBe("session_sandbox");
+    expect(String(fetchMock.mock.calls[0][0])).toBe("https://sandbox.cashfree.com/pg/orders");
+  });
+
   it("verifies the production webhook HMAC over timestamp + raw body", () => {
     const rawBody = JSON.stringify({ type: "PAYMENT_SUCCESS_WEBHOOK" });
     const timestamp = "1730000000";

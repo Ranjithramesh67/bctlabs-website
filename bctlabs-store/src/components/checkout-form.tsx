@@ -7,7 +7,9 @@ import { Button, Card, Input, Label, Select, Textarea } from "@/components/ui";
 import { CashfreeDropIn } from "@/components/cashfree-dropin";
 import { DeliveryCheck } from "@/components/delivery-check";
 import { IconLock, IconShield } from "@/components/icons";
+import type { SavedAddress } from "@/lib/address-fields";
 import type { Customer } from "@/lib/customers";
+import { COUNTRIES } from "@/lib/countries";
 import { initialDeliveryStatus, shouldBlockCheckout, type DeliveryStatus } from "@/lib/delivery";
 import { formatPrice } from "@/lib/format";
 import type { CartItem, CartTotals } from "@/lib/pricing";
@@ -28,17 +30,23 @@ type BillingFields = AddressFields & { email: string; phone: string };
 
 type PaymentMethod = "cod" | "cashfree";
 
-const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+function savedToBilling(address: SavedAddress, email: string): BillingFields {
+  return {
+    firstName: address.firstName,
+    lastName: address.lastName,
+    company: address.company,
+    address1: address.address1,
+    address2: address.address2,
+    city: address.city,
+    state: address.state,
+    postcode: address.postcode,
+    country: address.country,
+    email,
+    phone: address.phone,
+  };
+}
 
-const COUNTRIES = [
-  { value: "IN", label: "India" },
-  { value: "US", label: "United States" },
-  { value: "GB", label: "United Kingdom" },
-  { value: "AE", label: "United Arab Emirates" },
-  { value: "SG", label: "Singapore" },
-  { value: "AU", label: "Australia" },
-  { value: "CA", label: "Canada" },
-];
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 const PAYMENT_OPTIONS: { value: PaymentMethod; title: string; description: string }[] = [
   {
@@ -163,6 +171,7 @@ export function CheckoutForm({
   items,
   totals,
   customer,
+  savedAddresses = [],
   cashfreeEnabled,
   cashfreeMock = false,
   logisticsEnabled,
@@ -171,6 +180,7 @@ export function CheckoutForm({
   items: CartItem[];
   totals: CartTotals;
   customer: Customer | null;
+  savedAddresses?: SavedAddress[];
   cashfreeEnabled: boolean;
   cashfreeMock?: boolean;
   logisticsEnabled: boolean;
@@ -178,19 +188,25 @@ export function CheckoutForm({
 }) {
   const router = useRouter();
 
-  const [billing, setBilling] = useState<BillingFields>({
-    firstName: customer?.firstName ?? "",
-    lastName: customer?.lastName ?? "",
-    company: "",
-    address1: "",
-    address2: "",
-    city: "",
-    state: "",
-    postcode: "",
-    country: "IN",
-    email: customer?.email ?? "",
-    phone: customer?.phone ?? "",
-  });
+  const initialAddress = savedAddresses.find((address) => address.isDefault) ?? savedAddresses[0] ?? null;
+
+  const [billing, setBilling] = useState<BillingFields>(() =>
+    initialAddress
+      ? savedToBilling(initialAddress, customer?.email ?? "")
+      : {
+          firstName: customer?.firstName ?? "",
+          lastName: customer?.lastName ?? "",
+          company: "",
+          address1: "",
+          address2: "",
+          city: "",
+          state: "",
+          postcode: "",
+          country: "IN",
+          email: customer?.email ?? "",
+          phone: customer?.phone ?? "",
+        },
+  );
 
   const [shipping, setShipping] = useState<BillingFields>({
     firstName: "",
@@ -207,6 +223,9 @@ export function CheckoutForm({
   });
 
   const [shipToDifferent, setShipToDifferent] = useState(false);
+  const [billingAddressId, setBillingAddressId] = useState(initialAddress ? String(initialAddress.id) : "");
+  const [shippingAddressId, setShippingAddressId] = useState("");
+  const [saveAddress, setSaveAddress] = useState(false);
   const [note, setNote] = useState("");
   const [payment, setPayment] = useState<PaymentMethod>(cashfreeEnabled ? "cashfree" : "cod");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -239,6 +258,30 @@ export function CheckoutForm({
   function updateShipping(key: keyof BillingFields, value: string) {
     setShipping((prev) => ({ ...prev, [key]: value }));
     clearError(`shipping.${key}`);
+  }
+
+  function chooseBillingAddress(value: string) {
+    setBillingAddressId(value);
+    if (!value) return;
+    const address = savedAddresses.find((item) => String(item.id) === value);
+    if (!address) return;
+    setBilling(savedToBilling(address, billing.email || customer?.email || ""));
+    setErrors({});
+  }
+
+  function chooseShippingAddress(value: string) {
+    setShippingAddressId(value);
+    if (!value) return;
+    const address = savedAddresses.find((item) => String(item.id) === value);
+    if (!address) return;
+    setShipping(savedToBilling(address, ""));
+    setErrors((prev) => {
+      const next = { ...prev };
+      for (const key of Object.keys(next)) {
+        if (key.startsWith("shipping.")) delete next[key];
+      }
+      return next;
+    });
   }
 
   function validate(): Record<string, string> {
@@ -317,6 +360,7 @@ export function CheckoutForm({
           shipping: shipToDifferent ? trimmed(shipping) : undefined,
           paymentMethod: payment,
           customerNote: note.trim(),
+          saveAddress: customer && !billingAddressId ? saveAddress : false,
         }),
       });
 
@@ -437,6 +481,23 @@ export function CheckoutForm({
           <h2 className="text-lg font-bold text-slate-900">Billing details</h2>
           <p className="mt-1 text-sm text-slate-500">We use these details for your invoice and delivery.</p>
           <div className="mt-5">
+            {savedAddresses.length ? (
+              <div className="mb-5">
+                <Label htmlFor="billing.savedAddress">Use a saved address</Label>
+                <Select
+                  id="billing.savedAddress"
+                  value={billingAddressId}
+                  onChange={(event) => chooseBillingAddress(event.target.value)}
+                >
+                  <option value="">Enter a new address</option>
+                  {savedAddresses.map((address) => (
+                    <option key={address.id} value={address.id}>
+                      {address.label} - {address.firstName} {address.lastName}, {address.city}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+            ) : null}
             <AddressGrid
               prefix="billing"
               values={billing}
@@ -444,6 +505,17 @@ export function CheckoutForm({
               errors={errors}
               withContact
             />
+            {customer && !billingAddressId ? (
+              <label className="mt-4 flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={saveAddress}
+                  onChange={(event) => setSaveAddress(event.target.checked)}
+                  className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                />
+                Save this address to my account for next time
+              </label>
+            ) : null}
             <DeliveryCheck
               pincode={shipToDifferent ? shipping.postcode : billing.postcode}
               weightGrams={weightGrams}
@@ -469,6 +541,23 @@ export function CheckoutForm({
             <div className="mt-5">
               <h3 className="text-sm font-semibold text-slate-800">Shipping address</h3>
               <div className="mt-4">
+                {savedAddresses.length ? (
+                  <div className="mb-5">
+                    <Label htmlFor="shipping.savedAddress">Use a saved address</Label>
+                    <Select
+                      id="shipping.savedAddress"
+                      value={shippingAddressId}
+                      onChange={(event) => chooseShippingAddress(event.target.value)}
+                    >
+                      <option value="">Enter a new address</option>
+                      {savedAddresses.map((address) => (
+                        <option key={address.id} value={address.id}>
+                          {address.label} - {address.firstName} {address.lastName}, {address.city}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
+                ) : null}
                 <AddressGrid
                   prefix="shipping"
                   values={shipping}

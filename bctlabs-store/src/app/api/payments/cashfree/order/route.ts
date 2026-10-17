@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { publicOrigin } from "@/lib/app-url";
 import { getAdminSession, isStaffUser } from "@/lib/admin-auth";
 import {
   createCashfreeOrder,
   getCashfreeOrder,
   isCashfreeConfigured,
   isCashfreeMockEnabled,
+  isCashfreeProduction,
   mockPaymentSession,
 } from "@/lib/cashfree";
 import { getOrderById, getOrderMeta, setOrderMeta } from "@/lib/orders";
@@ -108,7 +110,13 @@ export async function POST(request: Request) {
       }
     }
 
-    const appUrl = (process.env.APP_URL ?? new URL(request.url).origin).replace(/\/+$/, "");
+    const appUrl = publicOrigin(request);
+    if (isCashfreeProduction() && !appUrl.startsWith("https://")) {
+      return NextResponse.json(
+        { error: "Online payment needs a public HTTPS site address." },
+        { status: 503 },
+      );
+    }
     const created = await createCashfreeOrder({
       orderId: cfOrderId,
       amount: order.total,

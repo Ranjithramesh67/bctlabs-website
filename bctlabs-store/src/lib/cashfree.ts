@@ -23,6 +23,10 @@ export function isCashfreeConfigured(): boolean {
   return Boolean(process.env.CASHFREE_APP_ID && process.env.CASHFREE_SECRET_KEY);
 }
 
+export function isCashfreeProduction(): boolean {
+  return (process.env.CASHFREE_ENV ?? "sandbox").toLowerCase() === "production";
+}
+
 /**
  * Local/test only: lets the checkout exercise the full order -> payment ->
  * fulfilment flow without live gateway credentials. Never available in a
@@ -42,7 +46,7 @@ export function mockPaymentSession(orderId: number): string {
 
 function baseUrl(): string {
   if (process.env.CASHFREE_BASE_URL) return process.env.CASHFREE_BASE_URL.replace(/\/+$/, "");
-  return (process.env.CASHFREE_ENV ?? "sandbox").toLowerCase() === "production"
+  return isCashfreeProduction()
     ? "https://api.cashfree.com/pg"
     : "https://sandbox.cashfree.com/pg";
 }
@@ -82,6 +86,19 @@ export type CreateCashfreeOrderInput = {
 
 /** Create a Cashfree order and return its payment session. */
 export async function createCashfreeOrder(input: CreateCashfreeOrderInput): Promise<CashfreeOrder> {
+  // Production Cashfree rejects non-HTTPS return/notify URLs. Fail with an
+  // actionable message instead of a generic gateway error.
+  if (isCashfreeProduction()) {
+    for (const [label, value] of [
+      ["return_url", input.returnUrl],
+      ["notify_url", input.notifyUrl],
+    ] as const) {
+      if (value && !value.startsWith("https://")) {
+        throw new Error(`Cashfree ${label} must use https in production (received ${value})`);
+      }
+    }
+  }
+
   const response = await fetch(`${baseUrl()}/orders`, {
     method: "POST",
     headers: headers(),

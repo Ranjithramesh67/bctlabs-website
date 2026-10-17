@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { AccountNav } from "@/components/account-nav";
+import { AddressBook } from "@/components/address-book";
 import { ButtonLink, Card, Container } from "@/components/ui";
+import { listAddresses } from "@/lib/addresses";
 import { getCustomerById } from "@/lib/customers";
 import { formatDate } from "@/lib/format";
 import { getSession } from "@/lib/session";
@@ -13,6 +15,7 @@ export default async function AccountPage() {
 
   const customer = await getCustomerById(session.customerId);
   if (!customer) redirect("/account/login");
+  const addresses = await listAddresses(session.customerId);
 
   const fullName = `${customer.firstName} ${customer.lastName}`.trim();
   const details = [
@@ -57,6 +60,8 @@ export default async function AccountPage() {
               ))}
             </dl>
           </Card>
+
+          <AddressBook initialAddresses={addresses} />
         </div>
       </div>
     </Container>

@@ -15,6 +15,9 @@ existing WordPress/WooCommerce database, so no data migration is required.
   they show up in WooCommerce admin too.
 - Customer accounts reuse the WordPress `wp_users` table and the
   `$wp$2y$` bcrypt password hashes, so existing customers can sign in.
+- Returning customers can save up to 10 billing/shipping addresses in
+  `bctlabs_customer_addresses`, reuse them at checkout and manage them from
+  `/account`. Checkout also offers to save the address used for an order.
 
 The app is independent from the education site in the repository root; the two
 share a database server but use separate databases. See `../DEPLOYMENT.md`
@@ -36,7 +39,7 @@ The store runs on http://localhost:4000.
 | --- | --- | --- |
 | `DATABASE_URL` | yes | `mysql://user:pass@host:3306/u936390473_ny0Uv` (the WooCommerce database). |
 | `SESSION_SECRET` | yes | 32+ byte base64 secret. Generate with `openssl rand -base64 32`. |
-| `APP_URL` | no | Public base URL used in metadata. |
+| `APP_URL` | no | Public base URL used in metadata and payment return/webhook URLs. When it is `localhost`, requests served through an HTTPS proxy use the forwarded host instead. |
 | `CASHFREE_APP_ID` | no | Cashfree App ID (Developers -> API Keys). Enables online payment at checkout. |
 | `CASHFREE_SECRET_KEY` | no | Cashfree Secret Key. Required for online payment and webhook verification. |
 | `CASHFREE_ENV` | no | `sandbox` (default) or `production`. |
@@ -93,8 +96,12 @@ Register the webhook in the Cashfree dashboard pointing at
 
 `APP_URL` must be the public HTTPS origin before going live: it is used for the
 payment return URL and the webhook `notify_url`, so `localhost` only works for a
-local walkthrough. Sandbox keys require `CASHFREE_ENV=sandbox`; live keys require
-`CASHFREE_ENV=production` and are rejected by the other host.
+local walkthrough. Behind an HTTPS preview proxy the app uses the forwarded
+host when `APP_URL` is `localhost`. Production Cashfree rejects non-HTTPS URLs;
+the order route then marks the order failed and asks the customer to use cash on
+delivery instead of leaving a pending order behind. Sandbox keys require
+`CASHFREE_ENV=sandbox`; live keys require `CASHFREE_ENV=production` and are
+rejected by the other host.
 
 Verify a key pair before deploying (no order is created):
 
@@ -175,6 +182,17 @@ CREATE TABLE IF NOT EXISTS bctlabs_contact_messages (
   PRIMARY KEY (id),
   KEY email_idx (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+
+- Saved addresses live in `bctlabs_customer_addresses`. The schema changes for
+  the store-managed tables (`bctlabs_*`) are kept as SQL migrations in
+  `prisma/migrations/*/migration.sql` and can be applied in order to an existing
+  database:
+
+```bash
+for file in prisma/migrations/*/migration.sql; do
+  mysql -h HOST -u USER -p DATABASE_NAME < "$file"
+done
 ```
 
 - Store images are served from `public/media/` (copied from the WordPress

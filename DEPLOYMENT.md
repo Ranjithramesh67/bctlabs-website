@@ -47,9 +47,12 @@ mysqldump --single-transaction --routines --triggers \
 mysql -h HOST -u USER -p DATABASE_NAME < bctlabs.sql
 ```
 
-There are no Prisma migrations to run: the schema was introspected from the
-existing database (`prisma db pull`). The Prisma Client is regenerated
-automatically on install via the `postinstall` script (`prisma generate`).
+The WordPress/WooCommerce schema was introspected from the existing database
+(`prisma db pull`). Store-owned `bctlabs_*` tables have SQL migrations in
+`prisma/migrations/*/migration.sql`; apply them in order when upgrading an
+existing database (the statements use `CREATE TABLE IF NOT EXISTS`). The Prisma
+Client is regenerated automatically on install via the `postinstall` script
+(`prisma generate`).
 
 ## 4. Vercel
 
@@ -147,8 +150,11 @@ enable online payment at checkout, then register the webhook URL
 Without them, checkout offers cash on delivery only. Sandbox and production key
 pairs are host-specific: use `CASHFREE_ENV=sandbox` with test keys and
 `CASHFREE_ENV=production` with live keys. `APP_URL` must be the public HTTPS
-origin (it builds the payment return URL and webhook `notify_url`); verify a pair
-with `npm run check:cashfree` before deploying.
+origin (it builds the payment return URL and webhook `notify_url`); when it is
+`localhost`, requests coming through an HTTPS proxy use the forwarded host
+instead. Production Cashfree rejects non-HTTPS URLs, so the order route fails
+cleanly with a cash-on-delivery suggestion rather than leaving a pending order.
+Verify a pair with `npm run check:cashfree` before deploying.
 
 The store also reads the optional NimbusPost logistics variables
 (`NIMBUSPOST_API_KEY`, `NIMBUSPOST_API_SECRET`, `ORIGIN_PINCODE_ARK`,

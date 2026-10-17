@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { publicOrigin } from "@/lib/app-url";
+import { createAddress } from "@/lib/addresses";
 import { getCart, writeCart } from "@/lib/cart";
-import { createOrder, setOrderMeta } from "@/lib/orders";
+import { createOrder, setOrderMeta, updateOrderStatus } from "@/lib/orders";
 import { computeTotals, type CartItem } from "@/lib/pricing";
 import { getSession } from "@/lib/session";
 import { getStoreSettings } from "@/lib/settings";
@@ -10,6 +12,7 @@ import {
   createCashfreeOrder,
   isCashfreeConfigured,
   isCashfreeMockEnabled,
+  isCashfreeProduction,
   mockPaymentSession,
 } from "@/lib/cashfree";
 
@@ -34,6 +37,7 @@ const bodySchema = z.object({
   shipping: shippingSchema.optional(),
   paymentMethod: z.enum(["cod", "cashfree"]),
   customerNote: z.string().trim().max(2000).optional().default(""),
+  saveAddress: z.boolean().optional().default(false),
 });
 
 const PAYMENT_METHODS: Record<"cod" | "cashfree", { title: string; status: string }> = {
@@ -60,7 +64,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { billing, shipping, paymentMethod, customerNote } = parsed.data;
+  const { billing, shipping, paymentMethod, customerNote, saveAddress } = parsed.data;
   const payment = PAYMENT_METHODS[paymentMethod];
 
   const mockCashfree = paymentMethod === "cashfree" && !isCashfreeConfigured() && isCashfreeMockEnabled();
@@ -124,8 +128,32 @@ export async function POST(request: Request) {
       status: payment.status,
     });
 
+    const persistAddress = async () => {
+      if (!saveAddress || !session.customerId) return;
+      try {
+        await createAddress(session.customerId, {
+          label: "Delivery",
+          firstName: billing.firstName,
+          lastName: billing.lastName,
+          company: billing.company ?? "",
+          address1: billing.address1,
+          address2: billing.address2 ?? "",
+          city: billing.city,
+          state: billing.state,
+          postcode: billing.postcode,
+          country: billing.country,
+          phone: billing.phone,
+          isDefault: false,
+        });
+      } catch (error) {
+        // The order is already valid; saving the address is a convenience.
+        console.error("Failed to save checkout address", error);
+      }
+    };
+
     if (paymentMethod === "cod") {
       await writeCart([]);
+      await persistAddress();
       return NextResponse.json({ id, key });
     }
 
@@ -146,32 +174,57 @@ export async function POST(request: Request) {
     // Online payment: create the Cashfree order now and hand the payment
     // session back to the browser. The cart is only cleared once Cashfree
     // confirms the payment (return page or webhook).
-    const appUrl = (process.env.APP_URL ?? new URL(request.url).origin).replace(/\/+$/, "");
-    const returnUrl = `${appUrl}/checkout/cashfree/return?order=${id}&key=${encodeURIComponent(key)}`;
-    const cfOrder = await createCashfreeOrder({
-      orderId: `bct-${id}`,
-      amount: totals.total,
-      customerId: session.customerId ? `cust-${session.customerId}` : `guest-${billing.email}`,
-      customerEmail: billing.email ?? "",
-      customerPhone: billing.phone ?? "",
-      returnUrl,
-      notifyUrl: `${appUrl}/api/webhooks/cashfree`,
-      note: `BCTLABS order #${id}`,
-    });
+    const appUrl = publicOrigin(request);
+    if (isCashfreeProduction() && !appUrl.startsWith("https://")) {
+      await failOrder(id, "Cashfree production requires a public HTTPS site URL");
+      return NextResponse.json(
+        {
+          error:
+            "Online payment is unavailable from this address. Please choose cash on delivery or open the site over HTTPS.",
+        },
+        { status: 503 },
+      );
+    }
 
-    await setOrderMeta(id, "_cashfree_order_id", String(cfOrder.cf_order_id));
-    await setOrderMeta(id, "_cashfree_order_status", cfOrder.order_status);
+    try {
+      const returnUrl = `${appUrl}/checkout/cashfree/return?order=${id}&key=${encodeURIComponent(key)}`;
+      const cfOrder = await createCashfreeOrder({
+        orderId: `bct-${id}`,
+        amount: totals.total,
+        customerId: session.customerId ? `cust-${session.customerId}` : `guest-${billing.email}`,
+        customerEmail: billing.email ?? "",
+        customerPhone: billing.phone ?? "",
+        returnUrl,
+        notifyUrl: `${appUrl}/api/webhooks/cashfree`,
+        note: `BCTLABS order #${id}`,
+      });
 
-    return NextResponse.json({
-      id,
-      key,
-      payment: {
-        provider: "cashfree" as const,
-        sessionId: cfOrder.payment_session_id,
-        cfOrderId: String(cfOrder.cf_order_id),
-        mode: (process.env.CASHFREE_ENV ?? "sandbox").toLowerCase() === "production" ? "production" : "sandbox",
-      },
-    });
+      await setOrderMeta(id, "_cashfree_order_id", String(cfOrder.cf_order_id));
+      await setOrderMeta(id, "_cashfree_order_status", cfOrder.order_status);
+      await persistAddress();
+
+      return NextResponse.json({
+        id,
+        key,
+        payment: {
+          provider: "cashfree" as const,
+          sessionId: cfOrder.payment_session_id,
+          cfOrderId: String(cfOrder.cf_order_id),
+          mode: isCashfreeProduction() ? ("production" as const) : ("sandbox" as const),
+        },
+      });
+    } catch (error) {
+      // Do not leave a pending order behind when the gateway session fails.
+      console.error("Cashfree session creation failed", error);
+      await failOrder(id, error instanceof Error ? error.message : String(error));
+      return NextResponse.json(
+        {
+          error:
+            "We could not start the online payment. Please try again or choose cash on delivery.",
+        },
+        { status: 502 },
+      );
+    }
   } catch (error) {
     console.error("Failed to create order", error);
     return NextResponse.json(
@@ -179,4 +232,11 @@ export async function POST(request: Request) {
       { status: 500 },
     );
   }
+}
+
+async function failOrder(id: number, reason: string): Promise<void> {
+  await Promise.all([
+    updateOrderStatus(id, "failed"),
+    setOrderMeta(id, "_payment_error", reason.slice(0, 500)),
+  ]).catch((error) => console.error("Failed to mark order as failed", id, error));
 }

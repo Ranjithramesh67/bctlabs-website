@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CheckoutForm } from "@/components/checkout-form";
 import { ButtonLink, Container, EmptyState } from "@/components/ui";
+import { listAddresses } from "@/lib/addresses";
 import { getCart } from "@/lib/cart";
 import { getCustomerById } from "@/lib/customers";
 import { isCashfreeAvailable, isCashfreeConfigured, isCashfreeMockEnabled } from "@/lib/cashfree";
@@ -17,6 +18,7 @@ export const metadata: Metadata = { title: "Checkout" };
 export default async function CheckoutPage() {
   const [lines, settings, session] = await Promise.all([getCart(), getStoreSettings(), getSession()]);
   const customer = session.customerId ? await getCustomerById(session.customerId) : null;
+  const savedAddresses = session.customerId ? await listAddresses(session.customerId) : [];
 
   if (!lines.length) {
     return (
@@ -69,6 +71,7 @@ export default async function CheckoutPage() {
         items={items}
         totals={totals}
         customer={customer}
+        savedAddresses={savedAddresses}
         cashfreeEnabled={isCashfreeAvailable()}
         cashfreeMock={isCashfreeMockEnabled() && !isCashfreeConfigured()}
         logisticsEnabled={isNimbusPostConfigured()}

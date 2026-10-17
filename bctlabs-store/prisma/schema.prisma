@@ -1125,3 +1125,25 @@ model bctlabs_newsletter_subscribers {
   source     String   @default("homepage") @db.VarChar(50)
   created_at DateTime @default(now()) @db.DateTime(0)
 }
+
+/// Saved billing/shipping addresses for returning customers.
+model bctlabs_customer_addresses {
+  id          BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  customer_id BigInt   @db.UnsignedBigInt
+  label       String   @default("Home") @db.VarChar(60)
+  first_name  String   @db.VarChar(100)
+  last_name   String   @db.VarChar(100)
+  company     String   @default("") @db.VarChar(191)
+  address_1   String   @db.VarChar(191)
+  address_2   String   @default("") @db.VarChar(191)
+  city        String   @db.VarChar(100)
+  state       String   @db.VarChar(100)
+  postcode    String   @db.VarChar(20)
+  country     String   @default("IN") @db.VarChar(2)
+  phone       String   @db.VarChar(32)
+  is_default  Boolean  @default(false)
+  created_at  DateTime @default(now()) @db.DateTime(0)
+  updated_at  DateTime @default(now()) @updatedAt @db.DateTime(0)
+
+  @@index([customer_id], map: "idx_customer_address_customer")
+}

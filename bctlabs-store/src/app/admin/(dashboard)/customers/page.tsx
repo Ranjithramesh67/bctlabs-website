@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Card, Container, EmptyState } from "@/components/ui";
+import { listAddressSummaries } from "@/lib/addresses";
 import { getCustomers } from "@/lib/customers";
 import { formatDate } from "@/lib/format";
 
@@ -9,8 +10,15 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = { title: "Customers" };
 
+function addressSummary(saved: { label: string }[] | undefined): string {
+  if (!saved?.length) return "-";
+  const listed = saved.slice(0, 2).map((address) => address.label).join(", ");
+  return saved.length > 2 ? `${listed} +${saved.length - 2}` : listed;
+}
+
 export default async function AdminCustomersPage() {
   const customers = await getCustomers(200);
+  const addressesByCustomer = await listAddressSummaries(customers.map((customer) => customer.id));
 
   return (
     <Container className="py-10">
@@ -37,6 +45,7 @@ export default async function AdminCustomersPage() {
                   <th scope="col" className="px-4 py-3">Name</th>
                   <th scope="col" className="px-4 py-3">Email</th>
                   <th scope="col" className="px-4 py-3">Phone</th>
+                  <th scope="col" className="px-4 py-3">Saved addresses</th>
                   <th scope="col" className="px-4 py-3">Registered</th>
                   <th scope="col" className="px-4 py-3">
                     <span className="sr-only">Orders</span>
@@ -59,6 +68,9 @@ export default async function AdminCustomersPage() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-slate-500">{customer.phone || "-"}</td>
+                    <td className="px-4 py-3 text-slate-500">
+                      {addressSummary(addressesByCustomer.get(customer.id))}
+                    </td>
                     <td className="px-4 py-3 text-slate-500">{formatDate(customer.registered) || "-"}</td>
                     <td className="px-4 py-3 text-right">
                       <Link
