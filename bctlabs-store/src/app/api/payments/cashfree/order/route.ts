@@ -2,7 +2,13 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { getAdminSession, isStaffUser } from "@/lib/admin-auth";
-import { createCashfreeOrder, getCashfreeOrder, isCashfreeConfigured } from "@/lib/cashfree";
+import {
+  createCashfreeOrder,
+  getCashfreeOrder,
+  isCashfreeConfigured,
+  isCashfreeMockEnabled,
+  mockPaymentSession,
+} from "@/lib/cashfree";
 import { getOrderById, getOrderMeta, setOrderMeta } from "@/lib/orders";
 import { getSession } from "@/lib/session";
 
@@ -29,7 +35,7 @@ const bodySchema = z.object({
  * database and never trusted from the request.
  */
 export async function POST(request: Request) {
-  if (!isCashfreeConfigured()) {
+  if (!isCashfreeConfigured() && !isCashfreeMockEnabled()) {
     return NextResponse.json({ error: "Online payment is not available right now." }, { status: 503 });
   }
 
@@ -58,11 +64,29 @@ export async function POST(request: Request) {
   if (["cancelled", "refunded", "failed", "wc-cancelled", "wc-refunded", "wc-failed"].includes(order.status)) {
     return NextResponse.json({ error: "This order cannot be paid." }, { status: 400 });
   }
+  if (order.paymentMethod && order.paymentMethod !== "cashfree") {
+    return NextResponse.json(
+      { error: "This order was placed with cash on delivery and cannot be paid online." },
+      { status: 400 },
+    );
+  }
   if (order.transactionId && !["pending", "on-hold", "failed"].includes(order.status)) {
     return NextResponse.json({ error: "This order is already paid.", order_id: order.id, status: order.status }, { status: 409 });
   }
   if (amount !== undefined && Math.abs(amount - order.total) > 0.01) {
     return NextResponse.json({ error: "Payment amount does not match the order total." }, { status: 422 });
+  }
+
+  if (!isCashfreeConfigured()) {
+    return NextResponse.json({
+      payment_session_id: mockPaymentSession(order.id),
+      order_id: order.id,
+      cf_order_id: `mock-${order.id}`,
+      amount: order.total,
+      mode: "sandbox",
+      reused: false,
+      mock: true,
+    });
   }
 
   try {

@@ -89,6 +89,24 @@ describe("confirmOrderPayment", () => {
     expect(markOrderPaid).not.toHaveBeenCalled();
   });
 
+  it("rejects an online payment for a cash-on-delivery order", async () => {
+    getOrderById.mockResolvedValue({
+      id: 4386,
+      total: 1499,
+      status: "pending",
+      transactionId: null,
+      paymentMethod: "cod",
+    });
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const result = await confirmOrderPayment(input);
+
+    expect(result).toEqual({ status: "rejected", orderId: 4386 });
+    expect(markOrderPaid).not.toHaveBeenCalled();
+    expect(triggerFulfillment).not.toHaveBeenCalled();
+    expect(consoleError).toHaveBeenCalled();
+  });
+
   it("keeps the payment confirmed when the courier call fails", async () => {
     triggerFulfillment.mockRejectedValue(new Error("nimbuspost down"));
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});

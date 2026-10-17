@@ -18,7 +18,6 @@ export function BrandLogo({
 
   return (
     <Link href="/" className={clsx("flex shrink-0 items-center gap-2.5", className)} aria-label={`${storeName} home`}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/brand/logo-mark.png"
         alt=""

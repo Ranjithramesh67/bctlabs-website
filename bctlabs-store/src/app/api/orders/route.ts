@@ -6,7 +6,12 @@ import { computeTotals, type CartItem } from "@/lib/pricing";
 import { getSession } from "@/lib/session";
 import { getStoreSettings } from "@/lib/settings";
 import { getProductsByIds } from "@/lib/store";
-import { createCashfreeOrder, isCashfreeConfigured } from "@/lib/cashfree";
+import {
+  createCashfreeOrder,
+  isCashfreeConfigured,
+  isCashfreeMockEnabled,
+  mockPaymentSession,
+} from "@/lib/cashfree";
 
 const billingSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required"),
@@ -58,7 +63,8 @@ export async function POST(request: Request) {
   const { billing, shipping, paymentMethod, customerNote } = parsed.data;
   const payment = PAYMENT_METHODS[paymentMethod];
 
-  if (paymentMethod === "cashfree" && !isCashfreeConfigured()) {
+  const mockCashfree = paymentMethod === "cashfree" && !isCashfreeConfigured() && isCashfreeMockEnabled();
+  if (paymentMethod === "cashfree" && !isCashfreeConfigured() && !mockCashfree) {
     return NextResponse.json(
       { error: "Online payment is not available right now. Please choose cash on delivery." },
       { status: 503 },
@@ -74,19 +80,25 @@ export async function POST(request: Request) {
 
     const products = await getProductsByIds(lines.map((line) => line.productId));
     const byId = new Map(products.map((product) => [product.id, product]));
-    const items: CartItem[] = lines
-      .map((line) => {
-        const product = byId.get(line.productId);
-        return product ? { ...product, quantity: line.quantity } : null;
-      })
-      .filter((item): item is CartItem => item !== null);
 
-    if (!items.length) {
+    // Re-validate every line server-side: a stale cart could otherwise sell a
+    // quote-only (price 0) or out-of-stock product.
+    const blocked = lines.find((line) => {
+      const product = byId.get(line.productId);
+      return !product || !(product.price > 0) || product.stockStatus === "outofstock";
+    });
+    if (blocked) {
+      const name = byId.get(blocked.productId)?.name ?? "An item";
       return NextResponse.json(
-        { error: "None of the items in your cart are available anymore." },
-        { status: 400 },
+        { error: `${name} is no longer available. Please review your cart.` },
+        { status: 409 },
       );
     }
+
+    const items: CartItem[] = lines.map((line) => ({
+      ...byId.get(line.productId)!,
+      quantity: line.quantity,
+    }));
 
     const totals = computeTotals(items, settings);
 
@@ -115,6 +127,20 @@ export async function POST(request: Request) {
     if (paymentMethod === "cod") {
       await writeCart([]);
       return NextResponse.json({ id, key });
+    }
+
+    if (paymentMethod === "cashfree" && mockCashfree) {
+      return NextResponse.json({
+        id,
+        key,
+        payment: {
+          provider: "cashfree" as const,
+          sessionId: mockPaymentSession(id),
+          cfOrderId: `mock-${id}`,
+          mode: "sandbox" as const,
+          mock: true,
+        },
+      });
     }
 
     // Online payment: create the Cashfree order now and hand the payment

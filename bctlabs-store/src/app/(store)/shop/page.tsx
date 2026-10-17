@@ -86,7 +86,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
         </p>
       </header>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[280px_1fr]">
+      <div className="mt-8 space-y-6">
         <aside>
           <ShopFilters
             categories={categories}
@@ -107,7 +107,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
           </div>
 
           {hasItems ? (
-            <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {result.items.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

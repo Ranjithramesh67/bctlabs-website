@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { checkLoginAllowed, clearLoginFailures, recordLoginFailure } from "@/lib/auth-throttle";
 import { authenticate } from "@/lib/customers";
 import { createSession } from "@/lib/session";
 
@@ -16,12 +17,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Enter a valid email address and password." }, { status: 422 });
     }
 
-    const { email, password, remember } = parsed.data;
+    const email = parsed.data.email.trim().toLowerCase();
+    const { password, remember } = parsed.data;
+
+    const gate = await checkLoginAllowed(email);
+    if (!gate.allowed) {
+      return NextResponse.json(
+        { error: `Too many failed attempts. Try again in ${Math.ceil(gate.retryAfter / 60)} minutes.` },
+        { status: 429, headers: { "Retry-After": String(gate.retryAfter) } },
+      );
+    }
+
     const customer = await authenticate(email, password);
     if (!customer) {
+      await recordLoginFailure(email);
       return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
     }
 
+    await clearLoginFailures(email);
     await createSession({ customerId: customer.id, remember });
     return NextResponse.json({ ok: true });
   } catch {

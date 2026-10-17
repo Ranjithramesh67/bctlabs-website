@@ -72,7 +72,7 @@ function StarRating({ rating, reviewCount }: { rating: number; reviewCount: numb
 export function ProductDetails({ product }: { product: ProductDetailsProduct }) {
   const [quantity, setQuantity] = useState(1);
 
-  const inStock = product.stockStatus === "instock";
+  const inStock = product.stockStatus === "instock" || product.stockStatus === "onbackorder";
   const onBackorder = product.stockStatus === "onbackorder";
   const maxQuantity =
     product.stockQuantity && product.stockQuantity > 0 ? product.stockQuantity : undefined;
@@ -183,7 +183,7 @@ export function ProductDetails({ product }: { product: ProductDetailsProduct }) 
         </div>
 
         {displayPrice > 0 ? (
-          <AddToCartButton productId={product.id} inStock={inStock} quantity={quantity} />
+          <AddToCartButton productId={product.id} inStock={inStock} quantity={quantity} showCount={false} />
         ) : (
           <ButtonLink href="/contact-us" className="w-full">
             Enquire for price

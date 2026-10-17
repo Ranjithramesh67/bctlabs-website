@@ -78,7 +78,6 @@ export default async function PostPage({ params }: PostPageProps) {
         </header>
 
         {post.image ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={post.image}
             alt={post.title}

@@ -1095,3 +1095,33 @@ model bctlabs_payment_events {
   @@index([order_id], map: "idx_payment_event_order")
   @@index([cf_payment_id], map: "idx_payment_event_payment")
 }
+
+/// Short-lived email verification codes (signup, password reset).
+model bctlabs_email_verifications {
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  email       String    @db.VarChar(191)
+  purpose     String    @default("signup") @db.VarChar(32)
+  code_hash   String    @db.VarChar(191)
+  payload     Json?
+  attempts    Int       @default(0) @db.UnsignedInt
+  expires_at  DateTime  @db.DateTime(0)
+  consumed_at DateTime? @db.DateTime(0)
+  created_at  DateTime  @default(now()) @db.DateTime(0)
+
+  @@index([email, purpose, created_at], map: "idx_email_verification_lookup")
+  @@index([expires_at], map: "idx_email_verification_expiry")
+}
+
+model bctlabs_auth_attempts {
+  email        String    @id @db.VarChar(191)
+  attempts     Int       @default(0) @db.UnsignedInt
+  locked_until DateTime? @db.DateTime(0)
+  updated_at   DateTime  @default(now()) @updatedAt @db.DateTime(0)
+}
+
+model bctlabs_newsletter_subscribers {
+  id         BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  email      String   @unique @db.VarChar(191)
+  source     String   @default("homepage") @db.VarChar(50)
+  created_at DateTime @default(now()) @db.DateTime(0)
+}

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { emailExists, registerCustomer } from "@/lib/customers";
-import { createSession } from "@/lib/session";
+import { emailExists, hashPassword } from "@/lib/customers";
+import { canExposeDevCode, createEmailOtp, sendVerificationEmail, type SignupPayload } from "@/lib/otp";
 
 const bodySchema = z.object({
   email: z.email(),
@@ -26,9 +26,36 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "An account with this email already exists." }, { status: 409 });
     }
 
-    const customer = await registerCustomer({ email, password, firstName, lastName, phone });
-    await createSession({ customerId: customer.id });
-    return NextResponse.json({ ok: true });
+    // Do not create the account yet: the email must be verified first.
+    const payload: SignupPayload = {
+      firstName,
+      lastName,
+      phone,
+      passwordHash: await hashPassword(password),
+    };
+    const { code } = await createEmailOtp({
+      email,
+      purpose: "signup",
+      payload,
+    });
+
+    let delivered = false;
+    try {
+      delivered = (await sendVerificationEmail(email, code)).delivered;
+    } catch {
+      return NextResponse.json(
+        { error: "We could not send the verification email. Please try again shortly." },
+        { status: 503 },
+      );
+    }
+
+    return NextResponse.json({
+      ok: true,
+      requiresVerification: true,
+      email,
+      delivered,
+      ...(canExposeDevCode() ? { devCode: code } : {}),
+    });
   } catch {
     return NextResponse.json({ error: "Unable to create your account right now. Please try again." }, { status: 500 });
   }

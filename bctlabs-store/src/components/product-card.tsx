@@ -6,7 +6,7 @@ import { ProductImage } from "./product-image";
 import { Stars } from "./ui";
 
 export function ProductCard({ product }: { product: Product }) {
-  const inStock = product.stockStatus === "instock";
+  const inStock = product.stockStatus === "instock" || product.stockStatus === "onbackorder";
   const priced = product.price > 0;
   const discount =
     product.onSale && product.regularPrice > product.price
@@ -62,7 +62,11 @@ export function ProductCard({ product }: { product: Product }) {
         </Link>
 
         <div className="mt-1.5">
-          <Stars rating={product.rating || 4.5} count={product.reviewCount || undefined} />
+          {product.rating > 0 ? (
+            <Stars rating={product.rating} count={product.reviewCount || undefined} />
+          ) : (
+            <span className="text-xs text-slate-400">No reviews yet</span>
+          )}
         </div>
 
         <div className="mt-auto pt-3">
@@ -75,14 +79,18 @@ export function ProductCard({ product }: { product: Product }) {
             ) : null}
           </div>
           <p className="mt-0.5 text-[11px] font-medium text-slate-400">
-            {inStock ? "In stock, ready to ship" : "Currently unavailable"}
+            {product.stockStatus === "onbackorder"
+              ? "Available on backorder"
+              : inStock
+                ? "In stock, ready to ship"
+                : "Currently unavailable"}
           </p>
           <div className="mt-3">
             {priced ? (
               <AddToCartButton
                 productId={product.id}
                 inStock={inStock}
-                label={inStock ? "Add to cart" : "Notify me"}
+                label={inStock ? "Add to cart" : "Sold out"}
                 variant="primary"
                 className="w-full"
               />

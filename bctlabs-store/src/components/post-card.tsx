@@ -12,7 +12,6 @@ export function PostCard({ post }: { post: BlogPost }) {
     >
       <div className="relative aspect-[16/9] overflow-hidden bg-slate-50">
         {post.image ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={post.image}
             alt={post.title}

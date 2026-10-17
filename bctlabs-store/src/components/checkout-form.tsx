@@ -164,6 +164,7 @@ export function CheckoutForm({
   totals,
   customer,
   cashfreeEnabled,
+  cashfreeMock = false,
   logisticsEnabled,
   weightGrams,
 }: {
@@ -171,6 +172,7 @@ export function CheckoutForm({
   totals: CartTotals;
   customer: Customer | null;
   cashfreeEnabled: boolean;
+  cashfreeMock?: boolean;
   logisticsEnabled: boolean;
   weightGrams: number;
 }) {
@@ -217,6 +219,7 @@ export function CheckoutForm({
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [createdOrder, setCreatedOrder] = useState<{ id: number; key: string } | null>(null);
   const [retryingPayment, setRetryingPayment] = useState(false);
+  const [mockPaying, setMockPaying] = useState(false);
   const [pending, setPending] = useState(false);
 
   function clearError(key: string) {
@@ -393,6 +396,29 @@ export function CheckoutForm({
     router.refresh();
   }
 
+  async function payWithMock() {
+    if (!createdOrder) return;
+    setMockPaying(true);
+    setPaymentError(null);
+    try {
+      const response = await fetch("/api/payments/cashfree/mock-confirm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order_id: createdOrder.id, key: createdOrder.key }),
+      });
+      const data = (await response.json().catch(() => null)) as { error?: string } | null;
+      if (!response.ok) {
+        setPaymentError(data?.error ?? "Could not complete the test payment.");
+        return;
+      }
+      goToSuccess(createdOrder);
+    } catch {
+      setPaymentError("Network error. Please check your connection and try again.");
+    } finally {
+      setMockPaying(false);
+    }
+  }
+
   const blockedByDelivery = logisticsEnabled && shouldBlockCheckout(deliveryStatus, logisticsEnabled);
 
   return (
@@ -502,10 +528,29 @@ export function CheckoutForm({
           {payment === "cashfree" ? (
             <p className="mt-4 flex items-center gap-2 text-xs text-slate-500">
               <IconLock className="h-4 w-4 text-emerald-600" />
-              Complete your payment securely in the Cashfree form after placing your order.
+              {cashfreeMock
+                ? "Test mode: placing the order opens a simulated Cashfree payment step. No money moves."
+                : "Complete your payment securely in the Cashfree form after placing your order."}
             </p>
           ) : null}
-          {paymentSession ? (
+          {paymentSession && paymentSession.sessionId.startsWith("mock_") ? (
+            <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4">
+              <p className="text-sm font-semibold text-amber-900">Cashfree test mode</p>
+              <p className="mt-1 text-xs text-amber-800">
+                Live Cashfree keys are not configured. Use the button below to simulate a
+                successful payment and complete the order flow.
+              </p>
+              <Button
+                type="button"
+                size="sm"
+                className="mt-3"
+                disabled={mockPaying}
+                onClick={payWithMock}
+              >
+                {mockPaying ? "Confirming..." : "Simulate successful payment"}
+              </Button>
+            </div>
+          ) : paymentSession ? (
             <CashfreeDropIn
               sessionId={paymentSession.sessionId}
               mode={paymentSession.mode}
@@ -545,7 +590,6 @@ export function CheckoutForm({
             {items.map((item) => (
               <li key={item.id} className="flex gap-3 py-3">
                 <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={item.image ?? "/media/woocommerce-placeholder.webp"}
                     alt={item.name}

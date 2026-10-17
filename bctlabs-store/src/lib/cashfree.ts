@@ -23,6 +23,23 @@ export function isCashfreeConfigured(): boolean {
   return Boolean(process.env.CASHFREE_APP_ID && process.env.CASHFREE_SECRET_KEY);
 }
 
+/**
+ * Local/test only: lets the checkout exercise the full order -> payment ->
+ * fulfilment flow without live gateway credentials. Never available in a
+ * production build, even if the flag leaks into the environment.
+ */
+export function isCashfreeMockEnabled(): boolean {
+  return process.env.NODE_ENV !== "production" && process.env.CASHFREE_MOCK === "1";
+}
+
+export function isCashfreeAvailable(): boolean {
+  return isCashfreeConfigured() || isCashfreeMockEnabled();
+}
+
+export function mockPaymentSession(orderId: number): string {
+  return `mock_${orderId}_${Date.now().toString(36)}`;
+}
+
 function baseUrl(): string {
   if (process.env.CASHFREE_BASE_URL) return process.env.CASHFREE_BASE_URL.replace(/\/+$/, "");
   return (process.env.CASHFREE_ENV ?? "sandbox").toLowerCase() === "production"

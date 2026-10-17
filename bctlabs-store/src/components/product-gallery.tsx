@@ -47,7 +47,6 @@ export function ProductGallery({
   return (
     <div className="flex flex-col gap-4">
       <div className="relative aspect-square overflow-hidden rounded-2xl border border-slate-200 bg-white">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={current} alt={name} className="h-full w-full object-contain p-6" />
       </div>
 
@@ -70,7 +69,6 @@ export function ProductGallery({
                     : "border-slate-200 hover:border-brand-300",
                 )}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={src} alt="" className="h-full w-full object-contain" />
               </button>
             );

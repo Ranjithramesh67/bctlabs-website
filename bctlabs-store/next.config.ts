@@ -6,6 +6,22 @@ const nextConfig: NextConfig = {
   images: {
     minimumCacheTTL: 86400,
   },
+  async redirects() {
+    // Theme demo pages imported from WooCommerce duplicate the real pages and
+    // carry the old store's placeholder contact details.
+    const legacyPages: [string, string][] = [
+      ["/pages/about-us", "/about-us"],
+      ["/pages/about-us-type-2", "/about-us"],
+      ["/pages/contact-us", "/contact-us"],
+      ["/pages/contact-us-type-2", "/contact-us"],
+      ["/pages/contact-2", "/contact-us"],
+    ];
+    return legacyPages.map(([source, destination]) => ({
+      source,
+      destination,
+      permanent: true,
+    }));
+  },
   async headers() {
     const imageExtensions = ["jpg", "jpeg", "png", "gif", "webp", "avif", "svg"];
     return imageExtensions.map((ext) => ({

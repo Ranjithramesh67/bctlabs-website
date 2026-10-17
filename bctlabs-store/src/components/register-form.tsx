@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { safeRedirect } from "@/lib/redirect";
 import { Button, Input, Label } from "./ui";
 
 type FieldErrors = { email?: string; password?: string; firstName?: string; lastName?: string };
@@ -20,6 +21,13 @@ export function RegisterForm({ redirectTo }: { redirectTo?: string }) {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState("");
   const [pending, setPending] = useState(false);
+  const [step, setStep] = useState<"details" | "verify">("details");
+  const [code, setCode] = useState("");
+  const [devCode, setDevCode] = useState<string | null>(null);
+  const [delivered, setDelivered] = useState(true);
+  const [verifying, setVerifying] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [notice, setNotice] = useState("");
 
   function validate(): FieldErrors {
     const next: FieldErrors = {};
@@ -57,13 +65,157 @@ export function RegisterForm({ redirectTo }: { redirectTo?: string }) {
         setFormError(data?.error ?? "Unable to create your account. Please try again.");
         return;
       }
-      router.push(redirectTo && redirectTo.startsWith("/") ? redirectTo : "/account");
+      const data = (await response.json().catch(() => null)) as
+        | { requiresVerification?: boolean; delivered?: boolean; devCode?: string; email?: string }
+        | null;
+
+      if (data?.requiresVerification) {
+        setDelivered(data.delivered !== false);
+        setDevCode(data.devCode ?? null);
+        setNotice(
+          data.delivered === false
+            ? "Email delivery is not configured on this environment. Use the code shown below."
+            : `We sent a 6 digit code to ${data.email ?? email.trim()}. It expires in 10 minutes.`,
+        );
+        setStep("verify");
+        return;
+      }
+
+      router.push(safeRedirect(redirectTo));
       router.refresh();
     } catch {
       setFormError("Network error. Please check your connection and try again.");
     } finally {
       setPending(false);
     }
+  }
+
+  async function verifyCode(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setFormError("");
+    setNotice("");
+    if (!/^\d{6}$/.test(code.trim())) {
+      setFormError("Enter the 6 digit code from your email.");
+      return;
+    }
+
+    setVerifying(true);
+    try {
+      const response = await fetch("/api/auth/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), code: code.trim() }),
+      });
+      if (!response.ok) {
+        const data = (await response.json().catch(() => null)) as { error?: string } | null;
+        setFormError(data?.error ?? "We could not verify that code. Please try again.");
+        return;
+      }
+      router.push(safeRedirect(redirectTo));
+      router.refresh();
+    } catch {
+      setFormError("Network error. Please check your connection and try again.");
+    } finally {
+      setVerifying(false);
+    }
+  }
+
+  async function resendCode() {
+    setFormError("");
+    setNotice("");
+    setResending(true);
+    try {
+      const response = await fetch("/api/auth/resend-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      const data = (await response.json().catch(() => null)) as
+        | { error?: string; delivered?: boolean; devCode?: string }
+        | null;
+      if (!response.ok) {
+        setFormError(data?.error ?? "Could not resend the code. Please try again.");
+        return;
+      }
+      setDelivered(data?.delivered !== false);
+      setDevCode(data?.devCode ?? null);
+      setNotice("A new code is on its way. Enter the latest code below.");
+    } catch {
+      setFormError("Network error. Please check your connection and try again.");
+    } finally {
+      setResending(false);
+    }
+  }
+
+  if (step === "verify") {
+    return (
+      <form onSubmit={verifyCode} noValidate className="space-y-5">
+        <div className="rounded-xl border border-brand-100 bg-brand-50 px-4 py-3 text-sm text-brand-900">
+          <p className="font-semibold">Verify your email</p>
+          <p className="mt-1 text-brand-800">
+            Enter the 6 digit code sent to <span className="font-semibold">{email.trim()}</span>.
+          </p>
+        </div>
+
+        {notice ? (
+          <p role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-sm text-emerald-800">
+            {notice}
+          </p>
+        ) : null}
+        {devCode ? (
+          <p className="rounded-xl border border-amber-300 bg-amber-50 px-3.5 py-2.5 text-sm text-amber-900">
+            Test mode code: <span className="font-mono text-base font-bold tracking-widest">{devCode}</span>
+            {!delivered ? " (no email was sent)" : ""}
+          </p>
+        ) : null}
+        {formError ? (
+          <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-sm text-rose-700">
+            {formError}
+          </p>
+        ) : null}
+
+        <div>
+          <Label htmlFor="register-code">Verification code</Label>
+          <Input
+            id="register-code"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            maxLength={6}
+            value={code}
+            onChange={(event) => setCode(event.target.value.replace(/\D/g, ""))}
+            placeholder="123456"
+            className="text-center text-lg font-bold tracking-[0.5em]"
+          />
+        </div>
+
+        <Button type="submit" size="lg" disabled={verifying || resending} className="w-full">
+          {verifying ? "Verifying..." : "Verify email and create account"}
+        </Button>
+
+        <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+          <button
+            type="button"
+            onClick={resendCode}
+            disabled={resending || verifying}
+            className="font-semibold text-brand-600 hover:text-brand-700 disabled:opacity-50"
+          >
+            {resending ? "Sending..." : "Resend code"}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setStep("details");
+              setCode("");
+              setFormError("");
+              setNotice("");
+            }}
+            className="font-medium text-slate-500 hover:text-slate-700"
+          >
+            Change details
+          </button>
+        </div>
+      </form>
+    );
   }
 
   return (

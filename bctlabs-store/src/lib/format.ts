@@ -60,16 +60,39 @@ export function cleanContent(html: string): string {
   return html
     .replace(/\[(?:\/)?[a-zA-Z_][^\]]*\]/g, "")
     .replace(/<script[\s\S]*?<\/script>/gi, "")
+    // Imported Elementor/theme pages carry their own CSS; never render it.
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<link[^>]*>/gi, "")
+    .replace(/<!--[\s\S]*?-->/g, "")
+    // Leftover theme placeholders must not leak the old store's contact details.
+    .replace(/contact@yourstore\.com/gi, "bctlabs@gmail.com")
     .trim();
 }
 
 export function truncate(text: string, length = 160): string {
-  const plain = text.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  const plain = text
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
   if (plain.length <= length) return plain;
   return `${plain.slice(0, length - 1).trimEnd()}\u2026`;
 }
 
+/**
+ * HPOS stores the canonical status, but rows migrated from the legacy
+ * postmeta table keep WooCommerce's `wc-` prefix. Normalise both spellings so
+ * filters, totals and labels all agree.
+ */
+export function normalizeOrderStatus(status: string | null | undefined): string {
+  const value = (status ?? "").trim().toLowerCase();
+  if (!value) return "";
+  return value.startsWith("wc-") ? value.slice(3) : value;
+}
+
 export function orderStatusLabel(status: string | null | undefined): string {
+  const key = normalizeOrderStatus(status);
   const map: Record<string, string> = {
     pending: "Pending payment",
     processing: "Processing",
@@ -80,7 +103,7 @@ export function orderStatusLabel(status: string | null | undefined): string {
     failed: "Failed",
     "checkout-draft": "Draft",
   };
-  return map[status ?? ""] ?? (status ?? "").replace(/-/g, " ");
+  return map[key] ?? (key.replace(/-/g, " ") || "Unknown");
 }
 
 const SHIPMENT_STATUS_LABELS: Record<string, string> = {

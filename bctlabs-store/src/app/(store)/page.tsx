@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NewsletterForm } from "@/components/newsletter-form";
 import { ProductCard } from "@/components/product-card";
 import { ProductImage } from "@/components/product-image";
 import { ButtonLink, Container, SectionHeading, Stars } from "@/components/ui";
@@ -371,25 +372,7 @@ export default async function HomePage() {
               spam, just useful updates.
             </p>
           </div>
-          <form action="/contact-us" className="flex flex-col gap-3 sm:flex-row">
-            <label className="sr-only" htmlFor="newsletter-email">
-              Email address
-            </label>
-            <input
-              id="newsletter-email"
-              type="email"
-              name="email"
-              required
-              placeholder="you@example.com"
-              className="w-full rounded-xl border border-white/25 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/60 focus:border-white focus:bg-white/15 focus:outline-none"
-            />
-            <button
-              type="submit"
-              className="shrink-0 rounded-xl bg-white px-6 py-3 text-sm font-bold text-brand-800 transition-colors hover:bg-white/90"
-            >
-              Subscribe
-            </button>
-          </form>
+          <NewsletterForm />
         </Container>
       </section>
     </>

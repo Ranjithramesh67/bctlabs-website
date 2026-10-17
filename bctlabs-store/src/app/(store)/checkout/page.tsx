@@ -3,7 +3,7 @@ import { CheckoutForm } from "@/components/checkout-form";
 import { ButtonLink, Container, EmptyState } from "@/components/ui";
 import { getCart } from "@/lib/cart";
 import { getCustomerById } from "@/lib/customers";
-import { isCashfreeConfigured } from "@/lib/cashfree";
+import { isCashfreeAvailable, isCashfreeConfigured, isCashfreeMockEnabled } from "@/lib/cashfree";
 import { defaultItemWeightGrams, isNimbusPostConfigured } from "@/lib/nimbuspost";
 import { computeTotals, type CartItem } from "@/lib/pricing";
 import { getSession } from "@/lib/session";
@@ -69,7 +69,8 @@ export default async function CheckoutPage() {
         items={items}
         totals={totals}
         customer={customer}
-        cashfreeEnabled={isCashfreeConfigured()}
+        cashfreeEnabled={isCashfreeAvailable()}
+        cashfreeMock={isCashfreeMockEnabled() && !isCashfreeConfigured()}
         logisticsEnabled={isNimbusPostConfigured()}
         weightGrams={weightGrams}
       />

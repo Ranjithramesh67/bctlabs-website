@@ -40,7 +40,9 @@ The store runs on http://localhost:4000.
 | `CASHFREE_APP_ID` | no | Cashfree App ID (Developers -> API Keys). Enables online payment at checkout. |
 | `CASHFREE_SECRET_KEY` | no | Cashfree Secret Key. Required for online payment and webhook verification. |
 | `CASHFREE_ENV` | no | `sandbox` (default) or `production`. |
+| `CASHFREE_MOCK` | no | Local/test only (`1`): simulates a successful online payment when no API keys are present. Ignored in production. |
 | `CASHFREE_BASE_URL`, `CASHFREE_API_VERSION` | no | Override the Cashfree API host/version (staging or pinned version). |
+| `BREVO_API_KEY`, `MAIL_FROM_EMAIL`, `MAIL_FROM_NAME` | no | Sends signup verification codes. Without a key, local dev shows the code on screen. |
 | `NIMBUSPOST_API_KEY` | no | NimbusPost API key. Enables delivery checks and shipment booking. |
 | `ORIGIN_PINCODE_ARK`, `ORIGIN_PINCODE_BLR` | no | Origin pincode per warehouse. At least one is required for serviceability. |
 | `NIMBUSPOST_DEFAULT_WAREHOUSE` | no | Warehouse used when a request omits one: `ARK` (default) or `BLR`. |
@@ -50,7 +52,7 @@ The store runs on http://localhost:4000.
 | `NIMBUSPOST_PICKUP_*` | no | Shared pickup address/phone for both warehouses; falls back to the brand address. |
 | `NIMBUSPOST_{BLR,ARK}_*` | no | Per-warehouse overrides for name, address, city, state, phone, email and warehouse id. |
 | `NIMBUSPOST_DEFAULT_ITEM_WEIGHT_GRAMS` | no | Weight assumed per line without a product weight (default `500`). |
-| `NIMBUSPOST_WEBHOOK_SECRET` | no | Shared secret required on tracking webhook calls. |
+| `NIMBUSPOST_WEBHOOK_SECRET` | yes (for tracking) | Shared secret required on tracking webhook calls; without it the webhook rejects every request. |
 
 ## Routes
 
@@ -86,6 +88,25 @@ Online flow:
 
 Register the webhook in the Cashfree dashboard pointing at
 `{APP_URL}/api/webhooks/cashfree`.
+
+### Test mode
+
+Set `CASHFREE_MOCK=1` in local development to exercise the whole online-payment
+flow (order -> payment -> fulfilment) without Cashfree credentials. The checkout
+shows a clearly labelled simulator; the flag is ignored when
+`NODE_ENV=production`.
+
+## Signup verification
+
+New accounts require a 6 digit email code before they are created:
+
+1. `POST /api/auth/register` validates the form and stores a hashed code with a
+   10 minute expiry (the WordPress user is not created yet).
+2. The code is emailed through Brevo when `BREVO_API_KEY` is set. In local
+   development without a key, the code is returned to the browser and shown on
+   the verification screen.
+3. `POST /api/auth/verify-otp` consumes the code and creates the account.
+   `POST /api/auth/resend-otp` issues a fresh code after a 60 second cooldown.
 
 ## Logistics (NimbusPost)
 

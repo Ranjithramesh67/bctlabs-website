@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { safeRedirect } from "@/lib/redirect";
 import { Button, Input, Label } from "./ui";
 
 type FieldErrors = { email?: string; password?: string };
@@ -46,7 +47,7 @@ export function LoginForm({ redirectTo }: { redirectTo?: string }) {
         setFormError(data?.error ?? "Unable to sign in. Please try again.");
         return;
       }
-      router.push(redirectTo && redirectTo.startsWith("/") ? redirectTo : "/account");
+      router.push(safeRedirect(redirectTo));
       router.refresh();
     } catch {
       setFormError("Network error. Please check your connection and try again.");

@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 import { toNumber } from "./format";
 
+const DUMMY_PASSWORD_HASH = "$2b$10$pn.J5p/mt3v1QLRzHQzlGehfha1NjrWT/RWjBhsun.aAov5J0ykz.";
+
 export type Customer = {
   id: number;
   email: string;
@@ -78,7 +80,12 @@ export async function authenticate(email: string, password: string): Promise<Cus
   const user = await prisma.wp_users.findFirst({
     where: { OR: [{ user_email: email }, { user_login: email }] },
   });
-  if (!user) return null;
+  if (!user) {
+    // Compare against a dummy hash so unknown emails take the same time as
+    // wrong passwords (prevents account enumeration by timing).
+    await bcrypt.compare(password, DUMMY_PASSWORD_HASH);
+    return null;
+  }
   if (!(await verifyPassword(password, user.user_pass))) return null;
   return mapCustomer(user, await metaFor(user.ID));
 }
@@ -90,13 +97,15 @@ export async function emailExists(email: string): Promise<boolean> {
 
 export async function registerCustomer(input: {
   email: string;
-  password: string;
+  /** Plain password. Ignored when `passwordHash` is provided. */
+  password?: string;
+  passwordHash?: string;
   firstName: string;
   lastName: string;
   phone?: string;
 }): Promise<Customer> {
   const now = new Date();
-  const passwordHash = await hashPassword(input.password);
+  const passwordHash = input.passwordHash ?? (await hashPassword(input.password ?? ""));
   const base = input.email.split("@")[0].replace(/[^a-z0-9._-]/gi, "").toLowerCase() || "customer";
   let username = base;
   for (let i = 0; await prisma.wp_users.count({ where: { user_login: username } }); i += 1) {

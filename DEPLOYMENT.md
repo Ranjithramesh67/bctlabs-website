@@ -27,9 +27,11 @@ Set these in the Vercel/Netlify dashboard (see `.env.example`):
 | `MAIL_TO_EMAIL`, `MAIL_FROM_EMAIL`, `BREVO_API_KEY` | no | Contact-form email relay. Without `BREVO_API_KEY` the message is stored but no email is sent. |
 | `CASHFREE_APP_ID`, `CASHFREE_SECRET_KEY`, `CASHFREE_ENV` | no | Enable online payment, the embedded checkout and webhook verification. |
 | `CASHFREE_BASE_URL`, `CASHFREE_API_VERSION` | no | Override the Cashfree API host/version. |
+| `CASHFREE_MOCK` | no | Local/test only. Ignored in production; never enable on a public deployment. |
+| `BREVO_API_KEY`, `MAIL_FROM_EMAIL`, `MAIL_FROM_NAME` | no | Required in production for signup verification emails. |
 | `NIMBUSPOST_API_KEY`, `ORIGIN_PINCODE_ARK`, `ORIGIN_PINCODE_BLR` | no | Enable delivery checks and shipment booking. Without them checkout skips the pincode check and the admin shipment panel is hidden. |
 | `NIMBUSPOST_DEFAULT_WAREHOUSE` | no | Warehouse used when a request omits one: `ARK` (default) or `BLR`. `NIMBUSPOST_ORIGIN_PINCODE` remains as a legacy fallback. |
-| `NIMBUSPOST_WEBHOOK_SECRET` | no | Shared secret for `POST /api/webhooks/nimbuspost`. |
+| `NIMBUSPOST_WEBHOOK_SECRET` | yes (for tracking) | Shared secret for `POST /api/webhooks/nimbuspost`; the route fails closed when it is missing. |
 
 ## 3. Database migration
 

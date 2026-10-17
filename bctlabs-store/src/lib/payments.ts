@@ -55,7 +55,7 @@ export type ConfirmPaymentInput = PaymentEventInput & {
 };
 
 export type ConfirmPaymentResult = {
-  status: "paid" | "already_paid" | "duplicate" | "not_found";
+  status: "paid" | "already_paid" | "duplicate" | "not_found" | "rejected";
   orderId: number | null;
 };
 
@@ -74,6 +74,13 @@ export async function confirmOrderPayment(input: ConfirmPaymentInput): Promise<C
 
   const order = await getOrderById(orderId);
   if (!order) return { status: "not_found", orderId };
+
+  // A Cashfree event can never settle an order that was placed as cash on
+  // delivery (or with another provider).
+  if (input.provider === "cashfree" && order.paymentMethod && order.paymentMethod !== "cashfree") {
+    console.error(`Refusing Cashfree payment for order ${orderId} paid via ${order.paymentMethod}`);
+    return { status: "rejected", orderId };
+  }
 
   const alreadyPaid =
     Boolean(order.transactionId) &&

@@ -7,20 +7,20 @@ import { clsx } from "clsx";
 import type { Category } from "@/lib/store";
 import { BRAND } from "@/lib/site-content";
 import { BrandLogo } from "./brand-logo";
+import { useCart } from "./cart-provider";
 import { IconCart, IconChevronDown, IconClose, IconMail, IconMenu, IconPhone, IconSearch, IconUser } from "./icons";
 
 export function StoreHeader({
   storeName,
   categories,
-  cartCount,
   customerName,
 }: {
   storeName: string;
   categories: Category[];
-  cartCount: number;
   customerName?: string;
 }) {
   const router = useRouter();
+  const { count: cartCount } = useCart();
   const [term, setTerm] = useState("");
   const [open, setOpen] = useState(false);
 

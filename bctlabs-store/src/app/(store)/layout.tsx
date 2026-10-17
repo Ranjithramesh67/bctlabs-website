@@ -1,3 +1,4 @@
+import { CartProvider } from "@/components/cart-provider";
 import { StoreHeader } from "@/components/store-header";
 import { StoreFooter } from "@/components/store-footer";
 import { getCart } from "@/lib/cart";
@@ -13,19 +14,19 @@ export default async function StoreLayout({ children }: { children: React.ReactN
     getCart(),
     getSession(),
   ]);
-  const cartCount = cart.reduce((sum, line) => sum + line.quantity, 0);
   const customer = session.customerId ? await getCustomerById(session.customerId) : null;
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f7f5f9]">
-      <StoreHeader
-        storeName={settings.name}
-        categories={categories}
-        cartCount={cartCount}
-        customerName={customer?.displayName}
-      />
-      <main className="flex-1">{children}</main>
-      <StoreFooter categories={categories} settings={settings} />
-    </div>
+    <CartProvider initialLines={cart}>
+      <div className="flex min-h-screen flex-col bg-[#f7f5f9]">
+        <StoreHeader
+          storeName={settings.name}
+          categories={categories}
+          customerName={customer?.displayName}
+        />
+        <main className="flex-1">{children}</main>
+        <StoreFooter categories={categories} settings={settings} />
+      </div>
+    </CartProvider>
   );
 }

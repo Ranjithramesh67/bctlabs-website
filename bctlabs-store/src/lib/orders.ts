@@ -2,7 +2,7 @@ import "server-only";
 
 import { randomBytes } from "crypto";
 import { prisma } from "./prisma";
-import { toNumber } from "./format";
+import { normalizeOrderStatus, toNumber } from "./format";
 
 export type Address = {
   firstName: string;
@@ -331,13 +331,18 @@ async function hydrateOrders(
 ): Promise<Order[]> {
   if (!orders.length) return [];
   const ids = orders.map((o) => o.id);
-  const [addresses, items, itemMetas, metas] = await Promise.all([
+  const [addresses, items, itemMetas, metas, operations] = await Promise.all([
     prisma.wp_wc_order_addresses.findMany({ where: { order_id: { in: ids } } }),
     prisma.wp_woocommerce_order_items.findMany({ where: { order_id: { in: ids } } }),
     prisma.wp_woocommerce_order_itemmeta.findMany({
       where: { meta_key: { in: ["_product_id", "_qty", "_line_total"] } },
     }),
     prisma.wp_wc_orders_meta.findMany({ where: { order_id: { in: ids }, meta_key: { in: ["_order_shipping", "_cart_discount", "_order_key"] } } }),
+    // Older rows only keep the key in HPOS operational data.
+    prisma.wp_wc_order_operational_data.findMany({
+      where: { order_id: { in: ids } },
+      select: { order_id: true, order_key: true },
+    }),
   ]);
 
   const itemIds = new Set(items.map((i) => toNumber(i.order_item_id)));
@@ -380,7 +385,7 @@ async function hydrateOrders(
     const shippingTotal = Number(om.get("_order_shipping") || 0);
     return {
       id: oid,
-      status: o.status ?? "",
+      status: normalizeOrderStatus(o.status),
       currency: o.currency ?? "INR",
       total,
       tax,
@@ -393,7 +398,10 @@ async function hydrateOrders(
       billingEmail: o.billing_email ?? "",
       dateCreated: o.date_created_gmt,
       customerNote: o.customer_note ?? "",
-      orderKey: om.get("_order_key") || "",
+      orderKey:
+        om.get("_order_key") ||
+        operations.find((op) => toNumber(op.order_id) === oid)?.order_key ||
+        "",
       transactionId: o.transaction_id || "",
       billing: billing ? mapAddress(billing) : null,
       shippingAddress: shipping ? mapAddress(shipping) : null,
@@ -404,7 +412,11 @@ async function hydrateOrders(
 
 export async function getOrders(opts: { status?: string; search?: string; limit?: number } = {}): Promise<Order[]> {
   const where: Record<string, unknown> = { type: "shop_order" };
-  if (opts.status) where.status = opts.status;
+  if (opts.status) {
+    const normalized = normalizeOrderStatus(opts.status);
+    // Honour both the HPOS spelling and legacy `wc-` rows.
+    where.status = { in: [normalized, `wc-${normalized}`] };
+  }
   if (opts.search) where.billing_email = { contains: opts.search };
   const rows = await prisma.wp_wc_orders.findMany({
     where,
@@ -415,6 +427,7 @@ export async function getOrders(opts: { status?: string; search?: string; limit?
 }
 
 export async function getOrderById(id: number): Promise<Order | null> {
+  if (!Number.isInteger(id) || id <= 0) return null;
   const row = await prisma.wp_wc_orders.findUnique({ where: { id: BigInt(id) } });
   if (!row) return null;
   const [order] = await hydrateOrders([row]);
@@ -422,6 +435,7 @@ export async function getOrderById(id: number): Promise<Order | null> {
 }
 
 export async function getOrdersForCustomer(customerId: number): Promise<Order[]> {
+  if (!Number.isInteger(customerId) || customerId <= 0) return [];
   const rows = await prisma.wp_wc_orders.findMany({
     where: { customer_id: BigInt(customerId), type: "shop_order" },
     orderBy: { date_created_gmt: "desc" },
@@ -437,8 +451,13 @@ export async function findOrderForTracking(id: number, email: string): Promise<O
 }
 
 export async function updateOrderStatus(id: number, status: string): Promise<void> {
-  await prisma.wp_wc_orders.update({ where: { id: BigInt(id) }, data: { status, date_updated_gmt: new Date() } });
-  await prisma.wp_wc_order_stats.update({ where: { order_id: BigInt(id) }, data: { status } }).catch(() => undefined);
+  if (!Number.isInteger(id) || id <= 0) return;
+  const normalized = normalizeOrderStatus(status);
+  await prisma.wp_wc_orders.update({
+    where: { id: BigInt(id) },
+    data: { status: normalized, date_updated_gmt: new Date() },
+  });
+  await prisma.wp_wc_order_stats.update({ where: { order_id: BigInt(id) }, data: { status: normalized } }).catch(() => undefined);
 }
 
 /** Read a single order meta value (HPOS `wp_wc_orders_meta`). */
@@ -508,14 +527,19 @@ export async function getOrderStats(): Promise<{
     orderBy: { date_created_gmt: "desc" },
   });
   const revenue = rows
-    .filter((r) => r.status && !["cancelled", "refunded", "failed", "checkout-draft"].includes(r.status))
+    .filter((r) => {
+      const status = normalizeOrderStatus(r.status);
+      return status && !["cancelled", "refunded", "failed", "checkout-draft"].includes(status);
+    })
     .reduce((sum, r) => sum + Number(r.total_amount ?? 0), 0);
+  const countByStatus = (wanted: string) =>
+    rows.filter((r) => normalizeOrderStatus(r.status) === wanted).length;
   return {
     totalOrders: rows.length,
     revenue,
-    pending: rows.filter((r) => r.status === "pending").length,
-    processing: rows.filter((r) => r.status === "processing").length,
-    completed: rows.filter((r) => r.status === "completed").length,
+    pending: countByStatus("pending"),
+    processing: countByStatus("processing"),
+    completed: countByStatus("completed"),
     recent: await hydrateOrders(rows.slice(0, 8)),
   };
 }

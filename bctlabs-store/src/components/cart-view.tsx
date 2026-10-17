@@ -80,7 +80,6 @@ export function CartView({
                   href={`/product/${item.slug}`}
                   className="block h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-50"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={item.image ?? "/media/woocommerce-placeholder.webp"}
                     alt={item.name}
@@ -100,8 +99,10 @@ export function CartView({
                   <p className="mt-1 text-sm text-slate-500 sm:hidden">
                     {formatPrice(item.price)} each
                   </p>
-                  {item.stockStatus !== "instock" ? (
+                  {item.stockStatus === "outofstock" ? (
                     <p className="mt-1 text-xs font-medium text-rose-600">Out of stock</p>
+                  ) : item.stockStatus === "onbackorder" ? (
+                    <p className="mt-1 text-xs font-medium text-amber-600">Available on backorder</p>
                   ) : null}
                 </div>
 

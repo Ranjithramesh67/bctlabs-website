@@ -69,7 +69,7 @@ function parseEvents(payload: unknown): TrackingEvent[] {
 
 function secretMatches(provided: string | null): boolean {
   const expected = process.env.NIMBUSPOST_WEBHOOK_SECRET;
-  if (!expected) return true;
+  if (!expected) return false;
   if (!provided) return false;
   const a = Buffer.from(provided);
   const b = Buffer.from(expected);
@@ -83,6 +83,12 @@ function secretMatches(provided: string | null): boolean {
  * events that do not concern this store.
  */
 export async function POST(request: Request) {
+  // Fail closed: without a configured secret anyone could rewrite shipments.
+  if (!process.env.NIMBUSPOST_WEBHOOK_SECRET) {
+    console.error("NIMBUSPOST_WEBHOOK_SECRET is not set; rejecting tracking webhook");
+    return NextResponse.json({ error: "Webhook is not configured" }, { status: 503 });
+  }
+
   const url = new URL(request.url);
   const providedSecret =
     request.headers.get("x-nimbuspost-secret") ??

@@ -537,14 +537,26 @@ export function mapTrackingStatus(input: string | null | undefined): ShipmentSta
 
   if (!token) return "UNKNOWN";
 
-  // Delivered and RTO-delivered first: they contain "DELIVER" substrings that
-  // would otherwise match the out-for-delivery branch.
+  // "DELIVERY_FAILED", "NOT_DELIVERED" and "UNDELIVERED" all contain
+  // "DELIVER", so failures must be classified before the delivered branch.
   if (token.includes("RTO") && token.includes("DELIVER")) return "RTO_DELIVERED";
-  if (token.includes("DELIVER")) return "DELIVERED";
+  if (
+    token.includes("UNDELIVER") ||
+    token.includes("NOT_DELIVERED") ||
+    token.includes("DELIVERY_FAILED") ||
+    token.includes("FAILED") ||
+    token.includes("EXCEPTION") ||
+    token === "NDR" ||
+    token.includes("HOLD") ||
+    token.includes("ADDRESS")
+  ) {
+    return "EXCEPTION";
+  }
   if (token.includes("RTO")) return "RTO_IN_TRANSIT";
   if (token === "OFD" || token.includes("OUT_FOR_DELIVERY") || token.includes("OUT_FOR_DELIVRY")) {
     return "OUT_FOR_DELIVERY";
   }
+  if (token.includes("DELIVERED") || token === "DELIVER") return "DELIVERED";
   if (token.includes("CANCEL")) return "CANCELLED";
   if (token.includes("PICKED") || token === "PICKUP_DONE" || token === "PICKED_UP") return "PICKED_UP";
   if (token.includes("PICKUP") || token.includes("MANIFEST") || token.includes("READY_FOR_PICKUP")) {
@@ -560,17 +572,6 @@ export function mapTrackingStatus(input: string | null | undefined): ShipmentSta
     token.includes("CONNECTED")
   ) {
     return "IN_TRANSIT";
-  }
-  if (
-    token.includes("EXCEPTION") ||
-    token.includes("UNDELIVER") ||
-    token.includes("FAILED") ||
-    token === "NDR" ||
-    token.includes("NOT_DELIVERED") ||
-    token.includes("HOLD") ||
-    token.includes("ADDRESS")
-  ) {
-    return "EXCEPTION";
   }
   if (token.includes("CREATED") || token.includes("BOOKED") || token.includes("NEW")) return "CREATED";
   return "UNKNOWN";
