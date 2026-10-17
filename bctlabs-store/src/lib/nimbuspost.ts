@@ -5,20 +5,21 @@ import "server-only";
  *
  * Credentials and warehouse settings come from the environment, never from
  * hardcoded values:
- *   NIMBUSPOST_API_KEY             - API key from the NimbusPost dashboard
+ *   NIMBUSPOST_API_KEY             - key id (`npk_...`) from Settings -> API Keys
+ *   NIMBUSPOST_API_SECRET          - secret paired with that key id
  *   NIMBUSPOST_EMAIL/PASSWORD      - fallback: log in for a bearer token
- *   NIMBUSPOST_BASE_URL            - defaults to https://api.nimbuspost.com/v1
+ *   NIMBUSPOST_BASE_URL            - defaults to https://api-v2.nimbuspost.com
  *   ORIGIN_PINCODE_BLR / _ARK      - per-warehouse origin pincodes
  *   NIMBUSPOST_ORIGIN_PINCODE      - legacy single-warehouse origin pincode
  *   NIMBUSPOST_DEFAULT_WAREHOUSE   - BLR | ARK (default ARK)
- *   NIMBUSPOST_PICKUP_WAREHOUSE_ID - optional warehouse id for pickup
- *   NIMBUSPOST_WEBHOOK_SECRET      - optional shared secret for the webhook
+ *   NIMBUSPOST_PICKUP_WAREHOUSE_ID - pickup warehouse id (required to book)
+ *   NIMBUSPOST_WEBHOOK_SECRET      - HMAC secret for the tracking webhook
  *
  * Serviceability is always answered by the live API: no pincode list is kept
  * anywhere in this codebase.
  */
 
-const DEFAULT_BASE_URL = "https://api.nimbuspost.com/v1";
+const DEFAULT_BASE_URL = "https://api-v2.nimbuspost.com";
 
 export type PaymentType = "COD" | "PREPAID";
 
@@ -43,7 +44,9 @@ export class NimbusPostApiError extends Error {
 }
 
 export function isNimbusPostConfigured(): boolean {
-  if (!process.env.NIMBUSPOST_API_KEY && !(process.env.NIMBUSPOST_EMAIL && process.env.NIMBUSPOST_PASSWORD)) {
+  const hasKeyPair = Boolean(process.env.NIMBUSPOST_API_KEY && process.env.NIMBUSPOST_API_SECRET);
+  const hasLogin = Boolean(process.env.NIMBUSPOST_EMAIL && process.env.NIMBUSPOST_PASSWORD);
+  if (!hasKeyPair && !hasLogin) {
     return false;
   }
   return Boolean(originPincode("BLR") || originPincode("ARK"));
@@ -138,22 +141,28 @@ function baseUrl(): string {
 let cachedToken: { token: string; expiresAt: number } | null = null;
 
 /**
- * Resolve the bearer token. An explicit API key wins; otherwise the operator
- * can supply dashboard credentials and we log in (cached for 20 hours).
+ * Partner API v2 authenticates with the key pair; the legacy API used a
+ * bearer token. Returns headers for whichever credential is configured.
  */
-async function authToken(): Promise<string> {
+async function authHeaders(): Promise<Record<string, string>> {
   const apiKey = process.env.NIMBUSPOST_API_KEY;
-  if (apiKey) return apiKey;
+  const apiSecret = process.env.NIMBUSPOST_API_SECRET;
+  if (apiKey && apiSecret) {
+    return { "x-api-key": apiKey, "x-api-secret": apiSecret };
+  }
 
   const email = process.env.NIMBUSPOST_EMAIL;
   const password = process.env.NIMBUSPOST_PASSWORD;
   if (!email || !password) {
     throw new NimbusPostApiError({
       statusCode: 503,
-      message: "NimbusPost is not configured. Set NIMBUSPOST_API_KEY in the environment.",
+      message:
+        "NimbusPost is not configured. Set NIMBUSPOST_API_KEY and NIMBUSPOST_API_SECRET in the environment.",
     });
   }
-  if (cachedToken && cachedToken.expiresAt > Date.now()) return cachedToken.token;
+  if (cachedToken && cachedToken.expiresAt > Date.now()) {
+    return { Authorization: `Bearer ${cachedToken.token}` };
+  }
 
   const response = await fetch(`${baseUrl()}/users/login`, {
     method: "POST",
@@ -176,7 +185,7 @@ async function authToken(): Promise<string> {
     throw new NimbusPostApiError({ statusCode: 502, message: "NimbusPost login returned no token.", details: payload });
   }
   cachedToken = { token, expiresAt: Date.now() + 20 * 60 * 60 * 1000 };
-  return token;
+  return { Authorization: `Bearer ${token}` };
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -189,51 +198,28 @@ async function readJson(response: Response): Promise<unknown> {
   return response.json().catch(() => null);
 }
 
-/**
- * NimbusPost accepts the API key either as `Authorization: Bearer <key>` or as
- * a raw `Authorization: <key>` depending on the account/API version. Start
- * with Bearer and fall back once, then remember what worked.
- */
-let authScheme: "bearer" | "raw" = "bearer";
-
-function send(
-  path: string,
-  init: RequestInit,
-  token: string,
-  scheme: "bearer" | "raw" = authScheme,
-): Promise<Response> {
-  return fetch(`${baseUrl()}${path}`, {
+async function request<T = unknown>(path: string, init: RequestInit = {}): Promise<T> {
+  const headers = await authHeaders();
+  const response = await fetch(`${baseUrl()}${path}`, {
     ...init,
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
       ...(init.headers ?? {}),
-      Authorization: scheme === "bearer" ? `Bearer ${token}` : token,
+      ...headers,
     },
     cache: "no-store",
   });
-}
-
-async function request<T = unknown>(path: string, init: RequestInit = {}): Promise<T> {
-  const token = await authToken();
-  let response = await send(path, init, token);
-  let payload = await readJson(response);
-
-  if (authScheme === "bearer" && (response.status === 401 || response.status === 403)) {
-    const retry = await send(path, init, token, "raw");
-    if (retry.ok) {
-      authScheme = "raw";
-      response = retry;
-      payload = await readJson(response);
-    }
-  }
-
+  const payload = await readJson(response);
   const body = asRecord(payload);
-  if (!response.ok || body?.status === false) {
+  const envelopeError = asRecord(body?.error);
+  if (!response.ok || body?.status === false || body?.success === false) {
     throw new NimbusPostApiError({
       statusCode: response.ok ? 502 : response.status,
       message:
-        (typeof body?.message === "string" && body.message) || `NimbusPost request failed (${response.status})`,
+        (typeof envelopeError?.detail === "string" && envelopeError.detail) ||
+        (typeof body?.message === "string" && body.message) ||
+        `NimbusPost request failed (${response.status})`,
       details: payload,
     });
   }
@@ -245,12 +231,14 @@ async function request<T = unknown>(path: string, init: RequestInit = {}): Promi
 // ---------------------------------------------------------------------------
 
 export type ServiceabilityOption = {
-  courierId: number | null;
+  courierId: string | null;
+  courierCode: string;
   courierName: string;
   freight: number;
   codCharges: number;
   total: number;
   estimatedDeliveryDays: string;
+  tatDays: number | null;
   raw: Record<string, unknown>;
 };
 
@@ -261,6 +249,9 @@ export type ServiceabilityQuery = {
   codAmount?: number;
   /** Pickup warehouse; defaults to NIMBUSPOST_DEFAULT_WAREHOUSE. */
   originWarehouse?: WarehouseCode;
+  lengthCm?: number;
+  widthCm?: number;
+  heightCm?: number;
 };
 
 function firstNumber(source: Record<string, unknown>, keys: string[]): number | null {
@@ -281,49 +272,32 @@ function firstString(source: Record<string, unknown>, keys: string[]): string {
   return "";
 }
 
-/** NimbusPost has returned several envelope shapes over API versions; accept all. */
-function extractCarriers(payload: unknown): Record<string, unknown>[] {
-  const envelope = asRecord(payload);
-  const data = envelope?.data ?? payload;
-  if (Array.isArray(data)) return data.filter((row): row is Record<string, unknown> => Boolean(asRecord(row)));
-  const nested = asRecord(data);
-  if (!nested) return [];
-  for (const key of ["couriers", "available_courier_companies"]) {
-    const list = nested[key];
-    if (Array.isArray(list)) return list.filter((row): row is Record<string, unknown> => Boolean(asRecord(row)));
-  }
-  const deep = Object.values(nested).find(
-    (value) => Array.isArray(value) && value.length > 0 && Boolean(asRecord(value[0])),
-  );
-  if (Array.isArray(deep)) return deep.filter((row): row is Record<string, unknown> => Boolean(asRecord(row)));
-  return [];
+/** Paise are the API's unit; the storefront quotes rupees. */
+function paiseToRupees(value: number | null): number {
+  return value === null ? 0 : Math.round(value) / 100;
 }
 
-function normalizeCarrier(row: Record<string, unknown>): ServiceabilityOption | null {
+function normalizeQuote(row: Record<string, unknown>): ServiceabilityOption | null {
   const courierName =
-    firstString(row, ["courier_name", "name", "courier_company", "courierName"]) ||
-    firstString(row, ["courier", "service_name"]);
+    firstString(row, ["courierDisplayName", "courierName"]) || firstString(row, ["courierCode"]);
   if (!courierName) return null;
 
-  const courierId = firstNumber(row, ["courier_id", "id", "courierId", "courier_company_id"]);
-  const freight =
-    firstNumber(row, ["freight_charges", "freight", "rate", "total_charges", "shipping_charges", "charge"]) ?? 0;
-  const codCharges = firstNumber(row, ["cod_charges", "cod_charge", "cod"]) ?? 0;
-  const days = firstString(row, [
-    "estimated_delivery_days",
-    "estimated_delivery",
-    "delivery_time",
-    "tat",
-    "expected_delivery_days",
-  ]);
+  const rate = asRecord(row.result) ?? {};
+  const freight = paiseToRupees(firstNumber(rate, ["shippingChargesPaise"]));
+  const codCharges = paiseToRupees(firstNumber(rate, ["codChargesPaise"]));
+  const quotedTotal = firstNumber(rate, ["totalPaise"]);
+  const tatDays = firstNumber(row, ["tatDays"]);
 
   return {
-    courierId: courierId === null ? null : Math.trunc(courierId),
+    courierId: firstString(row, ["courierId"]) || null,
+    courierCode: firstString(row, ["courierCode"]),
     courierName,
     freight,
     codCharges,
-    total: freight + codCharges,
-    estimatedDeliveryDays: days,
+    total: quotedTotal === null ? freight + codCharges : paiseToRupees(quotedTotal),
+    estimatedDeliveryDays:
+      tatDays === null ? "" : tatDays === 0 ? "Same day" : `${Math.trunc(tatDays)} day${tatDays === 1 ? "" : "s"}`,
+    tatDays: tatDays === null ? null : Math.trunc(tatDays),
     raw: row,
   };
 }
@@ -341,17 +315,28 @@ export async function checkServiceability(query: ServiceabilityQuery): Promise<S
     });
   }
 
-  const params = new URLSearchParams({
-    origin,
-    destination: query.destinationPincode,
-    payment_type: query.paymentType.toLowerCase(),
-    weight: String(query.weightGrams),
-    cod_amount: String(query.paymentType === "COD" ? Math.max(0, query.codAmount ?? 0) : 0),
+  const payload = await request("/v2/serviceability", {
+    method: "POST",
+    body: JSON.stringify({
+      pickupPincode: origin,
+      deliveryPincode: query.destinationPincode,
+      paymentMode: query.paymentType.toLowerCase(),
+      packages: [
+        {
+          weight: query.weightGrams,
+          length: query.lengthCm ?? 20,
+          width: query.widthCm ?? 15,
+          height: query.heightCm ?? 10,
+        },
+      ],
+      orderValuePaise: Math.round(Math.max(0, query.codAmount ?? 0) * 100),
+    }),
   });
-
-  const payload = await request(`/courier/serviceability?${params.toString()}`, { method: "GET" });
-  return extractCarriers(payload)
-    .map(normalizeCarrier)
+  const data = asRecord(asRecord(payload)?.data) ?? {};
+  const available = Array.isArray(data.available) ? data.available : [];
+  return available
+    .filter((row): row is Record<string, unknown> => Boolean(asRecord(row)))
+    .map(normalizeQuote)
     .filter((option): option is ServiceabilityOption => option !== null)
     .sort((a, b) => a.total - b.total);
 }
@@ -387,7 +372,9 @@ export type CreateShipmentInput = {
   breadthCm?: number;
   heightCm?: number;
   consignee: AddressPayload;
-  courierId?: number | null;
+  courierId?: string | null;
+  items?: { name: string; qty: number; price: number; sku?: string }[];
+  warehouseId?: string;
   warehouseName?: string;
   warehouseAddress?: AddressPayload;
 };
@@ -396,55 +383,69 @@ export type CreatedShipment = {
   shipmentId: string | null;
   awbNumber: string;
   courierName: string;
-  courierId: number | null;
+  courierId: string | null;
   freight: number | null;
   labelUrl: string | null;
   raw: unknown;
 };
 
 export async function createShipment(input: CreateShipmentInput): Promise<CreatedShipment> {
-  const warehouse = input.warehouseAddress;
+  // The pickup warehouse is registered with NimbusPost (its contact phone is
+  // OTP-verified there), so booking references it by id rather than resending
+  // the address.
+  const warehouseId = input.warehouseId || process.env.NIMBUSPOST_PICKUP_WAREHOUSE_ID || "";
+  if (!warehouseId) {
+    throw new NimbusPostApiError({
+      statusCode: 503,
+      message:
+        "Add a pickup warehouse in the NimbusPost dashboard, then set NIMBUSPOST_PICKUP_WAREHOUSE_ID.",
+    });
+  }
+
+  const cod = input.paymentType === "COD";
+  const items = input.items?.length
+    ? input.items.map((item) => ({
+        name: item.name,
+        qty: item.qty,
+        price: Number(item.price.toFixed(2)),
+        ...(item.sku ? { sku: item.sku } : {}),
+      }))
+    : [{ name: `Order ${input.orderNumber}`, qty: 1, price: Number(input.orderAmount.toFixed(2)) }];
+
   const payload: Record<string, unknown> = {
     order_number: input.orderNumber,
-    payment_type: input.paymentType === "COD" ? "cod" : "prepaid",
-    order_amount: Number(input.orderAmount.toFixed(2)),
-    package_weight: input.weightGrams,
-    package_length: input.lengthCm ?? 15,
-    package_breadth: input.breadthCm ?? 10,
-    package_height: input.heightCm ?? 10,
-    consignee: {
+    order_type: "b2c",
+    payment_mode: cod ? "cod" : "prepaid",
+    ...(cod ? { order_collectable_amount: Number((input.codAmount ?? input.orderAmount).toFixed(2)) } : {}),
+    warehouse_id: warehouseId,
+    shipping_address: {
       name: input.consignee.name,
+      ...(input.consignee.email ? { email: input.consignee.email } : {}),
       address: input.consignee.address,
-      address_2: input.consignee.address2 ?? "",
+      address_opt: input.consignee.address2 ?? "",
+      pincode: Number(input.consignee.pincode),
       city: input.consignee.city,
       state: input.consignee.state,
-      pincode: input.consignee.pincode,
-      phone: input.consignee.phone,
-      ...(input.consignee.email ? { email: input.consignee.email } : {}),
+      country: "India",
+      phone: Number(input.consignee.phone.replace(/\D/g, "").slice(-10)),
     },
-    ...(warehouse
-      ? {
-          pickup: {
-            warehouse_name: input.warehouseName ?? "BCTLABS",
-            name: warehouse.name,
-            address: warehouse.address,
-            address_2: warehouse.address2 ?? "",
-            city: warehouse.city,
-            state: warehouse.state,
-            pincode: warehouse.pincode,
-            phone: warehouse.phone,
-          },
-        }
-      : {}),
+    items,
+    package: {
+      weight: Number((input.weightGrams / 1000).toFixed(3)),
+      length: input.lengthCm ?? 20,
+      width: input.breadthCm ?? 15,
+      height: input.heightCm ?? 10,
+    },
   };
 
-  // Passing courier_id makes NimbusPost assign that courier (we pass the
-  // cheapest one); without it the account's default auto-assignment applies.
+  // Passing courier_id pins the cheapest quoted courier; without it NimbusPost
+  // auto-allocates its top-ranked serviceable courier.
   if (input.courierId) payload.courier_id = input.courierId;
 
-  const response = await request("/shipments", { method: "POST", body: JSON.stringify(payload) });
-  const data = asRecord(asRecord(response)?.data) ?? asRecord(response) ?? {};
-  const awbNumber = firstString(data, ["awb_number", "awb", "awbNumber"]);
+  const response = await request("/v2/shipments", { method: "POST", body: JSON.stringify(payload) });
+  const data = asRecord(asRecord(response)?.data) ?? {};
+  const booking = asRecord(data.booking) ?? data;
+  const awbNumber = firstString(booking, ["awb", "awb_number", "awbNumber"]);
 
   if (!awbNumber) {
     throw new NimbusPostApiError({
@@ -455,12 +456,12 @@ export async function createShipment(input: CreateShipmentInput): Promise<Create
   }
 
   return {
-    shipmentId: firstString(data, ["id", "shipment_id", "_id"]) || null,
+    shipmentId: firstString(booking, ["order_id", "shipment_id", "id"]) || null,
     awbNumber,
-    courierName: firstString(data, ["courier_name", "courier", "courierName"]),
-    courierId: firstNumber(data, ["courier_id", "courierId"]),
-    freight: firstNumber(data, ["freight_charges", "freight", "shipping_charges"]),
-    labelUrl: firstString(data, ["label_url", "label", "shipping_label", "labelUrl"]) || null,
+    courierName: firstString(booking, ["courier_name", "courierName", "courier_code"]),
+    courierId: firstString(booking, ["courier_id", "courierId"]) || input.courierId || null,
+    freight: firstNumber(asRecord(booking.price) ?? {}, ["total"]),
+    labelUrl: firstString(booking, ["label_url", "labelUrl"]) || null,
     raw: response,
   };
 }
@@ -475,26 +476,18 @@ export async function createShipment(input: CreateShipmentInput): Promise<Create
  */
 export async function generateManifest(
   awbNumbers: string[],
-  courierId?: string | number | null,
 ): Promise<{ pdfUrl: string | null; raw: unknown }> {
   if (!awbNumbers.length) {
     throw new NimbusPostApiError({ statusCode: 400, message: "At least one AWB is required." });
   }
 
-  const response = await request("/shipments/manifest", {
+  const response = await request("/v2/manifests", {
     method: "POST",
-    body: JSON.stringify({
-      awbs: awbNumbers,
-      ...(courierId ? { courier_id: courierId } : {}),
-    }),
+    body: JSON.stringify({ awbs: awbNumbers }),
   });
 
-  const envelope = asRecord(response);
-  const data = envelope?.data ?? response;
-  const record = asRecord(data);
-  const candidate =
-    (typeof data === "string" && data) ||
-    (record ? firstString(record, ["pdf_url", "url", "manifest_url", "file", "link"]) : "");
+  const data = asRecord(asRecord(response)?.data) ?? {};
+  const candidate = firstString(data, ["manifest_url", "pdf_url", "url"]);
   return { pdfUrl: candidate || null, raw: response };
 }
 

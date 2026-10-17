@@ -33,7 +33,6 @@ export async function POST(request: Request) {
   const result = await buildManifest({
     awbs: parsed.data.awbs,
     courierName: parsed.data.courier_name,
-    courierId: parsed.data.courier_id,
   });
   if (!result.ok) {
     return NextResponse.json(

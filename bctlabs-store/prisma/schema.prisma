@@ -1031,7 +1031,7 @@ model bctlabs_shipments {
   id                      BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
   order_id                BigInt              @unique(map: "uniq_shipment_order") @db.UnsignedBigInt
   awb_number              String?             @unique(map: "uniq_shipment_awb") @db.VarChar(64)
-  courier_id              Int?
+  courier_id              String?             @db.VarChar(64)
   courier_name            String?             @db.VarChar(191)
   nimbuspost_shipment_id  String?             @db.VarChar(64)
   status                  ShipmentStatus      @default(CREATED)

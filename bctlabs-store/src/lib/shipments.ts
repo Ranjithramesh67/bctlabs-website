@@ -9,7 +9,7 @@ export type Shipment = {
   id: number;
   orderId: number;
   awbNumber: string | null;
-  courierId: number | null;
+  courierId: string | null;
   courierName: string | null;
   status: ShipmentStatus;
   statusCode: string | null;
@@ -71,7 +71,7 @@ export async function getShipments(opts: { limit?: number; status?: ShipmentStat
 export type ShipmentInput = {
   orderId: number;
   awbNumber: string;
-  courierId?: number | null;
+  courierId?: string | null;
   courierName?: string | null;
   shipmentId?: string | null;
   freightAmount?: number | null;

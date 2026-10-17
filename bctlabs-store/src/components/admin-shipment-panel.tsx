@@ -156,7 +156,8 @@ export function AdminShipmentPanel({
 
       {!configured ? (
         <p className="mt-3 text-xs text-slate-500">
-          Logistics is not configured. Set NIMBUSPOST_API_KEY and NIMBUSPOST_ORIGIN_PINCODE to enable shipments.
+          Logistics is not configured. Set NIMBUSPOST_API_KEY, NIMBUSPOST_API_SECRET and an origin pincode to
+          enable shipments.
         </p>
       ) : null}
     </div>

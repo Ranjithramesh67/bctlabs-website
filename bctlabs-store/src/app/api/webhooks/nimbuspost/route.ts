@@ -1,4 +1,4 @@
-import { timingSafeEqual } from "crypto";
+import { createHmac, timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
 
 import { applyTrackingUpdate } from "@/lib/shipments";
@@ -77,6 +77,24 @@ function secretMatches(provided: string | null): boolean {
 }
 
 /**
+ * Partner API v2 signs each delivery with HMAC-SHA256 over the raw body and
+ * sends the digest in `x-nimbus-signature` (hex; base64 also accepted).
+ * Compare bytes in constant time.
+ */
+function signatureMatches(rawBody: string, provided: string | null): boolean {
+  const secret = process.env.NIMBUSPOST_WEBHOOK_SECRET;
+  if (!secret || !provided) return false;
+  const digest = createHmac("sha256", secret).update(rawBody, "utf8").digest();
+  const candidates = [digest.toString("hex"), digest.toString("base64")];
+  for (const candidate of candidates) {
+    const a = Buffer.from(provided.trim());
+    const b = Buffer.from(candidate);
+    if (a.length === b.length && timingSafeEqual(a, b)) return true;
+  }
+  return false;
+}
+
+/**
  * Unprotected tracking webhook (authenticated by a shared secret when one is
  * configured). Updates the shipment state and advances the order to completed
  * once delivered. Unknown AWBs are acknowledged so NimbusPost stops retrying
@@ -89,16 +107,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Webhook is not configured" }, { status: 503 });
   }
 
+  const rawBody = await request.text();
+  const signature = request.headers.get("x-nimbus-signature") ?? request.headers.get("x-nimbuspost-signature");
   const url = new URL(request.url);
   const providedSecret =
     request.headers.get("x-nimbuspost-secret") ??
     request.headers.get("x-webhook-secret") ??
     url.searchParams.get("secret");
-  if (!secretMatches(providedSecret)) {
+  if (!signatureMatches(rawBody, signature) && !secretMatches(providedSecret)) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  const rawBody = await request.text();
   let payload: unknown;
   try {
     payload = JSON.parse(rawBody);

@@ -7,9 +7,11 @@ import {
   checkServiceability,
   cheapestOption,
   createShipment,
+  defaultWarehouse,
   defaultItemWeightGrams,
   isNimbusPostConfigured,
   originPincode,
+  warehouse,
   type AddressPayload,
   type PaymentType,
 } from "@/lib/nimbuspost";
@@ -33,7 +35,7 @@ const bodySchema = z.object({
   payment_type: z.enum(["COD", "PREPAID", "Prepaid", "cod", "prepaid"]).optional(),
   weight: z.coerce.number().int().positive().max(50000).optional(),
   shipping: addressSchema.optional(),
-  courier_id: z.coerce.number().int().positive().optional(),
+  courier_id: z.string().trim().min(1).optional(),
   // Optional SKU list from the picking sheet; used only to derive parcel weight.
   items: z
     .array(z.object({ sku: z.string().trim().optional(), quantity: z.coerce.number().int().positive() }))
@@ -174,6 +176,7 @@ export async function POST(request: Request) {
       weightGrams: computedWeight,
       consignee,
       courierId: courier_id ?? chosen.courierId,
+      warehouseId: warehouse(defaultWarehouse()).warehouseId,
       warehouseName: process.env.NIMBUSPOST_PICKUP_NAME || BRAND.name,
       warehouseAddress: pickupAddress(),
     });

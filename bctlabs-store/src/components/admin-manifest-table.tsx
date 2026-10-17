@@ -18,7 +18,7 @@ type ManifestShipment = {
 
 type ManifestGroup = {
   courier: string;
-  courierId: number | null;
+  courierId: string | null;
   shipments: ManifestShipment[];
 };
 

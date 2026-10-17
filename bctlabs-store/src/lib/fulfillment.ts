@@ -63,7 +63,7 @@ async function resolveWarehouse(orderId: number, requested?: WarehouseCode): Pro
  */
 export async function createShippingOrder(
   orderId: number,
-  options: { warehouse?: WarehouseCode; weightGrams?: number; courierId?: number } = {},
+  options: { warehouse?: WarehouseCode; weightGrams?: number; courierId?: string } = {},
 ): Promise<FulfillmentResult> {
   if (!isNimbusPostConfigured()) {
     return { status: "skipped", reason: "NimbusPost is not configured." };
@@ -115,6 +115,7 @@ export async function createShippingOrder(
       weightGrams,
       consignee,
       courierId: options.courierId ?? chosen.courierId,
+      warehouseId: pickup.warehouseId,
       warehouseName: pickup.name,
       warehouseAddress: pickup,
     });

@@ -6,7 +6,6 @@ import { getShipmentByAwb, saveManifest } from "./shipments";
 export type ManifestRequest = {
   awbs: string[];
   courierName?: string;
-  courierId?: string | number;
 };
 
 export type ManifestResult =
@@ -55,7 +54,7 @@ export async function buildManifest(input: ManifestRequest): Promise<ManifestRes
   const courierName = input.courierName || couriers[0] || "NimbusPost";
 
   try {
-    const manifest = await generateManifest(awbs, input.courierId);
+    const manifest = await generateManifest(awbs);
     const batch = await saveManifest(courierName, awbs, manifest.pdfUrl);
     return {
       ok: true,

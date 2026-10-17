@@ -43,16 +43,18 @@ The store runs on http://localhost:4000.
 | `CASHFREE_MOCK` | no | Local/test only (`1`): simulates a successful online payment when no API keys are present. Ignored in production. |
 | `CASHFREE_BASE_URL`, `CASHFREE_API_VERSION` | no | Override the Cashfree API host/version (staging or pinned version). |
 | `BREVO_API_KEY`, `MAIL_FROM_EMAIL`, `MAIL_FROM_NAME` | no | Sends signup verification codes. Without a key, local dev shows the code on screen. |
-| `NIMBUSPOST_API_KEY` | no | NimbusPost API key. Enables delivery checks and shipment booking. |
+| `NIMBUSPOST_API_KEY` | no | NimbusPost API key id (`npk_...`, Settings -> API Keys). Enables delivery checks and shipment booking. |
+| `NIMBUSPOST_API_SECRET` | no | Secret paired with the key id. Required together with `NIMBUSPOST_API_KEY`. |
 | `ORIGIN_PINCODE_ARK`, `ORIGIN_PINCODE_BLR` | no | Origin pincode per warehouse. At least one is required for serviceability. |
 | `NIMBUSPOST_DEFAULT_WAREHOUSE` | no | Warehouse used when a request omits one: `ARK` (default) or `BLR`. |
 | `NIMBUSPOST_ORIGIN_PINCODE` | no | Legacy single-warehouse origin, used when the per-warehouse value is blank. |
-| `NIMBUSPOST_BASE_URL` | no | Defaults to `https://api.nimbuspost.com/v1`. |
-| `NIMBUSPOST_EMAIL`, `NIMBUSPOST_PASSWORD` | no | Dashboard login used to mint a bearer token when no API key is set. |
+| `NIMBUSPOST_BASE_URL` | no | Defaults to `https://api-v2.nimbuspost.com` (Partner API v2). |
+| `NIMBUSPOST_EMAIL`, `NIMBUSPOST_PASSWORD` | no | Legacy only: dashboard login used to mint a bearer token when no key pair is set. |
 | `NIMBUSPOST_PICKUP_*` | no | Shared pickup address/phone for both warehouses; falls back to the brand address. |
 | `NIMBUSPOST_{BLR,ARK}_*` | no | Per-warehouse overrides for name, address, city, state, phone, email and warehouse id. |
+| `NIMBUSPOST_PICKUP_WAREHOUSE_ID` | to book | Pickup warehouse id registered in NimbusPost. Booking fails with a clear message when it is unset. |
 | `NIMBUSPOST_DEFAULT_ITEM_WEIGHT_GRAMS` | no | Weight assumed per line without a product weight (default `500`). |
-| `NIMBUSPOST_WEBHOOK_SECRET` | yes (for tracking) | Shared secret required on tracking webhook calls; without it the webhook rejects every request. |
+| `NIMBUSPOST_WEBHOOK_SECRET` | yes (for tracking) | HMAC secret used to verify the `x-nimbus-signature` header over the raw body; without it the webhook rejects every request. |
 
 ## Routes
 
@@ -110,22 +112,29 @@ New accounts require a 6 digit email code before they are created:
 
 ## Logistics (NimbusPost)
 
-Delivery checks and shipments use the live NimbusPost API; no pincode list is
-stored in the app. With `NIMBUSPOST_API_KEY` and `ORIGIN_PINCODE_ARK` /
+Delivery checks and shipments use the live NimbusPost **Partner API v2**
+(`https://api-v2.nimbuspost.com/v2`), authenticated with the `x-api-key` /
+`x-api-secret` pair; no pincode list is stored in the app. Create the key pair
+under Settings -> API Keys in the NimbusPost dashboard. With
+`NIMBUSPOST_API_KEY`, `NIMBUSPOST_API_SECRET` and `ORIGIN_PINCODE_ARK` /
 `ORIGIN_PINCODE_BLR` set (default warehouse `ARK`):
 
 - Checkout asks `POST /api/logistics/serviceability` before placing the order.
   An empty courier list returns HTTP 400 and blocks the order; a gateway outage
   (503/502) does not block checkout.
 - Staff can book the cheapest courier from the admin order page via
-  `POST /api/logistics/create-order`, which stores the AWB and courier.
+  `POST /api/logistics/create-order`, which stores the AWB and courier. Booking
+  needs a pickup warehouse: add it (and verify its contact phone) in NimbusPost,
+  then set `NIMBUSPOST_PICKUP_WAREHOUSE_ID`.
 - `/admin/logistics` lists pending AWBs grouped by courier;
   `POST /api/admin/logistics/generate-manifest` turns one courier's AWBs into a
   single manifest PDF. `POST /api/logistics/generate-manifest` exposes the same
   builder.
 - `POST /api/webhooks/nimbuspost` consumes tracking updates and advances the
-  shipment state, marking the order completed on delivery. Configure the URL in
-  NimbusPost and set `NIMBUSPOST_WEBHOOK_SECRET` to authenticate the calls.
+  shipment state, marking the order completed on delivery. Register the URL at
+  `{APP_URL}/api/webhooks/nimbuspost` for `tracking.updated` (and optionally the
+  order events) using `NIMBUSPOST_WEBHOOK_SECRET` as the signing secret; the
+  route verifies the HMAC over the raw body with a constant-time compare.
 
 ## Admin access
 

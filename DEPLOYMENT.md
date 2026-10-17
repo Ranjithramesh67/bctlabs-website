@@ -29,9 +29,10 @@ Set these in the Vercel/Netlify dashboard (see `.env.example`):
 | `CASHFREE_BASE_URL`, `CASHFREE_API_VERSION` | no | Override the Cashfree API host/version. |
 | `CASHFREE_MOCK` | no | Local/test only. Ignored in production; never enable on a public deployment. |
 | `BREVO_API_KEY`, `MAIL_FROM_EMAIL`, `MAIL_FROM_NAME` | no | Required in production for signup verification emails. |
-| `NIMBUSPOST_API_KEY`, `ORIGIN_PINCODE_ARK`, `ORIGIN_PINCODE_BLR` | no | Enable delivery checks and shipment booking. Without them checkout skips the pincode check and the admin shipment panel is hidden. |
+| `NIMBUSPOST_API_KEY`, `NIMBUSPOST_API_SECRET`, `ORIGIN_PINCODE_ARK`, `ORIGIN_PINCODE_BLR` | no | Enable delivery checks and shipment booking (Partner API v2 key pair from Settings -> API Keys). Without them checkout skips the pincode check and the admin shipment panel is hidden. |
 | `NIMBUSPOST_DEFAULT_WAREHOUSE` | no | Warehouse used when a request omits one: `ARK` (default) or `BLR`. `NIMBUSPOST_ORIGIN_PINCODE` remains as a legacy fallback. |
-| `NIMBUSPOST_WEBHOOK_SECRET` | yes (for tracking) | Shared secret for `POST /api/webhooks/nimbuspost`; the route fails closed when it is missing. |
+| `NIMBUSPOST_PICKUP_WAREHOUSE_ID` | to book | Pickup warehouse id registered in NimbusPost. Required for AWB booking. |
+| `NIMBUSPOST_WEBHOOK_SECRET` | yes (for tracking) | HMAC secret used to verify `x-nimbus-signature` on `POST /api/webhooks/nimbuspost`; the route fails closed when it is missing. |
 
 ## 3. Database migration
 
@@ -146,11 +147,13 @@ enable online payment at checkout, then register the webhook URL
 Without them, checkout offers cash on delivery only.
 
 The store also reads the optional NimbusPost logistics variables
-(`NIMBUSPOST_API_KEY`, `ORIGIN_PINCODE_ARK`, `ORIGIN_PINCODE_BLR`,
-`NIMBUSPOST_DEFAULT_WAREHOUSE`, plus per-warehouse pickup overrides and
-`NIMBUSPOST_WEBHOOK_SECRET`). When configured, checkout validates the delivery
-pincode against the live API, admin staff can book the cheapest courier,
-generate manifest PDFs from `/admin/logistics` and receive tracking updates at
+(`NIMBUSPOST_API_KEY`, `NIMBUSPOST_API_SECRET`, `ORIGIN_PINCODE_ARK`,
+`ORIGIN_PINCODE_BLR`, `NIMBUSPOST_DEFAULT_WAREHOUSE`,
+`NIMBUSPOST_PICKUP_WAREHOUSE_ID` and `NIMBUSPOST_WEBHOOK_SECRET`). The key pair
+comes from Settings -> API Keys in the NimbusPost dashboard (Partner API v2).
+When configured, checkout validates the delivery pincode against the live API,
+admin staff can book the cheapest courier, generate manifest PDFs from
+`/admin/logistics` and receive HMAC-signed tracking updates at
 `https://bctlabs.com/api/webhooks/nimbuspost`.
 
 ### Running both in production (single server)
