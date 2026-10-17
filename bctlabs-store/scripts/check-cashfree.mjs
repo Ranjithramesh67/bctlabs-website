@@ -39,10 +39,6 @@ if (!appId || !secretKey) {
   process.exit(2);
 }
 
-if (secretKey.startsWith("cfsk_") && !appId.startsWith("CF")) {
-  console.error("App ID does not look like a Cashfree client id (expected to start with CF).");
-}
-
 const response = await fetch(`${base}/orders/cf_credential_probe`, {
   headers: {
     "x-client-id": appId,

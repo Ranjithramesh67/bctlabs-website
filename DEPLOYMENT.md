@@ -144,7 +144,11 @@ The store also reads the optional Cashfree payment variables
 (`CASHFREE_APP_ID`, `CASHFREE_SECRET_KEY`, `CASHFREE_ENV`). Set all three to
 enable online payment at checkout, then register the webhook URL
 `https://bctlabs.com/api/webhooks/cashfree` in the Cashfree dashboard.
-Without them, checkout offers cash on delivery only.
+Without them, checkout offers cash on delivery only. Sandbox and production key
+pairs are host-specific: use `CASHFREE_ENV=sandbox` with test keys and
+`CASHFREE_ENV=production` with live keys. `APP_URL` must be the public HTTPS
+origin (it builds the payment return URL and webhook `notify_url`); verify a pair
+with `npm run check:cashfree` before deploying.
 
 The store also reads the optional NimbusPost logistics variables
 (`NIMBUSPOST_API_KEY`, `NIMBUSPOST_API_SECRET`, `ORIGIN_PINCODE_ARK`,

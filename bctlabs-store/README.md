@@ -91,6 +91,11 @@ Online flow:
 Register the webhook in the Cashfree dashboard pointing at
 `{APP_URL}/api/webhooks/cashfree`.
 
+`APP_URL` must be the public HTTPS origin before going live: it is used for the
+payment return URL and the webhook `notify_url`, so `localhost` only works for a
+local walkthrough. Sandbox keys require `CASHFREE_ENV=sandbox`; live keys require
+`CASHFREE_ENV=production` and are rejected by the other host.
+
 Verify a key pair before deploying (no order is created):
 
 ```bash
