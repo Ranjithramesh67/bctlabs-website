@@ -4,6 +4,7 @@ import { ButtonLink, Container, EmptyState } from "@/components/ui";
 import { getCart } from "@/lib/cart";
 import { getCustomerById } from "@/lib/customers";
 import { isCashfreeConfigured } from "@/lib/cashfree";
+import { defaultItemWeightGrams, isNimbusPostConfigured } from "@/lib/nimbuspost";
 import { computeTotals, type CartItem } from "@/lib/pricing";
 import { getSession } from "@/lib/session";
 import { getStoreSettings } from "@/lib/settings";
@@ -51,6 +52,10 @@ export default async function CheckoutPage() {
   }
 
   const totals = computeTotals(items, settings);
+  const weightGrams = Math.max(
+    1,
+    items.reduce((sum, item) => sum + item.quantity * defaultItemWeightGrams(), 0),
+  );
 
   return (
     <Container className="py-10">
@@ -65,6 +70,8 @@ export default async function CheckoutPage() {
         totals={totals}
         customer={customer}
         cashfreeEnabled={isCashfreeConfigured()}
+        logisticsEnabled={isNimbusPostConfigured()}
+        weightGrams={weightGrams}
       />
     </Container>
   );

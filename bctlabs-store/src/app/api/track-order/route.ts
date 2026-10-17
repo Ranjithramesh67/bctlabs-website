@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { findOrderForTracking, type Order } from "@/lib/orders";
+import { getShipmentForOrder } from "@/lib/shipments";
 
 export type TrackedOrder = {
   id: number;
@@ -35,6 +36,12 @@ export type TrackedOrder = {
     email?: string;
     phone?: string;
   } | null;
+  shipment: {
+    awbNumber: string | null;
+    courierName: string | null;
+    status: string;
+    statusUpdatedAt: string | null;
+  } | null;
 };
 
 const bodySchema = z.object({
@@ -43,7 +50,14 @@ const bodySchema = z.object({
 });
 
 // Never expose the order key or anything beyond what the customer needs to see.
-function serialize(order: Order): TrackedOrder {
+type ShipmentSummary = {
+  awbNumber: string | null;
+  courierName: string | null;
+  status: string;
+  statusUpdatedAt: Date | null;
+} | null;
+
+function serialize(order: Order, shipment: ShipmentSummary): TrackedOrder {
   return {
     id: order.id,
     status: order.status,
@@ -65,6 +79,14 @@ function serialize(order: Order): TrackedOrder {
       productId: item.productId,
     })),
     shippingAddress: order.shippingAddress,
+    shipment: shipment
+      ? {
+          awbNumber: shipment.awbNumber,
+          courierName: shipment.courierName,
+          status: shipment.status,
+          statusUpdatedAt: shipment.statusUpdatedAt ? shipment.statusUpdatedAt.toISOString() : null,
+        }
+      : null,
   };
 }
 
@@ -89,7 +111,8 @@ export async function POST(request: Request) {
     if (!order) {
       return NextResponse.json({ error: "Order not found." }, { status: 404 });
     }
-    return NextResponse.json(serialize(order));
+    const shipment = await getShipmentForOrder(order.id);
+    return NextResponse.json(serialize(order, shipment));
   } catch (error) {
     console.error("Failed to look up order", error);
     return NextResponse.json(

@@ -3,9 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AdminOrderStatus } from "@/components/admin-order-status";
+import { AdminShipmentPanel } from "@/components/admin-shipment-panel";
 import { ButtonLink, Card, Container, StatusBadge } from "@/components/ui";
 import { formatDate, formatPrice } from "@/lib/format";
+import { isNimbusPostConfigured } from "@/lib/nimbuspost";
 import { getOrderById, type Address } from "@/lib/orders";
+import { getShipmentForOrder } from "@/lib/shipments";
 
 export const dynamic = "force-dynamic";
 
@@ -41,6 +44,7 @@ export default async function AdminOrderDetailPage({ params }: OrderDetailPagePr
   const { id } = await params;
   const order = await getOrderById(Number(id));
   if (!order) notFound();
+  const shipment = await getShipmentForOrder(order.id);
 
   const payment = order.paymentTitle || order.paymentMethod || "Not provided";
 
@@ -89,6 +93,28 @@ export default async function AdminOrderDetailPage({ params }: OrderDetailPagePr
         </p>
         <div className="mt-4">
           <AdminOrderStatus orderId={order.id} status={order.status} />
+        </div>
+      </Card>
+
+      <Card className="mt-6 p-5">
+        <h2 className="text-sm font-semibold text-slate-900">Shipment</h2>
+        <p className="mt-1 text-xs text-slate-500">NimbusPost booking, tracking and courier manifest.</p>
+        <div className="mt-4">
+          <AdminShipmentPanel
+            orderId={order.id}
+            configured={isNimbusPostConfigured()}
+            shipment={
+              shipment
+                ? {
+                    awbNumber: shipment.awbNumber,
+                    courierName: shipment.courierName,
+                    status: shipment.status,
+                    statusUpdatedAt: shipment.statusUpdatedAt ? shipment.statusUpdatedAt.toISOString() : null,
+                    manifestUrl: shipment.manifestUrl,
+                  }
+                : null
+            }
+          />
         </div>
       </Card>
 

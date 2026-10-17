@@ -199,11 +199,15 @@ export function CheckoutForm({
   totals,
   customer,
   cashfreeEnabled,
+  logisticsEnabled,
+  weightGrams,
 }: {
   items: CartItem[];
   totals: CartTotals;
   customer: Customer | null;
   cashfreeEnabled: boolean;
+  logisticsEnabled: boolean;
+  weightGrams: number;
 }) {
   const router = useRouter();
 
@@ -240,6 +244,7 @@ export function CheckoutForm({
   const [payment, setPayment] = useState<PaymentMethod>(cashfreeEnabled ? "cashfree" : "cod");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
+  const [deliveryNote, setDeliveryNote] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
   function clearError(key: string) {
@@ -322,6 +327,43 @@ export function CheckoutForm({
     setFormError(null);
     if (Object.keys(nextErrors).length > 0) return;
 
+    // Block checkout when the live serviceability API has no courier for the
+    // destination. A gateway outage (503/502) must not stop orders, so only an
+    // explicit "not deliverable" answer blocks.
+    if (logisticsEnabled) {
+      const postcode = (shipToDifferent ? shipping.postcode : billing.postcode).trim();
+      const field = shipToDifferent ? "shipping.postcode" : "billing.postcode";
+      try {
+        const response = await fetch("/api/logistics/serviceability", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            destination_pincode: postcode,
+            weight: weightGrams,
+            payment_type: payment === "cod" ? "COD" : "PREPAID",
+            cod_amount: payment === "cod" ? totals.total : 0,
+          }),
+        });
+        const data = await response.json().catch(() => null);
+        if (response.status === 400) {
+          setErrors((prev) => ({
+            ...prev,
+            [field]: data?.error || "We cannot deliver to this pincode yet.",
+          }));
+          setFormError(data?.error || "We cannot deliver to this pincode yet.");
+          return;
+        }
+        if (response.ok && data?.cheapest) {
+          const estimate = data.cheapest.estimated_delivery_days
+            ? ` in ${data.cheapest.estimated_delivery_days}`
+            : "";
+          setDeliveryNote(`Deliverable via ${data.cheapest.courier_name}${estimate}.`);
+        }
+      } catch {
+        // Network failure: let the order proceed, the warehouse re-checks.
+      }
+    }
+
     setPending(true);
     try {
       const response = await fetch("/api/orders", {
@@ -401,6 +443,9 @@ export function CheckoutForm({
               errors={errors}
               withContact
             />
+            {deliveryNote ? (
+              <p className="mt-3 text-sm font-medium text-emerald-700">{deliveryNote}</p>
+            ) : null}
           </div>
         </Card>
 

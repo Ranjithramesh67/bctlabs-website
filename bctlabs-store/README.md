@@ -40,6 +40,14 @@ The store runs on http://localhost:4000.
 | `CASHFREE_APP_ID` | no | Cashfree App ID (Developers -> API Keys). Enables online payment at checkout. |
 | `CASHFREE_SECRET_KEY` | no | Cashfree Secret Key. Required for online payment and webhook verification. |
 | `CASHFREE_ENV` | no | `sandbox` (default) or `production`. |
+| `NIMBUSPOST_API_KEY` | no | NimbusPost API key. Enables delivery checks and shipment booking. |
+| `NIMBUSPOST_ORIGIN_PINCODE` | no | Warehouse pincode shipments start from. Required with the API key. |
+| `NIMBUSPOST_BASE_URL` | no | Defaults to `https://api.nimbuspost.com/v1`. |
+| `NIMBUSPOST_EMAIL`, `NIMBUSPOST_PASSWORD` | no | Dashboard login used to mint a bearer token when no API key is set. |
+| `NIMBUSPOST_PICKUP_*` | no | Pickup warehouse address/phone; falls back to the brand address. |
+| `NIMBUSPOST_PICKUP_WAREHOUSE_ID` | no | Warehouse id when the NimbusPost account already has one. |
+| `NIMBUSPOST_DEFAULT_ITEM_WEIGHT_GRAMS` | no | Weight assumed per line without a product weight (default `500`). |
+| `NIMBUSPOST_WEBHOOK_SECRET` | no | Shared secret required on tracking webhook calls. |
 
 ## Routes
 
@@ -49,7 +57,7 @@ The store runs on http://localhost:4000.
 | Cart & checkout | `/cart`, `/checkout`, `/checkout/success`, `/checkout/cashfree/return`, `/order-tracking` |
 | Account | `/account`, `/account/login`, `/account/register`, `/account/orders`, `/account/orders/[id]` |
 | Admin (staff only) | `/admin`, `/admin/orders`, `/admin/orders/[id]`, `/admin/products`, `/admin/customers`, `/admin/messages` |
-| API | `/api/cart`, `/api/orders`, `/api/track-order`, `/api/auth/*`, `/api/admin/*`, `/api/contact`, `/api/payments/cashfree/webhook` |
+| API | `/api/cart`, `/api/orders`, `/api/track-order`, `/api/auth/*`, `/api/admin/*`, `/api/contact`, `/api/logistics/*`, `/api/payments/cashfree/webhook`, `/api/webhooks/nimbuspost` |
 
 ## Payments (Cashfree)
 
@@ -70,6 +78,23 @@ Online flow:
 
 Register the webhook in the Cashfree dashboard pointing at
 `{APP_URL}/api/payments/cashfree/webhook`.
+
+## Logistics (NimbusPost)
+
+Delivery checks and shipments use the live NimbusPost API; no pincode list is
+stored in the app. With `NIMBUSPOST_API_KEY` and `NIMBUSPOST_ORIGIN_PINCODE`
+set:
+
+- Checkout asks `POST /api/logistics/serviceability` before placing the order.
+  An empty courier list returns HTTP 400 and blocks the order; a gateway outage
+  (503/502) does not block checkout.
+- Staff can book the cheapest courier from the admin order page via
+  `POST /api/logistics/create-order`, which stores the AWB and courier.
+- `POST /api/logistics/generate-manifest` (staff only) turns a list of AWBs from
+  one courier into a single manifest PDF.
+- `POST /api/webhooks/nimbuspost` consumes tracking updates and advances the
+  shipment state, marking the order completed on delivery. Configure the URL in
+  NimbusPost and set `NIMBUSPOST_WEBHOOK_SECRET` to authenticate the calls.
 
 ## Admin access
 

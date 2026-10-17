@@ -4,8 +4,9 @@ import { notFound, redirect } from "next/navigation";
 
 import { AccountNav } from "@/components/account-nav";
 import { ButtonLink, Card, Container, StatusBadge } from "@/components/ui";
-import { formatDate, formatPrice } from "@/lib/format";
+import { formatDate, formatPrice, shipmentStatusLabel } from "@/lib/format";
 import { getOrderById, type Address } from "@/lib/orders";
+import { getShipmentForOrder } from "@/lib/shipments";
 import { getSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -45,6 +46,7 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
   const { id } = await params;
   const order = await getOrderById(Number(id));
   if (!order || order.customerId !== session.customerId) notFound();
+  const shipment = await getShipmentForOrder(order.id);
 
   const payment = order.paymentTitle || order.paymentMethod || "Not provided";
 
@@ -191,6 +193,30 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
               <p className="mt-1 text-xs text-slate-500">Method: {order.paymentMethod}</p>
             ) : null}
           </Card>
+
+          {shipment?.awbNumber ? (
+            <Card className="p-5">
+              <h2 className="text-sm font-semibold text-slate-900">Delivery tracking</h2>
+              <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-3">
+                <div>
+                  <dt className="text-xs uppercase tracking-wide text-slate-500">Courier</dt>
+                  <dd className="mt-0.5 font-medium text-slate-900">
+                    {shipment.courierName || "NimbusPost"}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase tracking-wide text-slate-500">AWB number</dt>
+                  <dd className="mt-0.5 font-mono text-slate-900">{shipment.awbNumber}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase tracking-wide text-slate-500">Status</dt>
+                  <dd className="mt-0.5 font-medium text-slate-900">
+                    {shipmentStatusLabel(shipment.status)}
+                  </dd>
+                </div>
+              </dl>
+            </Card>
+          ) : null}
 
           {order.customerNote ? (
             <Card className="p-5">

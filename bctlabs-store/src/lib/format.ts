@@ -82,3 +82,21 @@ export function orderStatusLabel(status: string | null | undefined): string {
   };
   return map[status ?? ""] ?? (status ?? "").replace(/-/g, " ");
 }
+
+const SHIPMENT_STATUS_LABELS: Record<string, string> = {
+  CREATED: "Shipment created",
+  PICKUP_SCHEDULED: "Pickup scheduled",
+  PICKED_UP: "Picked up",
+  IN_TRANSIT: "In transit",
+  OUT_FOR_DELIVERY: "Out for delivery",
+  DELIVERED: "Delivered",
+  RTO_IN_TRANSIT: "Returning to origin",
+  RTO_DELIVERED: "Returned to origin",
+  CANCELLED: "Shipment cancelled",
+  EXCEPTION: "Delivery exception",
+  UNKNOWN: "Awaiting tracking update",
+};
+
+export function shipmentStatusLabel(status: string | null | undefined): string {
+  return SHIPMENT_STATUS_LABELS[status ?? ""] ?? (status ?? "").replace(/_/g, " ").toLowerCase();
+}

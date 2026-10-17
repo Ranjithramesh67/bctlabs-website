@@ -25,6 +25,8 @@ Set these in the Vercel/Netlify dashboard (see `.env.example`):
 | `SESSION_LIFETIME_MINUTES` | no | Default `120`. |
 | `APP_URL` | yes | Public base URL, e.g. `https://your-app.vercel.app`. |
 | `MAIL_TO_EMAIL`, `MAIL_FROM_EMAIL`, `BREVO_API_KEY` | no | Contact-form email relay. Without `BREVO_API_KEY` the message is stored but no email is sent. |
+| `NIMBUSPOST_API_KEY`, `NIMBUSPOST_ORIGIN_PINCODE` | no | Enable delivery checks and shipment booking. Without them checkout skips the pincode check and the admin shipment panel is hidden. |
+| `NIMBUSPOST_WEBHOOK_SECRET` | no | Shared secret for `POST /api/webhooks/nimbuspost`. |
 
 ## 3. Database migration
 
@@ -137,6 +139,13 @@ The store also reads the optional Cashfree payment variables
 enable online payment at checkout, then register the webhook URL
 `https://bctlabs.com/api/payments/cashfree/webhook` in the Cashfree dashboard.
 Without them, checkout offers cash on delivery only.
+
+The store also reads the optional NimbusPost logistics variables
+(`NIMBUSPOST_API_KEY`, `NIMBUSPOST_ORIGIN_PINCODE`, plus optional pickup
+address overrides and `NIMBUSPOST_WEBHOOK_SECRET`). When configured, checkout
+validates the delivery pincode against the live API, admin staff can book the
+cheapest courier, generate manifest PDFs and receive tracking updates at
+`https://bctlabs.com/api/webhooks/nimbuspost`.
 
 ### Running both in production (single server)
 

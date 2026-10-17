@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import type { TrackedOrder } from "@/app/api/track-order/route";
 import { Button, Card, Input, Label, StatusBadge } from "@/components/ui";
-import { formatDate, formatPrice } from "@/lib/format";
+import { formatDate, formatPrice, shipmentStatusLabel } from "@/lib/format";
 
 type FieldErrors = { orderId?: string; email?: string };
 
@@ -199,6 +199,28 @@ export function OrderTrackingForm({
               </tbody>
             </table>
           </div>
+
+          {order.shipment?.awbNumber ? (
+            <div className="border-t border-slate-100 bg-slate-50/60 px-6 py-4">
+              <h2 className="text-sm font-bold text-slate-900">Delivery</h2>
+              <dl className="mt-2 grid gap-2 text-sm sm:grid-cols-3">
+                <div>
+                  <dt className="text-xs uppercase tracking-wide text-slate-500">Courier</dt>
+                  <dd className="font-medium text-slate-800">{order.shipment.courierName || "NimbusPost"}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase tracking-wide text-slate-500">AWB number</dt>
+                  <dd className="font-mono text-slate-800">{order.shipment.awbNumber}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase tracking-wide text-slate-500">Status</dt>
+                  <dd className="font-medium text-slate-800">
+                    {shipmentStatusLabel(order.shipment.status)}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          ) : null}
 
           <div className="grid gap-6 border-t border-slate-100 px-6 py-6 sm:grid-cols-2">
             <div>

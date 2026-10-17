@@ -1005,3 +1005,59 @@ enum wp_awp_user_info_whatsapp_verified {
   Verified
   Not_Verified @map("Not Verified")
 }
+
+/// Shipment lifecycle states mirroring NimbusPost tracking updates.
+enum ShipmentStatus {
+  CREATED
+  PICKUP_SCHEDULED
+  PICKED_UP
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  RTO_IN_TRANSIT
+  RTO_DELIVERED
+  CANCELLED
+  EXCEPTION
+  UNKNOWN
+}
+
+enum ShipmentPaymentType {
+  COD
+  PREPAID
+}
+
+/// One shipment per WooCommerce order (`order_id` -> wp_wc_orders.id).
+model bctlabs_shipments {
+  id                      BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
+  order_id                BigInt              @unique(map: "uniq_shipment_order") @db.UnsignedBigInt
+  awb_number              String?             @unique(map: "uniq_shipment_awb") @db.VarChar(64)
+  courier_id              Int?
+  courier_name            String?             @db.VarChar(191)
+  nimbuspost_shipment_id  String?             @db.VarChar(64)
+  status                  ShipmentStatus      @default(CREATED)
+  status_code             String?             @db.VarChar(64)
+  status_updated_at       DateTime?           @db.DateTime(0)
+  freight_amount          Decimal?            @db.Decimal(10, 2)
+  cod_amount              Decimal?            @db.Decimal(10, 2)
+  payment_type            ShipmentPaymentType @default(PREPAID)
+  weight_grams            Int?                @db.UnsignedInt
+  manifest_url            String?             @db.VarChar(512)
+  manifest_generated_at   DateTime?           @db.DateTime(0)
+  created_at              DateTime            @default(now()) @db.DateTime(0)
+  updated_at              DateTime            @default(now()) @updatedAt @db.DateTime(0)
+
+  @@index([status], map: "idx_shipment_status")
+  @@index([courier_name], map: "idx_shipment_courier")
+}
+
+/// One row per manifest PDF generated for a courier pickup.
+model bctlabs_manifests {
+  id           BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  courier_name String   @db.VarChar(191)
+  awb_numbers  Json
+  pdf_url      String?  @db.VarChar(512)
+  created_at   DateTime @default(now()) @db.DateTime(0)
+
+  @@index([courier_name], map: "idx_manifest_courier")
+  @@index([created_at], map: "idx_manifest_created")
+}
