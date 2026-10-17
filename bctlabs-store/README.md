@@ -40,12 +40,15 @@ The store runs on http://localhost:4000.
 | `CASHFREE_APP_ID` | no | Cashfree App ID (Developers -> API Keys). Enables online payment at checkout. |
 | `CASHFREE_SECRET_KEY` | no | Cashfree Secret Key. Required for online payment and webhook verification. |
 | `CASHFREE_ENV` | no | `sandbox` (default) or `production`. |
+| `CASHFREE_BASE_URL`, `CASHFREE_API_VERSION` | no | Override the Cashfree API host/version (staging or pinned version). |
 | `NIMBUSPOST_API_KEY` | no | NimbusPost API key. Enables delivery checks and shipment booking. |
-| `NIMBUSPOST_ORIGIN_PINCODE` | no | Warehouse pincode shipments start from. Required with the API key. |
+| `ORIGIN_PINCODE_ARK`, `ORIGIN_PINCODE_BLR` | no | Origin pincode per warehouse. At least one is required for serviceability. |
+| `NIMBUSPOST_DEFAULT_WAREHOUSE` | no | Warehouse used when a request omits one: `ARK` (default) or `BLR`. |
+| `NIMBUSPOST_ORIGIN_PINCODE` | no | Legacy single-warehouse origin, used when the per-warehouse value is blank. |
 | `NIMBUSPOST_BASE_URL` | no | Defaults to `https://api.nimbuspost.com/v1`. |
 | `NIMBUSPOST_EMAIL`, `NIMBUSPOST_PASSWORD` | no | Dashboard login used to mint a bearer token when no API key is set. |
-| `NIMBUSPOST_PICKUP_*` | no | Pickup warehouse address/phone; falls back to the brand address. |
-| `NIMBUSPOST_PICKUP_WAREHOUSE_ID` | no | Warehouse id when the NimbusPost account already has one. |
+| `NIMBUSPOST_PICKUP_*` | no | Shared pickup address/phone for both warehouses; falls back to the brand address. |
+| `NIMBUSPOST_{BLR,ARK}_*` | no | Per-warehouse overrides for name, address, city, state, phone, email and warehouse id. |
 | `NIMBUSPOST_DEFAULT_ITEM_WEIGHT_GRAMS` | no | Weight assumed per line without a product weight (default `500`). |
 | `NIMBUSPOST_WEBHOOK_SECRET` | no | Shared secret required on tracking webhook calls. |
 
@@ -56,8 +59,8 @@ The store runs on http://localhost:4000.
 | Storefront | `/`, `/shop`, `/category/[slug]`, `/product/[slug]`, `/search`, `/blog`, `/blog/[slug]`, `/pages/[slug]`, `/about-us`, `/contact-us` |
 | Cart & checkout | `/cart`, `/checkout`, `/checkout/success`, `/checkout/cashfree/return`, `/order-tracking` |
 | Account | `/account`, `/account/login`, `/account/register`, `/account/orders`, `/account/orders/[id]` |
-| Admin (staff only) | `/admin`, `/admin/orders`, `/admin/orders/[id]`, `/admin/products`, `/admin/customers`, `/admin/messages` |
-| API | `/api/cart`, `/api/orders`, `/api/track-order`, `/api/auth/*`, `/api/admin/*`, `/api/contact`, `/api/logistics/*`, `/api/payments/cashfree/webhook`, `/api/webhooks/nimbuspost` |
+| Admin (staff only) | `/admin`, `/admin/orders`, `/admin/orders/[id]`, `/admin/products`, `/admin/customers`, `/admin/messages`, `/admin/logistics` |
+| API | `/api/cart`, `/api/orders`, `/api/track-order`, `/api/auth/*`, `/api/admin/*`, `/api/contact`, `/api/logistics/*`, `/api/payments/cashfree/order`, `/api/webhooks/cashfree`, `/api/webhooks/nimbuspost` |
 
 ## Payments (Cashfree)
 
@@ -69,29 +72,36 @@ otherwise only cash on delivery is offered.
 Online flow:
 
 1. `POST /api/orders` creates the WooCommerce order and a matching Cashfree order
-   (`bct-<orderId>`), returning a payment session.
-2. The browser is handed to the Cashfree checkout SDK to collect the payment.
+   (`bct-<orderId>`); `POST /api/payments/cashfree/order` returns the payment
+   session and reuses an existing one for the same order.
+2. The Cashfree checkout SDK is embedded at checkout (element mode, falling back
+   to the modal) so the customer stays on the store domain.
 3. Cashfree redirects back to `/checkout/cashfree/return`, which verifies the
    payment and marks the order as paid.
-4. `POST /api/payments/cashfree/webhook` confirms payments server-side (HMAC
-   signature verified) even if the customer never returns.
+4. `POST /api/webhooks/cashfree` confirms payments server-side even if the
+   customer never returns. The HMAC is verified over the raw body with a
+   constant-time compare, the amount must match the stored order, and a unique
+   event key makes replays idempotent. `POST /api/payments/cashfree/webhook` is
+   kept as an alias.
 
 Register the webhook in the Cashfree dashboard pointing at
-`{APP_URL}/api/payments/cashfree/webhook`.
+`{APP_URL}/api/webhooks/cashfree`.
 
 ## Logistics (NimbusPost)
 
 Delivery checks and shipments use the live NimbusPost API; no pincode list is
-stored in the app. With `NIMBUSPOST_API_KEY` and `NIMBUSPOST_ORIGIN_PINCODE`
-set:
+stored in the app. With `NIMBUSPOST_API_KEY` and `ORIGIN_PINCODE_ARK` /
+`ORIGIN_PINCODE_BLR` set (default warehouse `ARK`):
 
 - Checkout asks `POST /api/logistics/serviceability` before placing the order.
   An empty courier list returns HTTP 400 and blocks the order; a gateway outage
   (503/502) does not block checkout.
 - Staff can book the cheapest courier from the admin order page via
   `POST /api/logistics/create-order`, which stores the AWB and courier.
-- `POST /api/logistics/generate-manifest` (staff only) turns a list of AWBs from
-  one courier into a single manifest PDF.
+- `/admin/logistics` lists pending AWBs grouped by courier;
+  `POST /api/admin/logistics/generate-manifest` turns one courier's AWBs into a
+  single manifest PDF. `POST /api/logistics/generate-manifest` exposes the same
+  builder.
 - `POST /api/webhooks/nimbuspost` consumes tracking updates and advances the
   shipment state, marking the order completed on delivery. Configure the URL in
   NimbusPost and set `NIMBUSPOST_WEBHOOK_SECRET` to authenticate the calls.

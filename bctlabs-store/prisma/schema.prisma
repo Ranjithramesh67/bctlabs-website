@@ -1042,6 +1042,9 @@ model bctlabs_shipments {
   payment_type            ShipmentPaymentType @default(PREPAID)
   weight_grams            Int?                @db.UnsignedInt
   manifest_url            String?             @db.VarChar(512)
+  label_url               String?             @db.VarChar(512)
+  origin_warehouse        String?             @db.VarChar(16)
+  origin_pincode          String?             @db.VarChar(10)
   manifest_generated_at   DateTime?           @db.DateTime(0)
   created_at              DateTime            @default(now()) @db.DateTime(0)
   updated_at              DateTime            @default(now()) @updatedAt @db.DateTime(0)
@@ -1060,4 +1063,35 @@ model bctlabs_manifests {
 
   @@index([courier_name], map: "idx_manifest_courier")
   @@index([created_at], map: "idx_manifest_created")
+}
+
+/// Append-only tracking timeline for a shipment (drives the customer stepper).
+model bctlabs_shipment_events {
+  id          BigInt         @id @default(autoincrement()) @db.UnsignedBigInt
+  shipment_id BigInt         @db.UnsignedBigInt
+  status      ShipmentStatus
+  status_code String?        @db.VarChar(64)
+  raw_status  String?        @db.VarChar(191)
+  occurred_at DateTime       @db.DateTime(0)
+  created_at  DateTime       @default(now()) @db.DateTime(0)
+
+  @@unique([shipment_id, status, occurred_at], map: "uniq_shipment_event")
+  @@index([shipment_id, occurred_at], map: "idx_shipment_event_shipment")
+}
+
+/// Gateway webhook idempotency ledger. event_key is unique per provider event.
+model bctlabs_payment_events {
+  id            BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  event_key     String    @unique(map: "uniq_payment_event_key") @db.VarChar(191)
+  order_id      BigInt?   @db.UnsignedBigInt
+  provider      String    @db.VarChar(32)
+  event_type    String    @db.VarChar(64)
+  cf_order_id   String?   @db.VarChar(64)
+  cf_payment_id String?   @db.VarChar(64)
+  amount        Decimal?  @db.Decimal(10, 2)
+  payload       Json?
+  created_at    DateTime  @default(now()) @db.DateTime(0)
+
+  @@index([order_id], map: "idx_payment_event_order")
+  @@index([cf_payment_id], map: "idx_payment_event_payment")
 }

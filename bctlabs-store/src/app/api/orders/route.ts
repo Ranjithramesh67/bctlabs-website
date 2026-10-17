@@ -129,7 +129,7 @@ export async function POST(request: Request) {
       customerEmail: billing.email ?? "",
       customerPhone: billing.phone ?? "",
       returnUrl,
-      notifyUrl: `${appUrl}/api/payments/cashfree/webhook`,
+      notifyUrl: `${appUrl}/api/webhooks/cashfree`,
       note: `BCTLABS order #${id}`,
     });
 

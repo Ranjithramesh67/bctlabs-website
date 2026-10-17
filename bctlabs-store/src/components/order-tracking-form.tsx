@@ -74,6 +74,7 @@ export function OrderTrackingForm({
     if (!initialOrder.trim() || !initialEmail.trim()) return;
     autoLookedUp.current = true;
     if (Number(initialOrder) > 0 && EMAIL_PATTERN.test(initialEmail.trim())) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot deep-link lookup
       void lookup(initialOrder, initialEmail);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

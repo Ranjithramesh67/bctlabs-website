@@ -9,7 +9,8 @@ import {
   getCashfreePayments,
   isPaidStatus,
 } from "@/lib/cashfree";
-import { getOrderById, getOrderMeta, markOrderPaid } from "@/lib/orders";
+import { getOrderById, getOrderMeta } from "@/lib/orders";
+import { confirmOrderPayment } from "@/lib/payments";
 import { IconCheck, IconRefresh } from "@/components/icons";
 
 export const dynamic = "force-dynamic";
@@ -47,7 +48,15 @@ export default async function CashfreeReturnPage({ searchParams }: { searchParam
     transactionId = successful ? String(successful.cf_payment_id) : "";
 
     if (paid && order.status === "pending") {
-      await markOrderPaid(orderId, {
+      await confirmOrderPayment({
+        eventKey: `cashfree:RETURN_VERIFY:${transactionId || cfOrderId}`,
+        orderId,
+        provider: "cashfree",
+        eventType: "RETURN_VERIFY",
+        cfOrderId,
+        cfPaymentId: transactionId || null,
+        amount: order.total,
+        payload: { source: "return_page" },
         transactionId,
         paymentMethod: "cashfree",
         paymentTitle: "Cashfree (online payment)",

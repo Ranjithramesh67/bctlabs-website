@@ -8,7 +8,9 @@ import "server-only";
  *   NIMBUSPOST_API_KEY             - API key from the NimbusPost dashboard
  *   NIMBUSPOST_EMAIL/PASSWORD      - fallback: log in for a bearer token
  *   NIMBUSPOST_BASE_URL            - defaults to https://api.nimbuspost.com/v1
- *   NIMBUSPOST_ORIGIN_PINCODE      - warehouse pincode shipments start from
+ *   ORIGIN_PINCODE_BLR / _ARK      - per-warehouse origin pincodes
+ *   NIMBUSPOST_ORIGIN_PINCODE      - legacy single-warehouse origin pincode
+ *   NIMBUSPOST_DEFAULT_WAREHOUSE   - BLR | ARK (default ARK)
  *   NIMBUSPOST_PICKUP_WAREHOUSE_ID - optional warehouse id for pickup
  *   NIMBUSPOST_WEBHOOK_SECRET      - optional shared secret for the webhook
  *
@@ -19,6 +21,8 @@ import "server-only";
 const DEFAULT_BASE_URL = "https://api.nimbuspost.com/v1";
 
 export type PaymentType = "COD" | "PREPAID";
+
+export type WarehouseCode = "BLR" | "ARK";
 
 export type NimbusPostError = {
   statusCode: number;
@@ -42,12 +46,76 @@ export function isNimbusPostConfigured(): boolean {
   if (!process.env.NIMBUSPOST_API_KEY && !(process.env.NIMBUSPOST_EMAIL && process.env.NIMBUSPOST_PASSWORD)) {
     return false;
   }
-  return Boolean(originPincode());
+  return Boolean(originPincode("BLR") || originPincode("ARK"));
 }
 
-/** Warehouse origin pincode, supplied by the operator via env. */
-export function originPincode(): string {
-  return (process.env.NIMBUSPOST_ORIGIN_PINCODE ?? "").trim();
+/**
+ * Origin pincode for a warehouse, supplied by the operator via env.
+ * Falls back to the legacy single-origin variable when a per-warehouse value
+ * is not configured.
+ */
+export function originPincode(warehouse: WarehouseCode = defaultWarehouse()): string {
+  const specific = warehouse === "BLR" ? process.env.ORIGIN_PINCODE_BLR : process.env.ORIGIN_PINCODE_ARK;
+  return (specific ?? process.env.NIMBUSPOST_ORIGIN_PINCODE ?? "").trim();
+}
+
+export function defaultWarehouse(): WarehouseCode {
+  const configured = (process.env.NIMBUSPOST_DEFAULT_WAREHOUSE ?? "ARK").trim().toUpperCase();
+  return configured === "BLR" ? "BLR" : "ARK";
+}
+
+export function isWarehouseCode(value: unknown): value is WarehouseCode {
+  return value === "BLR" || value === "ARK";
+}
+
+export type Warehouse = {
+  code: WarehouseCode;
+  name: string;
+  address: string;
+  address2: string;
+  city: string;
+  state: string;
+  pincode: string;
+  phone: string;
+  email: string;
+  warehouseId: string;
+};
+
+/**
+ * Pickup address for a warehouse. Every field is overridable via
+ * `NIMBUSPOST_<CODE>_*`; the ARK defaults mirror the brand's registered
+ * address, BLR defaults to the Bangalore city warehouse.
+ */
+export function warehouse(code: WarehouseCode): Warehouse {
+  const isBlr = code === "BLR";
+  const fallback = isBlr
+    ? {
+        name: "BCTLABS Bangalore",
+        address: "Bangalore",
+        address2: "",
+        city: "Bangalore",
+        state: "Karnataka",
+      }
+    : {
+        name: "BCTLABS",
+        address: "5/3, Nehruji 8th Street",
+        address2: "Arakkonam, Vellore",
+        city: "Arakkonam",
+        state: "Tamil Nadu",
+      };
+  const prefix = `NIMBUSPOST_${code}_`;
+  return {
+    code,
+    name: process.env[`${prefix}NAME`] || fallback.name,
+    address: process.env[`${prefix}ADDRESS`] || fallback.address,
+    address2: process.env[`${prefix}ADDRESS_2`] ?? fallback.address2,
+    city: process.env[`${prefix}CITY`] || fallback.city,
+    state: process.env[`${prefix}STATE`] || fallback.state,
+    pincode: originPincode(code),
+    phone: process.env[`${prefix}PHONE`] || process.env.NIMBUSPOST_PICKUP_PHONE || "+91 95431 00296",
+    email: process.env[`${prefix}EMAIL`] || process.env.NIMBUSPOST_PICKUP_EMAIL || "bctlabs@gmail.com",
+    warehouseId: process.env[`${prefix}WAREHOUSE_ID`] || process.env.NIMBUSPOST_PICKUP_WAREHOUSE_ID || "",
+  };
 }
 
 /**
@@ -191,6 +259,8 @@ export type ServiceabilityQuery = {
   weightGrams: number;
   paymentType: PaymentType;
   codAmount?: number;
+  /** Pickup warehouse; defaults to NIMBUSPOST_DEFAULT_WAREHOUSE. */
+  originWarehouse?: WarehouseCode;
 };
 
 function firstNumber(source: Record<string, unknown>, keys: string[]): number | null {
@@ -263,11 +333,11 @@ function normalizeCarrier(row: Record<string, unknown>): ServiceabilityOption | 
  * Returns an empty array when no courier covers the route.
  */
 export async function checkServiceability(query: ServiceabilityQuery): Promise<ServiceabilityOption[]> {
-  const origin = originPincode();
+  const origin = originPincode(query.originWarehouse ?? defaultWarehouse());
   if (!origin) {
     throw new NimbusPostApiError({
       statusCode: 503,
-      message: "Logistics is not configured. Set NIMBUSPOST_ORIGIN_PINCODE in the environment.",
+      message: "Logistics is not configured. Set ORIGIN_PINCODE_BLR / ORIGIN_PINCODE_ARK in the environment.",
     });
   }
 
@@ -328,6 +398,7 @@ export type CreatedShipment = {
   courierName: string;
   courierId: number | null;
   freight: number | null;
+  labelUrl: string | null;
   raw: unknown;
 };
 
@@ -367,9 +438,6 @@ export async function createShipment(input: CreateShipmentInput): Promise<Create
       : {}),
   };
 
-  if (process.env.NIMBUSPOST_PICKUP_WAREHOUSE_ID) {
-    payload.pickup_warehouse_id = Number(process.env.NIMBUSPOST_PICKUP_WAREHOUSE_ID);
-  }
   // Passing courier_id makes NimbusPost assign that courier (we pass the
   // cheapest one); without it the account's default auto-assignment applies.
   if (input.courierId) payload.courier_id = input.courierId;
@@ -392,6 +460,7 @@ export async function createShipment(input: CreateShipmentInput): Promise<Create
     courierName: firstString(data, ["courier_name", "courier", "courierName"]),
     courierId: firstNumber(data, ["courier_id", "courierId"]),
     freight: firstNumber(data, ["freight_charges", "freight", "shipping_charges"]),
+    labelUrl: firstString(data, ["label_url", "label", "shipping_label", "labelUrl"]) || null,
     raw: response,
   };
 }
@@ -404,14 +473,20 @@ export async function createShipment(input: CreateShipmentInput): Promise<Create
  * Generate one manifest PDF for a set of AWBs from the same courier.
  * NimbusPost returns either a direct PDF URL or an object containing one.
  */
-export async function generateManifest(awbNumbers: string[]): Promise<{ pdfUrl: string | null; raw: unknown }> {
+export async function generateManifest(
+  awbNumbers: string[],
+  courierId?: string | number | null,
+): Promise<{ pdfUrl: string | null; raw: unknown }> {
   if (!awbNumbers.length) {
     throw new NimbusPostApiError({ statusCode: 400, message: "At least one AWB is required." });
   }
 
   const response = await request("/shipments/manifest", {
     method: "POST",
-    body: JSON.stringify({ awbs: awbNumbers }),
+    body: JSON.stringify({
+      awbs: awbNumbers,
+      ...(courierId ? { courier_id: courierId } : {}),
+    }),
   });
 
   const envelope = asRecord(response);

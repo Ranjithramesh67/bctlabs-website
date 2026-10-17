@@ -77,6 +77,17 @@ function MessagesIcon() {
   );
 }
 
+function LogisticsIcon() {
+  return (
+    <Icon>
+      <path d="M3 7h11v10H3z" />
+      <path d="M14 10h4l3 3v4h-7z" />
+      <circle cx="7" cy="18" r="2" />
+      <circle cx="18" cy="18" r="2" />
+    </Icon>
+  );
+}
+
 function SignOutIcon() {
   return (
     <Icon>
@@ -92,6 +103,7 @@ type NavLink = { href: string; label: string; Icon: ComponentType };
 const LINKS: NavLink[] = [
   { href: "/admin", label: "Dashboard", Icon: DashboardIcon },
   { href: "/admin/orders", label: "Orders", Icon: OrdersIcon },
+  { href: "/admin/logistics", label: "Logistics", Icon: LogisticsIcon },
   { href: "/admin/products", label: "Products", Icon: ProductsIcon },
   { href: "/admin/customers", label: "Customers", Icon: CustomersIcon },
   { href: "/admin/messages", label: "Messages", Icon: MessagesIcon },

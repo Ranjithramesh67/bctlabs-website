@@ -25,7 +25,10 @@ Set these in the Vercel/Netlify dashboard (see `.env.example`):
 | `SESSION_LIFETIME_MINUTES` | no | Default `120`. |
 | `APP_URL` | yes | Public base URL, e.g. `https://your-app.vercel.app`. |
 | `MAIL_TO_EMAIL`, `MAIL_FROM_EMAIL`, `BREVO_API_KEY` | no | Contact-form email relay. Without `BREVO_API_KEY` the message is stored but no email is sent. |
-| `NIMBUSPOST_API_KEY`, `NIMBUSPOST_ORIGIN_PINCODE` | no | Enable delivery checks and shipment booking. Without them checkout skips the pincode check and the admin shipment panel is hidden. |
+| `CASHFREE_APP_ID`, `CASHFREE_SECRET_KEY`, `CASHFREE_ENV` | no | Enable online payment, the embedded checkout and webhook verification. |
+| `CASHFREE_BASE_URL`, `CASHFREE_API_VERSION` | no | Override the Cashfree API host/version. |
+| `NIMBUSPOST_API_KEY`, `ORIGIN_PINCODE_ARK`, `ORIGIN_PINCODE_BLR` | no | Enable delivery checks and shipment booking. Without them checkout skips the pincode check and the admin shipment panel is hidden. |
+| `NIMBUSPOST_DEFAULT_WAREHOUSE` | no | Warehouse used when a request omits one: `ARK` (default) or `BLR`. `NIMBUSPOST_ORIGIN_PINCODE` remains as a legacy fallback. |
 | `NIMBUSPOST_WEBHOOK_SECRET` | no | Shared secret for `POST /api/webhooks/nimbuspost`. |
 
 ## 3. Database migration
@@ -137,14 +140,15 @@ use different `SESSION_SECRET` values.
 The store also reads the optional Cashfree payment variables
 (`CASHFREE_APP_ID`, `CASHFREE_SECRET_KEY`, `CASHFREE_ENV`). Set all three to
 enable online payment at checkout, then register the webhook URL
-`https://bctlabs.com/api/payments/cashfree/webhook` in the Cashfree dashboard.
+`https://bctlabs.com/api/webhooks/cashfree` in the Cashfree dashboard.
 Without them, checkout offers cash on delivery only.
 
 The store also reads the optional NimbusPost logistics variables
-(`NIMBUSPOST_API_KEY`, `NIMBUSPOST_ORIGIN_PINCODE`, plus optional pickup
-address overrides and `NIMBUSPOST_WEBHOOK_SECRET`). When configured, checkout
-validates the delivery pincode against the live API, admin staff can book the
-cheapest courier, generate manifest PDFs and receive tracking updates at
+(`NIMBUSPOST_API_KEY`, `ORIGIN_PINCODE_ARK`, `ORIGIN_PINCODE_BLR`,
+`NIMBUSPOST_DEFAULT_WAREHOUSE`, plus per-warehouse pickup overrides and
+`NIMBUSPOST_WEBHOOK_SECRET`). When configured, checkout validates the delivery
+pincode against the live API, admin staff can book the cheapest courier,
+generate manifest PDFs from `/admin/logistics` and receive tracking updates at
 `https://bctlabs.com/api/webhooks/nimbuspost`.
 
 ### Running both in production (single server)

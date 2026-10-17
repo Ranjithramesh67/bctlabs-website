@@ -4,8 +4,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { clsx } from "clsx";
 import { Button, Card, Input, Label, Select, Textarea } from "@/components/ui";
+import { CashfreeDropIn } from "@/components/cashfree-dropin";
+import { DeliveryCheck } from "@/components/delivery-check";
 import { IconLock, IconShield } from "@/components/icons";
 import type { Customer } from "@/lib/customers";
+import { initialDeliveryStatus, shouldBlockCheckout, type DeliveryStatus } from "@/lib/delivery";
 import { formatPrice } from "@/lib/format";
 import type { CartItem, CartTotals } from "@/lib/pricing";
 
@@ -45,44 +48,6 @@ const PAYMENT_OPTIONS: { value: PaymentMethod; title: string; description: strin
   },
   { value: "cod", title: "Cash on delivery", description: "Pay in cash when your order is delivered." },
 ];
-
-const CASHFREE_SDK_URL = "https://sdk.cashfree.com/js/v3/cashfree.js";
-
-type CashfreeCheckout = {
-  checkout: (options: { paymentSessionId: string; redirectTarget: "_self" | "_blank" }) => Promise<unknown>;
-};
-
-declare global {
-  interface Window {
-    Cashfree?: (options: { mode: "sandbox" | "production" }) => CashfreeCheckout;
-  }
-}
-
-/** Load the Cashfree JS SDK once and resolve with the global factory. */
-function loadCashfreeSdk(): Promise<(options: { mode: "sandbox" | "production" }) => CashfreeCheckout> {
-  return new Promise((resolve, reject) => {
-    if (typeof window === "undefined") {
-      reject(new Error("Cashfree checkout is only available in the browser"));
-      return;
-    }
-    if (window.Cashfree) {
-      resolve(window.Cashfree);
-      return;
-    }
-    const existing = document.querySelector<HTMLScriptElement>(`script[src="${CASHFREE_SDK_URL}"]`);
-    const script = existing ?? document.createElement("script");
-    script.addEventListener("load", () => {
-      if (window.Cashfree) resolve(window.Cashfree);
-      else reject(new Error("Cashfree SDK failed to initialise"));
-    });
-    script.addEventListener("error", () => reject(new Error("Could not load the payment gateway")));
-    if (!existing) {
-      script.src = CASHFREE_SDK_URL;
-      script.async = true;
-      document.body.appendChild(script);
-    }
-  });
-}
 
 const FIELD_LABELS: Record<string, string> = {
   firstName: "First name",
@@ -244,7 +209,14 @@ export function CheckoutForm({
   const [payment, setPayment] = useState<PaymentMethod>(cashfreeEnabled ? "cashfree" : "cod");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
-  const [deliveryNote, setDeliveryNote] = useState<string | null>(null);
+  const [deliveryStatus, setDeliveryStatus] = useState<DeliveryStatus>(initialDeliveryStatus);
+  const [paymentSession, setPaymentSession] = useState<{
+    sessionId: string;
+    mode: "sandbox" | "production";
+  } | null>(null);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [createdOrder, setCreatedOrder] = useState<{ id: number; key: string } | null>(null);
+  const [retryingPayment, setRetryingPayment] = useState(false);
   const [pending, setPending] = useState(false);
 
   function clearError(key: string) {
@@ -325,44 +297,8 @@ export function CheckoutForm({
     const nextErrors = validate();
     setErrors(nextErrors);
     setFormError(null);
+    setPaymentError(null);
     if (Object.keys(nextErrors).length > 0) return;
-
-    // Block checkout when the live serviceability API has no courier for the
-    // destination. A gateway outage (503/502) must not stop orders, so only an
-    // explicit "not deliverable" answer blocks.
-    if (logisticsEnabled) {
-      const postcode = (shipToDifferent ? shipping.postcode : billing.postcode).trim();
-      const field = shipToDifferent ? "shipping.postcode" : "billing.postcode";
-      try {
-        const response = await fetch("/api/logistics/serviceability", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            destination_pincode: postcode,
-            weight: weightGrams,
-            payment_type: payment === "cod" ? "COD" : "PREPAID",
-            cod_amount: payment === "cod" ? totals.total : 0,
-          }),
-        });
-        const data = await response.json().catch(() => null);
-        if (response.status === 400) {
-          setErrors((prev) => ({
-            ...prev,
-            [field]: data?.error || "We cannot deliver to this pincode yet.",
-          }));
-          setFormError(data?.error || "We cannot deliver to this pincode yet.");
-          return;
-        }
-        if (response.ok && data?.cheapest) {
-          const estimate = data.cheapest.estimated_delivery_days
-            ? ` in ${data.cheapest.estimated_delivery_days}`
-            : "";
-          setDeliveryNote(`Deliverable via ${data.cheapest.courier_name}${estimate}.`);
-        }
-      } catch {
-        // Network failure: let the order proceed, the warehouse re-checks.
-      }
-    }
 
     setPending(true);
     try {
@@ -401,24 +337,63 @@ export function CheckoutForm({
         return;
       }
 
+      setCreatedOrder({ id: data.id, key: data.key });
+
       if (data.payment?.provider === "cashfree") {
-        // Hand off to the Cashfree checkout; the order is confirmed on return.
-        const cashfree = await loadCashfreeSdk();
-        await cashfree({ mode: data.payment.mode }).checkout({
-          paymentSessionId: data.payment.sessionId,
-          redirectTarget: "_self",
-        });
+        // Keep the customer on this page and mount the inline payment form.
+        setPaymentSession({ sessionId: data.payment.sessionId, mode: data.payment.mode });
         return;
       }
 
-      router.push(`/checkout/success?order=${data.id}&key=${encodeURIComponent(data.key)}`);
-      router.refresh();
+      goToSuccess({ id: data.id, key: data.key });
     } catch {
       setFormError("Network error. Please check your connection and try again.");
     } finally {
       setPending(false);
     }
   }
+
+  async function retryPayment() {
+    if (!createdOrder) return;
+    setRetryingPayment(true);
+    setPaymentError(null);
+    setPaymentSession(null);
+    try {
+      const response = await fetch("/api/payments/cashfree/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order_id: createdOrder.id, key: createdOrder.key }),
+      });
+      const data = (await response.json().catch(() => null)) as
+        | {
+            payment_session_id?: string;
+            mode?: "sandbox" | "production";
+            error?: string;
+          }
+        | null;
+
+      if (!response.ok || !data?.payment_session_id) {
+        setPaymentError(data?.error ?? "Could not restart the payment. Please try again.");
+        return;
+      }
+
+      setPaymentSession({
+        sessionId: data.payment_session_id,
+        mode: data.mode === "production" ? "production" : "sandbox",
+      });
+    } catch {
+      setPaymentError("Network error. Please check your connection and try again.");
+    } finally {
+      setRetryingPayment(false);
+    }
+  }
+
+  function goToSuccess(order: { id: number; key: string }) {
+    router.push(`/checkout/success?order=${order.id}&key=${encodeURIComponent(order.key)}`);
+    router.refresh();
+  }
+
+  const blockedByDelivery = logisticsEnabled && shouldBlockCheckout(deliveryStatus, logisticsEnabled);
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
@@ -443,9 +418,13 @@ export function CheckoutForm({
               errors={errors}
               withContact
             />
-            {deliveryNote ? (
-              <p className="mt-3 text-sm font-medium text-emerald-700">{deliveryNote}</p>
-            ) : null}
+            <DeliveryCheck
+              pincode={shipToDifferent ? shipping.postcode : billing.postcode}
+              weightGrams={weightGrams}
+              paymentMode={payment === "cod" ? "cod" : "prepaid"}
+              enabled={logisticsEnabled}
+              onStatusChange={setDeliveryStatus}
+            />
           </div>
         </Card>
 
@@ -523,8 +502,38 @@ export function CheckoutForm({
           {payment === "cashfree" ? (
             <p className="mt-4 flex items-center gap-2 text-xs text-slate-500">
               <IconLock className="h-4 w-4 text-emerald-600" />
-              You will be redirected to Cashfree&apos;s secure payment page to complete your purchase.
+              Complete your payment securely in the Cashfree form after placing your order.
             </p>
+          ) : null}
+          {paymentSession ? (
+            <CashfreeDropIn
+              sessionId={paymentSession.sessionId}
+              mode={paymentSession.mode}
+              onSuccess={() => {
+                if (createdOrder) goToSuccess(createdOrder);
+              }}
+              onFailure={(message) => setPaymentError(message)}
+            />
+          ) : null}
+          {paymentError ? (
+            <div
+              role="alert"
+              className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
+            >
+              <p className="font-medium">{paymentError}</p>
+              {createdOrder ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-3"
+                  disabled={retryingPayment}
+                  onClick={retryPayment}
+                >
+                  {retryingPayment ? "Reloading payment..." : "Try again"}
+                </Button>
+              ) : null}
+            </div>
           ) : null}
         </Card>
       </div>
@@ -583,15 +592,19 @@ export function CheckoutForm({
             </div>
           </dl>
 
-          <Button type="submit" size="lg" disabled={pending} className="mt-5 w-full">
-            {pending
-              ? payment === "cashfree"
-                ? "Redirecting to payment..."
-                : "Placing order..."
-              : payment === "cashfree"
-                ? `Pay ${formatPrice(totals.total)} securely`
-                : "Place order"}
+          <Button
+            type="submit"
+            size="lg"
+            disabled={pending || blockedByDelivery || Boolean(paymentSession)}
+            className="mt-5 w-full"
+          >
+            {deliveryStatus.state === "checking" ? "Checking delivery..." : "Place order"}
           </Button>
+          {blockedByDelivery ? (
+            <p className="mt-2 text-center text-xs font-medium text-amber-700">
+              Enter a serviceable delivery pincode to continue.
+            </p>
+          ) : null}
           <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-slate-400">
             <IconShield className="h-3.5 w-3.5" />
             Secure checkout. By placing your order you agree to our terms. All prices in INR.

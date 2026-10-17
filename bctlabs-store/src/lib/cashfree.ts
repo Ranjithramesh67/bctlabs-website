@@ -10,18 +10,21 @@ import { createHmac, timingSafeEqual } from "crypto";
  *   CASHFREE_APP_ID       - Cashfree App ID (x-client-id)
  *   CASHFREE_SECRET_KEY   - Cashfree Secret Key (x-client-secret)
  *   CASHFREE_ENV          - "sandbox" (default) or "production"
+ *   CASHFREE_BASE_URL     - override the API base (default sandbox/production)
+ *   CASHFREE_API_VERSION  - defaults to 2023-08-01
  *
  * See `.env.example`. Until both keys are set, `isCashfreeConfigured()`
  * returns false and the checkout hides the online-payment option.
  */
 
-const API_VERSION = "2023-08-01";
+const DEFAULT_API_VERSION = "2023-08-01";
 
 export function isCashfreeConfigured(): boolean {
   return Boolean(process.env.CASHFREE_APP_ID && process.env.CASHFREE_SECRET_KEY);
 }
 
 function baseUrl(): string {
+  if (process.env.CASHFREE_BASE_URL) return process.env.CASHFREE_BASE_URL.replace(/\/+$/, "");
   return (process.env.CASHFREE_ENV ?? "sandbox").toLowerCase() === "production"
     ? "https://api.cashfree.com/pg"
     : "https://sandbox.cashfree.com/pg";
@@ -35,7 +38,7 @@ function headers(): Record<string, string> {
     "Content-Type": "application/json",
     "x-client-id": appId,
     "x-client-secret": secret,
-    "x-api-version": API_VERSION,
+    "x-api-version": process.env.CASHFREE_API_VERSION || DEFAULT_API_VERSION,
   };
 }
 

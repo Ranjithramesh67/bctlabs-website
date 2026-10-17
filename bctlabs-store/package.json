@@ -9,9 +9,12 @@
     "lint": "eslint",
     "postinstall": "prisma generate",
     "db:pull": "prisma db pull",
-    "db:generate": "prisma generate"
+    "db:generate": "prisma generate",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
+    "@cashfreepayments/cashfree-js": "^1.0.7",
     "@prisma/adapter-mariadb": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "bcryptjs": "^3.0.3",
@@ -26,15 +29,21 @@
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.8",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4.7.0",
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
+    "jsdom": "^29.1.1",
     "playwright": "^1.64.1",
     "prisma": "^7.10.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.7"
   }
 }
