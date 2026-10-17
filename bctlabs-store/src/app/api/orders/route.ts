@@ -67,7 +67,9 @@ export async function POST(request: Request) {
   const { billing, shipping, paymentMethod, customerNote, saveAddress } = parsed.data;
   const payment = PAYMENT_METHODS[paymentMethod];
 
-  const mockCashfree = paymentMethod === "cashfree" && !isCashfreeConfigured() && isCashfreeMockEnabled();
+  // CASHFREE_MOCK is an explicit local opt-in, so it also wins over a live key
+  // pair. It is ignored in production builds.
+  const mockCashfree = paymentMethod === "cashfree" && isCashfreeMockEnabled();
   if (paymentMethod === "cashfree" && !isCashfreeConfigured() && !mockCashfree) {
     return NextResponse.json(
       { error: "Online payment is not available right now. Please choose cash on delivery." },

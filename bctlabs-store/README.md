@@ -43,7 +43,8 @@ The store runs on http://localhost:4000.
 | `CASHFREE_APP_ID` | no | Cashfree App ID (Developers -> API Keys). Enables online payment at checkout. |
 | `CASHFREE_SECRET_KEY` | no | Cashfree Secret Key. Required for online payment and webhook verification. |
 | `CASHFREE_ENV` | no | `sandbox` (default) or `production`. |
-| `CASHFREE_MOCK` | no | Local/test only (`1`): simulates a successful online payment when no API keys are present. Ignored in production. |
+| `CASHFREE_SANDBOX_APP_ID`, `CASHFREE_SANDBOX_SECRET_KEY` | no | Optional sandbox key pair used when `CASHFREE_ENV=sandbox`, so live keys can stay configured for production. |
+| `CASHFREE_MOCK` | no | Local/test only (`1`): simulates a successful online payment instead of calling Cashfree. Ignored in production. |
 | `CASHFREE_BASE_URL`, `CASHFREE_API_VERSION` | no | Override the Cashfree API host/version (staging or pinned version). |
 | `BREVO_API_KEY`, `MAIL_FROM_EMAIL`, `MAIL_FROM_NAME` | no | Sends signup verification codes. Without a key, local dev shows the code on screen. |
 | `NIMBUSPOST_API_KEY` | no | NimbusPost API key id (`npk_...`, Settings -> API Keys). Enables delivery checks and shipment booking. |
@@ -117,9 +118,16 @@ rejected by the gateway with 401.
 ### Test mode
 
 Set `CASHFREE_MOCK=1` in local development to exercise the whole online-payment
-flow (order -> payment -> fulfilment) without Cashfree credentials. The checkout
+flow (order -> payment -> fulfilment) without contacting Cashfree. The checkout
 shows a clearly labelled simulator; the flag is ignored when
-`NODE_ENV=production`.
+`NODE_ENV=production` and wins over a configured key pair.
+
+With sandbox keys, set `CASHFREE_ENV=sandbox` (and optionally
+`CASHFREE_SANDBOX_APP_ID` / `CASHFREE_SANDBOX_SECRET_KEY`). Sandbox does not
+require domain whitelisting. Live keys additionally require the storefront
+origin to be whitelisted in the Cashfree dashboard
+(Developers -> Whitelisting); until then payment sessions fail with a
+domain-not-approved error.
 
 ## Signup verification
 

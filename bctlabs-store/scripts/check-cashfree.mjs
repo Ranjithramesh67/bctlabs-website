@@ -29,13 +29,26 @@ function loadEnv() {
 
 loadEnv();
 
-const appId = (process.argv[2] ?? process.env.CASHFREE_APP_ID ?? "").trim();
-const secretKey = (process.argv[3] ?? process.env.CASHFREE_SECRET_KEY ?? "").trim();
 const env = (process.env.CASHFREE_ENV ?? "sandbox").toLowerCase() === "production" ? "production" : "sandbox";
+// Mirror src/lib/cashfree.ts: sandbox prefers its own pair when one is set.
+const appId = (
+  process.argv[2] ||
+  (env === "sandbox" ? process.env.CASHFREE_SANDBOX_APP_ID || process.env.CASHFREE_APP_ID : process.env.CASHFREE_APP_ID) ||
+  ""
+).trim();
+const secretKey = (
+  process.argv[3] ||
+  (env === "sandbox"
+    ? process.env.CASHFREE_SANDBOX_SECRET_KEY || process.env.CASHFREE_SECRET_KEY
+    : process.env.CASHFREE_SECRET_KEY) ||
+  ""
+).trim();
 const base = env === "production" ? "https://api.cashfree.com/pg" : "https://sandbox.cashfree.com/pg";
 
 if (!appId || !secretKey) {
-  console.error("Missing credentials. Pass them as arguments or set CASHFREE_APP_ID / CASHFREE_SECRET_KEY.");
+  console.error(
+    "Missing credentials. Pass them as arguments or set CASHFREE_APP_ID / CASHFREE_SECRET_KEY.",
+  );
   process.exit(2);
 }
 

@@ -4,7 +4,7 @@ import { ButtonLink, Container, EmptyState } from "@/components/ui";
 import { listAddresses } from "@/lib/addresses";
 import { getCart } from "@/lib/cart";
 import { getCustomerById } from "@/lib/customers";
-import { isCashfreeAvailable, isCashfreeConfigured, isCashfreeMockEnabled } from "@/lib/cashfree";
+import { isCashfreeAvailable, isCashfreeMockEnabled } from "@/lib/cashfree";
 import { defaultItemWeightGrams, isNimbusPostConfigured } from "@/lib/nimbuspost";
 import { computeTotals, type CartItem } from "@/lib/pricing";
 import { getSession } from "@/lib/session";
@@ -73,7 +73,7 @@ export default async function CheckoutPage() {
         customer={customer}
         savedAddresses={savedAddresses}
         cashfreeEnabled={isCashfreeAvailable()}
-        cashfreeMock={isCashfreeMockEnabled() && !isCashfreeConfigured()}
+        cashfreeMock={isCashfreeMockEnabled()}
         logisticsEnabled={isNimbusPostConfigured()}
         weightGrams={weightGrams}
       />

@@ -79,7 +79,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Payment amount does not match the order total." }, { status: 422 });
   }
 
-  if (!isCashfreeConfigured()) {
+  if (isCashfreeMockEnabled()) {
     return NextResponse.json({
       payment_session_id: mockPaymentSession(order.id),
       order_id: order.id,

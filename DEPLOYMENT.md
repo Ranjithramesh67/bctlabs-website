@@ -156,6 +156,14 @@ instead. Production Cashfree rejects non-HTTPS URLs, so the order route fails
 cleanly with a cash-on-delivery suggestion rather than leaving a pending order.
 Verify a pair with `npm run check:cashfree` before deploying.
 
+Sandbox payments do not need domain whitelisting. Live payments do: add the
+storefront origin under Developers -> Whitelisting in the Cashfree dashboard,
+otherwise live payment sessions fail with a domain-not-approved error. Keep a
+separate test pair in `CASHFREE_SANDBOX_APP_ID` / `CASHFREE_SANDBOX_SECRET_KEY`
+so preview environments can stay on `CASHFREE_ENV=sandbox` while production uses
+the live pair. `npm run check:cashfree` exercises the pair for the active
+`CASHFREE_ENV`.
+
 The store also reads the optional NimbusPost logistics variables
 (`NIMBUSPOST_API_KEY`, `NIMBUSPOST_API_SECRET`, `ORIGIN_PINCODE_ARK`,
 `ORIGIN_PINCODE_BLR`, `NIMBUSPOST_DEFAULT_WAREHOUSE`,

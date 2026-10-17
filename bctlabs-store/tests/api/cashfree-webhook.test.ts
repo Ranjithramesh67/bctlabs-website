@@ -54,6 +54,10 @@ const order = {
 
 describe("POST /api/webhooks/cashfree", () => {
   beforeEach(() => {
+    // A real .env may carry a dedicated sandbox pair; this suite signs with
+    // the generic secret, so make that pair authoritative.
+    delete process.env.CASHFREE_SANDBOX_APP_ID;
+    delete process.env.CASHFREE_SANDBOX_SECRET_KEY;
     process.env.CASHFREE_SECRET_KEY = SECRET;
     getOrderById.mockResolvedValue(order);
     confirmOrderPayment.mockResolvedValue({ status: "paid", orderId: 4386 });

@@ -21,6 +21,8 @@ describe("Cashfree Payment Gateway client", () => {
   afterEach(() => {
     delete process.env.CASHFREE_APP_ID;
     delete process.env.CASHFREE_SECRET_KEY;
+    delete process.env.CASHFREE_SANDBOX_APP_ID;
+    delete process.env.CASHFREE_SANDBOX_SECRET_KEY;
     delete process.env.CASHFREE_ENV;
     vi.unstubAllGlobals();
   });
@@ -129,6 +131,39 @@ describe("Cashfree Payment Gateway client", () => {
 
     expect(order.payment_session_id).toBe("session_sandbox");
     expect(String(fetchMock.mock.calls[0][0])).toBe("https://sandbox.cashfree.com/pg/orders");
+  });
+
+  it("uses the dedicated sandbox pair and ignores the live pair in sandbox", async () => {
+    process.env.CASHFREE_ENV = "sandbox";
+    process.env.CASHFREE_SANDBOX_APP_ID = "TEST10900892a42f479420c0ea704c8a29800901";
+    process.env.CASHFREE_SANDBOX_SECRET_KEY = "cfsk_ma_test_secret";
+    const fetchMock = vi.fn().mockResolvedValue(
+      json({
+        cf_order_id: 123456,
+        order_id: "bct-4407",
+        order_status: "ACTIVE",
+        payment_session_id: "session_sandbox",
+        order_amount: 499,
+        order_currency: "INR",
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await createCashfreeOrder({
+      orderId: "bct-4407",
+      amount: 499,
+      customerId: "guest-asha@example.com",
+      customerEmail: "asha@example.com",
+      customerPhone: "9876543210",
+      returnUrl: "http://localhost:4000/checkout/cashfree/return?order=4407",
+    });
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(String(url)).toBe("https://sandbox.cashfree.com/pg/orders");
+    expect(init.headers).toMatchObject({
+      "x-client-id": "TEST10900892a42f479420c0ea704c8a29800901",
+      "x-client-secret": "cfsk_ma_test_secret",
+    });
   });
 
   it("verifies the production webhook HMAC over timestamp + raw body", () => {

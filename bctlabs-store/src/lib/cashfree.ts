@@ -10,6 +10,10 @@ import { createHmac, timingSafeEqual } from "crypto";
  *   CASHFREE_APP_ID       - Cashfree App ID (x-client-id)
  *   CASHFREE_SECRET_KEY   - Cashfree Secret Key (x-client-secret)
  *   CASHFREE_ENV          - "sandbox" (default) or "production"
+ *   CASHFREE_SANDBOX_APP_ID / CASHFREE_SANDBOX_SECRET_KEY
+ *                         - optional sandbox pair, used when
+ *                           CASHFREE_ENV=sandbox so a live pair can stay
+ *                           configured for production.
  *   CASHFREE_BASE_URL     - override the API base (default sandbox/production)
  *   CASHFREE_API_VERSION  - defaults to 2023-08-01
  *
@@ -19,8 +23,29 @@ import { createHmac, timingSafeEqual } from "crypto";
 
 const DEFAULT_API_VERSION = "2023-08-01";
 
+type CashfreeCredentials = { appId: string; secret: string };
+
+function credentials(): CashfreeCredentials | null {
+  if (isCashfreeProduction()) {
+    const appId = process.env.CASHFREE_APP_ID;
+    const secret = process.env.CASHFREE_SECRET_KEY;
+    return appId && secret ? { appId, secret } : null;
+  }
+  // Sandbox: prefer a dedicated test pair, else fall back to the generic pair
+  // (useful when only sandbox keys are configured at all).
+  const appId = process.env.CASHFREE_SANDBOX_APP_ID || process.env.CASHFREE_APP_ID;
+  const secret = process.env.CASHFREE_SANDBOX_SECRET_KEY || process.env.CASHFREE_SECRET_KEY;
+  return appId && secret ? { appId, secret } : null;
+}
+
 export function isCashfreeConfigured(): boolean {
-  return Boolean(process.env.CASHFREE_APP_ID && process.env.CASHFREE_SECRET_KEY);
+  return credentials() !== null;
+}
+
+/** Webhook signing only needs the secret, not a complete key pair. */
+function webhookSecret(): string | undefined {
+  if (isCashfreeProduction()) return process.env.CASHFREE_SECRET_KEY;
+  return process.env.CASHFREE_SANDBOX_SECRET_KEY || process.env.CASHFREE_SECRET_KEY;
 }
 
 export function isCashfreeProduction(): boolean {
@@ -52,13 +77,12 @@ function baseUrl(): string {
 }
 
 function headers(): Record<string, string> {
-  const appId = process.env.CASHFREE_APP_ID;
-  const secret = process.env.CASHFREE_SECRET_KEY;
-  if (!appId || !secret) throw new Error("Cashfree credentials are not configured");
+  const creds = credentials();
+  if (!creds) throw new Error("Cashfree credentials are not configured");
   return {
     "Content-Type": "application/json",
-    "x-client-id": appId,
-    "x-client-secret": secret,
+    "x-client-id": creds.appId,
+    "x-client-secret": creds.secret,
     "x-api-version": process.env.CASHFREE_API_VERSION || DEFAULT_API_VERSION,
   };
 }
@@ -144,7 +168,7 @@ export async function getCashfreeOrder(cashfreeOrderId: string): Promise<Cashfre
  * The signature is HMAC-SHA256 of `timestamp + rawBody`, keyed with the secret.
  */
 export function verifyWebhookSignature(rawBody: string, timestamp: string, signature: string): boolean {
-  const secret = process.env.CASHFREE_SECRET_KEY;
+  const secret = webhookSecret();
   if (!secret || !timestamp || !signature) return false;
   const expected = createHmac("sha256", secret).update(`${timestamp}${rawBody}`).digest("base64");
   const a = Buffer.from(expected);
