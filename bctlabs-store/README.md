@@ -91,6 +91,17 @@ Online flow:
 Register the webhook in the Cashfree dashboard pointing at
 `{APP_URL}/api/webhooks/cashfree`.
 
+Verify a key pair before deploying (no order is created):
+
+```bash
+node scripts/check-cashfree.mjs
+```
+
+It reads `CASHFREE_APP_ID` / `CASHFREE_SECRET_KEY` (and `CASHFREE_ENV`) from
+`.env`, or accepts them as arguments. Payment Gateway keys are a different
+product from the Payouts keys shown on some Cashfree screens; Payouts keys are
+rejected by the gateway with 401.
+
 ### Test mode
 
 Set `CASHFREE_MOCK=1` in local development to exercise the whole online-payment

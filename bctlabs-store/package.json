@@ -10,6 +10,7 @@
     "postinstall": "prisma generate",
     "db:pull": "prisma db pull",
     "db:generate": "prisma generate",
+    "check:cashfree": "node scripts/check-cashfree.mjs",
     "test": "vitest run",
     "test:watch": "vitest"
   },
