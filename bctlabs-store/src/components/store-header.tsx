@@ -74,7 +74,7 @@ export function StoreHeader({
       <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:gap-5 sm:px-6 lg:px-8">
         <BrandLogo storeName={storeName} />
 
-        <form onSubmit={submitSearch} className="hidden flex-1 md:block">
+        <form onSubmit={submitSearch} role="search" className="hidden flex-1 md:block">
           <div className="relative w-full">
             <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
               <IconSearch className="h-4 w-4" />
@@ -124,6 +124,29 @@ export function StoreHeader({
         </div>
       </div>
 
+      {/* Mobile search: always visible so it is not hidden behind the menu. */}
+      <form
+        onSubmit={submitSearch}
+        role="search"
+        className="border-t border-slate-100 px-4 pb-3 pt-3 md:hidden"
+      >
+        <div className="relative">
+          <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+            <IconSearch className="h-4 w-4" />
+          </span>
+          <input
+            value={term}
+            onChange={(e) => setTerm(e.target.value)}
+            placeholder="Search components, boards, sensors..."
+            aria-label="Search products"
+            type="search"
+            enterKeyHint="search"
+            autoComplete="off"
+            className="w-full rounded-full border border-slate-300 bg-slate-50 py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+          />
+        </div>
+      </form>
+
       {/* Desktop nav with category mega-menu */}
       <nav className="hidden border-t border-slate-100 bg-white lg:block">
         <div className="mx-auto flex max-w-7xl items-center gap-1 px-4 text-sm sm:px-6 lg:px-8">
@@ -170,20 +193,6 @@ export function StoreHeader({
       {/* Mobile drawer */}
       {open ? (
         <div className="border-t border-slate-100 bg-white px-4 py-4 lg:hidden">
-          <form onSubmit={submitSearch} className="mb-4">
-            <div className="relative">
-              <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
-                <IconSearch className="h-4 w-4" />
-              </span>
-              <input
-                value={term}
-                onChange={(e) => setTerm(e.target.value)}
-                placeholder="Search products..."
-                aria-label="Search products"
-                className="w-full rounded-full border border-slate-300 bg-slate-50 py-2.5 pl-10 pr-3 text-sm"
-              />
-            </div>
-          </form>
           <div className="grid grid-cols-2 gap-1 text-sm">
             {navLinks.map((link) => (
               <Link
