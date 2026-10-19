@@ -108,6 +108,27 @@ export type CreateCashfreeOrderInput = {
   note?: string;
 };
 
+/**
+ * Cashfree only accepts alphanumeric, underscore and hyphen in customer ids,
+ * so a guest email has to be normalised (`guest-name@example.com` is invalid).
+ */
+export function cashfreeCustomerId(raw: string, fallback = "guest"): string {
+  const cleaned = raw
+    .trim()
+    .replace(/[^a-zA-Z0-9_-]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 50);
+  return cleaned || fallback;
+}
+
+/** Cashfree expects a plain 10 digit Indian mobile number. */
+export function cashfreePhone(raw: string | undefined | null, fallback = "9999999999"): string {
+  const digits = (raw ?? "").replace(/\D/g, "");
+  if (digits.length === 10) return digits;
+  if (digits.length === 12 && digits.startsWith("91")) return digits.slice(2);
+  return fallback;
+}
+
 /** Create a Cashfree order and return its payment session. */
 export async function createCashfreeOrder(input: CreateCashfreeOrderInput): Promise<CashfreeOrder> {
   // Production Cashfree rejects non-HTTPS return/notify URLs. Fail with an
@@ -132,9 +153,9 @@ export async function createCashfreeOrder(input: CreateCashfreeOrderInput): Prom
       order_amount: Number(input.amount.toFixed(2)),
       order_currency: input.currency ?? "INR",
       customer_details: {
-        customer_id: input.customerId,
+        customer_id: cashfreeCustomerId(input.customerId),
         customer_email: input.customerEmail,
-        customer_phone: input.customerPhone,
+        customer_phone: cashfreePhone(input.customerPhone),
       },
       order_meta: {
         return_url: input.returnUrl,

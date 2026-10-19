@@ -1,7 +1,12 @@
 import { createHmac } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createCashfreeOrder, verifyWebhookSignature } from "@/lib/cashfree";
+import {
+  cashfreeCustomerId,
+  cashfreePhone,
+  createCashfreeOrder,
+  verifyWebhookSignature,
+} from "@/lib/cashfree";
 
 function json(payload: unknown, status = 200) {
   return new Response(JSON.stringify(payload), {
@@ -176,5 +181,48 @@ describe("Cashfree Payment Gateway client", () => {
     expect(verifyWebhookSignature(rawBody, timestamp, signature)).toBe(true);
     expect(verifyWebhookSignature(rawBody, timestamp, "bm90LWEtc2lnbmF0dXJl")).toBe(false);
     expect(verifyWebhookSignature(rawBody, "", signature)).toBe(false);
+  });
+
+  it("normalises guest emails into gateway-safe customer ids", () => {
+    expect(cashfreeCustomerId("guest-asha@example.com")).toBe("guest-asha_example_com");
+    expect(cashfreeCustomerId("cust-33")).toBe("cust-33");
+    expect(cashfreeCustomerId("  ...  ")).toBe("guest");
+    expect(cashfreeCustomerId("a".repeat(80))).toHaveLength(50);
+  });
+
+  it("normalises phone numbers to 10 digits", () => {
+    expect(cashfreePhone("+91 98765 43210")).toBe("9876543210");
+    expect(cashfreePhone("9876543210")).toBe("9876543210");
+    expect(cashfreePhone("")).toBe("9999999999");
+  });
+
+  it("sends a sanitised guest customer id to the gateway", async () => {
+    process.env.CASHFREE_ENV = "sandbox";
+    const fetchMock = vi.fn().mockResolvedValue(
+      json({
+        cf_order_id: 1,
+        order_id: "bct-4408",
+        order_status: "ACTIVE",
+        payment_session_id: "session_guest",
+        order_amount: 499,
+        order_currency: "INR",
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await createCashfreeOrder({
+      orderId: "bct-4408",
+      amount: 499,
+      customerId: "guest-asha@example.com",
+      customerEmail: "asha@example.com",
+      customerPhone: "+91 98765 43210",
+      returnUrl: "http://localhost:4000/checkout/cashfree/return?order=4408",
+    });
+
+    const payload = JSON.parse(String(fetchMock.mock.calls[0][1].body));
+    expect(payload.customer_details).toMatchObject({
+      customer_id: "guest-asha_example_com",
+      customer_phone: "9876543210",
+    });
   });
 });
