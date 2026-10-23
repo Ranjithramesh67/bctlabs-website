@@ -1,0 +1,32 @@
+{
+  "voice": "en-IN-NeerjaExpressiveNeural",
+  "rate": "-6%",
+  "pitch": "+2Hz",
+  "marketing": [
+    { "id": "m1", "text": "This is B C T Labs. Since twenty thirteen, we have been putting the right components into the hands of makers, students and engineers across India." },
+    { "id": "m2", "text": "It starts with a storefront that respects your time. Sixty six parts, twelve categories, and one warehouse in Bengaluru. Every listing you see is stock we actually hold." },
+    { "id": "m3", "text": "Browse by category, or narrow it down. Filter by price, availability, and the specs that matter. What you see is what is on the shelf." },
+    { "id": "m4", "text": "Open any part, and you get the details an engineer needs. The exact variant, the specifications, the price, and live stock. Add it to the cart in one tap." },
+    { "id": "m5", "text": "Your cart keeps the maths simple. Subtotal, delivery and any discount are clear before you commit. No surprises at the end." },
+    { "id": "m6", "text": "Checkout works for guests as well as account holders. Enter your details once, and we save the address to your book for next time." },
+    { "id": "m7", "text": "Pay with U P I, cards, net banking or wallets, through Cashfree. The payment is confirmed on our server, never in the browser. An order is only marked paid when the money is really there." },
+    { "id": "m8", "text": "The moment it clears, you get an order number, a GST invoice, and a tracking link. You can follow the parcel without ever creating an account." },
+    { "id": "m9", "text": "Signed in, your address book and order history stay in one place. Reorder in two taps." },
+    { "id": "m10", "text": "And when it ships, the tracking page shows exactly where your parcel is, and when it will reach you." },
+    { "id": "m11", "text": "B C T Labs. Components that build the future. Bengaluru, India." }
+  ],
+  "admin": [
+    { "id": "a1", "text": "Now the other side. The B C T Labs admin console, where every order, customer and shipment is managed." },
+    { "id": "a2", "text": "Staff sign in with a dedicated admin account. Customers never see this area." },
+    { "id": "a3", "text": "The dashboard is your morning briefing. Revenue, open orders, customers and low stock, all on one screen." },
+    { "id": "a4", "text": "Orders arrive here the moment someone checks out. Statuses are live. Processing, shipped, delivered, failed. Search by order number, or filter by status and date." },
+    { "id": "a5", "text": "Open an order, and everything is in one place. Line items, payment status, the shipping address, and the full timeline of what happened, and when." },
+    { "id": "a6", "text": "From here you create the shipment. Rates and serviceability come from Nimbus Post, and the A W B is booked against the order without leaving the page." },
+    { "id": "a7", "text": "Products holds the catalogue and the stock. Price, variant, category and availability are edited in place, and low stock is flagged before it becomes a problem." },
+    { "id": "a8", "text": "Customers shows who is buying. Contact details, saved addresses, order count and lifetime value, so support can answer without digging." },
+    { "id": "a9", "text": "Logistics collects the day's shipments into a manifest, ready for pickup. Tracking updates flow back through a signed webhook, and update the order automatically." },
+    { "id": "a10", "text": "Payments are reconciled by webhook. The signature is checked against the raw request body, and the amount is validated against the stored order, before anything is marked paid." },
+    { "id": "a11", "text": "Contact messages and enquiries land in Messages, so nothing gets lost in an inbox." },
+    { "id": "a12", "text": "One console for the storefront, the money, and the parcels. That is B C T Labs admin." }
+  ]
+}

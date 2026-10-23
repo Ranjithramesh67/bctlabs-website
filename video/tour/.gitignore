@@ -1,0 +1,14 @@
+# Generated media. Regenerate with the commands in README.md.
+vo/raw/
+vo/raw2/
+vo/proc/
+vo/proc2/
+vo/*.wav
+v2/prev/
+v2/qa*/
+*.mp4
+captures/
+
+# python
+__pycache__/
+*.pyc
